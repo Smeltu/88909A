@@ -144,9 +144,7 @@ void RobotController::DriveStraight(double inches, double targetHeading, double 
   double headingError = targetHeading - m_Tracker.getHeading();
   double error = inches / degreesToInches;
   double lastError = error;
-  double v = 0;
   double counter = 0;
-  double lastUpdate = 0;
   dsPID.start(error);
   dsSC.start();
   aePID.start(headingError);
@@ -156,13 +154,6 @@ void RobotController::DriveStraight(double inches, double targetHeading, double 
     //update errors
     error = targetDegrees - m_Tracker.getAxial();
     headingError = angleError(targetHeading);
-    if (error != lastError) { //used to smooth out pid since motor doesn't update values that fast (NOT NEEDED ANYMORE?)
-      v = (error - lastError) / (counter - lastUpdate);
-      lastUpdate = counter;
-    }
-    else {
-      v *= (counter - lastUpdate - 1.0) / (counter - lastUpdate);
-    }
 
     //calculate a
     double a = aePID.calculate(headingError);
@@ -189,14 +180,11 @@ void RobotController::DriveStraight(double inches, double targetHeading, double 
       break;
     }
 
-    //cap speed at start??
-    //out = range(out, minSpeed, (RightDrive.velocity(vex::velocityUnits::pct)+LeftDrive.velocity(vex::velocityUnits::pct))/2.0+50);
-
     //angLimit
     if(angLimit) {
       a = arPID.calculate(headingError);
       a = range(a, 0, maxSpeed);
-      out *= pow(cos(fmin(fabs(headingError),90.0) / 180.0 * PI),2);
+      out *= pow(cos(fmin(fabs(headingError), 90.0) / 180.0 * PI), 2);
     }
 
     //output 
@@ -274,7 +262,10 @@ void RobotController::DriveArc(double X, double Y, bool Forward, double maxSpeed
     //std::cout<<error<<" "<<out<<" "<<targetHeading<<std::endl;
   }
   std::cout << "driveArc done; x: " << m_Tracker.getX() << " y: " << m_Tracker.getY() << std::endl;
-  if(minSpeed == maxSpeed) {Output(minSpeed,minSpeed);return;}
+  if(minSpeed == maxSpeed) {
+    Output(minSpeed, minSpeed);
+    return;
+  }
   StopMotors();
 }
 
@@ -294,9 +285,9 @@ void RobotController::Output(double leftPct, double rightPct) {
   leftFirst = !leftFirst;
   if (leftFirst) {
     LeftDrive.spin(left, leftPct * 3 / 25.0, vex::voltageUnits::volt);
-  }
-  RightDrive.spin(right, rightPct * 3 / 25.0, vex::voltageUnits::volt);
-  if (!leftFirst) {
+    RightDrive.spin(right, rightPct * 3 / 25.0, vex::voltageUnits::volt);
+  } else {
+    RightDrive.spin(right, rightPct * 3 / 25.0, vex::voltageUnits::volt);
     LeftDrive.spin(left, leftPct * 3 / 25.0, vex::voltageUnits::volt);
   }
 }
