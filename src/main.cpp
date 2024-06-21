@@ -3,7 +3,7 @@
 /*    Module:       main.cpp                                                  */
 /*    Author:       88909A                                                    */
 /*    Created:      Mon Mar 13 2023                                           */
-/*    Description:  Over Under                                                */
+/*    Description:  Code for Team 88909A                                      */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
 
