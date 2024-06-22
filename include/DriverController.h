@@ -3,7 +3,6 @@
 
 class DriverController {
   private: void RunDriveTrain();
-  void RunIntake();
 
   public: DriverController();
   void resetDriveMotors();
