@@ -77,9 +77,6 @@ void armDown() {
   Slapper.spinToPosition(-20,degrees,100,vex::velocityUnits::pct,false);
 }
 
-void toggleWings() {
-  Wings.set(!Wings.value());
-}
 
 DriverController::DriverController() {}
 
@@ -91,8 +88,6 @@ void DriverController::Run(vex::competition Competition) {
   Controller1.ButtonB.pressed(armBackward);
   Controller1.ButtonRight.pressed(armUp);
   Controller1.ButtonDown.pressed(armDown);
-
-  Controller1.ButtonL1.pressed(toggleWings);
 
   theTracker.Start();
   Auton.Init(0,0,0);

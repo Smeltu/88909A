@@ -83,51 +83,38 @@ void RobotController::Goto(double X, double Y, double AngleCalibrate, bool Forwa
 }
 
 void RobotController::RotateTo(double TargetAngle, Event positionEvent /*=NULL*/ , double EventAngle /*= 0*/ ) {
-  std::cout << "Starting RotateTo; TargetAngle: " << TargetAngle << std::endl;
   double angle = m_Tracker.getHeading();
-  if (fabs(TargetAngle - angle) < 0.3) // Don't rotate if less than 0.3 degree
+  if (fabs(TargetAngle - angle) < 0.3) { // Don't rotate if less than 0.3 degree
+    std::cout << "RotateTo Exited (Low Error)" << std::endl;
     return;
-  double v = 0;
+  }
+  
+  std::cout << "Starting RotateTo; TargetAngle: " << TargetAngle << ", Current Angle: " << angle << std::endl;
+  
   double error = angleError(TargetAngle);
   double lastError = error;
-  int counter = 0;
-  int lastUpdate = 0;
+
   rtPID.start(error);
-  int moveCheck = error;
+  rtSC.start();
+
   while (fabs(error) > 0.3) {
-    counter++;
     error = angleError(TargetAngle);
-    if(counter%100==0) {
-      if(fabs(moveCheck-error)<0.4) {
-        std::cout<<"no movement ";
-        break;
+    double speed = range(rtPID.calculate(error), 23);
+
+    if(rtSC.calculate(speed)) { //stallcheck
+      std::cout << "rtSC" << std::endl;
+      if(fabs(error) <= 0.3) {
+        break; 
       }
-      moveCheck = error;
+      rtPID.start(error);
+      rtSC.start();
     }
-    if (error != lastError) {
-      v = (error - lastError)/(counter - lastUpdate);
-      lastUpdate = counter;
-    }
-    double speed = rtPID.calculate(error);
-    /*if(fabs(speed) < 0.05 && fabs(error) < 3) {
-      std::cout<<"low output ";
-      break;
-    }*/
-    speed = range(speed, 23);//18
-    /*if(rtSC.calculate(speed)) {
-      std::cout<<"rtSC"<<std::endl;
-      if(fabs(error) > 0.3) {
-        dsPID.start(error);
-        dsSC.start(); 
-      }
-      else {
-        break;
-      }
-    }*/
+    
     Output(-speed, speed);
     lastError = error;
     vex::task::sleep(10);
   }
+
   std::cout << "RotateTo done; x: " << m_Tracker.getX() << " y: " << m_Tracker.getY() << " Error: " << angleError(TargetAngle) << std::endl;
   StopMotors();
 }
