@@ -15,9 +15,6 @@ extern motor_group LeftDrive;
 extern motor_group RightDrive;
 
 extern motor Intake;
-extern motor SlapperA;
-extern motor SlapperB;
-extern motor_group Slapper;
 
 extern inertial Inertial;
 extern rotSub Axial;
@@ -26,8 +23,7 @@ extern controller Controller1;
 extern optical Optical;
 extern distance Distance;
 
-extern digital_out Wings;
-extern digital_out Pto;
+extern digital_out Hook;
 
 
 /**

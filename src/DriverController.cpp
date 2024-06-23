@@ -39,6 +39,9 @@ void intakeBackward() {
   }
 }
 
+void toggleHook() {
+  Hook.set(!Hook.value());
+}
 
 DriverController::DriverController() {}
 
@@ -46,6 +49,7 @@ DriverController::DriverController() {}
 void DriverController::Run(vex::competition Competition) {
   Controller1.ButtonR1.pressed(intakeForward);
   Controller1.ButtonR2.pressed(intakeBackward);
+  Controller1.ButtonL1.pressed(toggleHook);
 
   theTracker.Start();
   Auton.Init(0,0,0);

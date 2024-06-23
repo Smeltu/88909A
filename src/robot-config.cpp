@@ -20,9 +20,6 @@ motor_group LeftDrive = motor_group(LeftDriveMotorA, LeftDriveMotorB, LeftDriveM
 motor_group RightDrive = motor_group(RightDriveMotorA, RightDriveMotorB, RightDriveMotorC);
 
 motor Intake = motor(PORT21, ratio6_1, false);//21
-motor SlapperA = motor(PORT19, ratio18_1, true);//18
-motor SlapperB = motor(PORT10, ratio18_1, false);
-motor_group Slapper = motor_group(SlapperA, SlapperB);
 
 inertial Inertial = inertial(PORT15,turnType::left);
 optical Optical = optical(PORT4);
@@ -30,8 +27,7 @@ distance Distance = distance(PORT9);
 rotSub Axial = rotSub(PORT9, false);
 rotSub Lateral = rotSub(PORT2, false);
 controller Controller1 = controller(primary);
-digital_out Wings = digital_out(Brain.ThreeWirePort.A);
-digital_out Pto = digital_out(Brain.ThreeWirePort.G);
+digital_out Hook = digital_out(Brain.ThreeWirePort.A);
 
 
 // VEXcode generated functions

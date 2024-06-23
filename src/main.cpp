@@ -71,11 +71,7 @@ void driverControl(void) {
 void preAutonomous(void) {
   LeftDrive.resetPosition();
   RightDrive.resetPosition();
-  Slapper.resetPosition();
-  Slapper.setTimeout(5,seconds);
   Intake.resetPosition();
-  Pto.set(false);
-  Wings.set(false);
   Axial.resetPosition();
   Lateral.resetPosition();
   Axial.setdatarate(10);
