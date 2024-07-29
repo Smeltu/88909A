@@ -19,7 +19,7 @@ motor RightDriveMotorC = motor(PORT14, ratio6_1, false);
 motor_group LeftDrive = motor_group(LeftDriveMotorA, LeftDriveMotorB, LeftDriveMotorC);
 motor_group RightDrive = motor_group(RightDriveMotorA, RightDriveMotorB, RightDriveMotorC);
 
-motor Intake = motor(PORT1, ratio6_1, false);//21
+motor Intake = motor(PORT5, ratio18_1, false);
 
 inertial Inertial = inertial(PORT15,turnType::left);
 optical Optical = optical(PORT4);
