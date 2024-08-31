@@ -28,7 +28,7 @@ const int ofs2 = 5;
 const int tests = 6;
 const int empty = 8;
 
-int autonMode = ofs; // change this for different autons
+int autonMode = tests; // change this for different autons
 double iBrightness = 0;
 
 //objects

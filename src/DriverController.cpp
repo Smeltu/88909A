@@ -57,7 +57,7 @@ void DriverController::Run(vex::competition Competition) {
   while (true) {
     RunDriveTrain();
     if(i==0) {
-      //std::cout<<theTracker.getX()<<", "<<theTracker.getX2()<<", "<<theTracker.getY()<<", "<<theTracker.getY2()<<std::endl;
+      std::cout<<theTracker.getX()<<", "<<theTracker.getX2()<<", "<<theTracker.getY()<<", "<<theTracker.getY2()<<std::endl;
       //std::cout<<theTracker.getHeading()<<std::endl;
     }
     i = (i+1)%100;

@@ -33,12 +33,9 @@ void skills() {
 
 void test() {
   Auton.Init(0,0,0);
-  LeftDrive.resetPosition();
-  LeftDrive.spin(forward,12,vex::voltageUnits::volt);
-  vex::task::sleep(10000);
-  Brain.Screen.print(LeftDrive.position(degrees));
-  vex::task::sleep(100);
-  LeftDrive.stop();
+  Auton.DriveStraight(24);
+  //vex::task::sleep(3000);
+  Auton.RotateTo(90);
   /*LeftDrive.resetPosition();
   RightDrive.resetPosition();
   LeftDrive.spin(forward,12,vex::voltageUnits::volt);

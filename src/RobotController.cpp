@@ -10,13 +10,11 @@ using namespace vex;
 const double Degree2Arc = PI / 180.0;
 
 //driveStraight
-PID dsPID = PID(0.3, 0.02, 0.02);//0.6,0.03,0.03
+PID dsPID = PID(0.33, 0.02, 0.005);//0.6,0.03,0.03
 PID aePID = PID(1.1, 0.22, 0.09);
-StallCheck dsSC = StallCheck(0.9, 50);
 
 //rotateTo
 PID rtPID = PID(3,0.1,0.1);//2, 0.08, 0.1
-StallCheck rtSC = StallCheck(0.95, 30);//0.8,40
 
 //driveArc
 PID daPID = PID(dsPID.get('p') / degreesToInches, dsPID.get('i') / degreesToInches, dsPID.get('d') / degreesToInches); //move PID - remember it's in inches, not degrees
@@ -95,27 +93,18 @@ void RobotController::RotateTo(double TargetAngle, Event positionEvent /*=NULL*/
   double lastError = error;
 
   rtPID.start(error);
-  rtSC.start();
+  BreakTimer small = BreakTimer(0.3, 0.1);
+  BreakTimer large = BreakTimer(1.5, 0.5);
 
-  while (fabs(error) > 0.3) {
+  while (!small.update(error) && !large.update(error)) {
     error = angleError(TargetAngle);
-    double speed = range(rtPID.calculate(error), 23);
 
-    if(rtSC.calculate(speed)) { //stallcheck
-      std::cout << "rtSC" << std::endl;
-      if(fabs(error) <= 0.3) {
-        break; 
-      }
-      rtPID.start(error);
-      rtSC.start();
-    }
-    
+    double speed = range(rtPID.calculate(error), 23);
     Output(-speed, speed);
     lastError = error;
     vex::task::sleep(10);
   }
-
-  std::cout << "RotateTo done; x: " << m_Tracker.getX() << " y: " << m_Tracker.getY() << " Error: " << angleError(TargetAngle) << std::endl;
+  std::cout << "Small: " << small.update(error) << ", RotateTo done; x: " << m_Tracker.getX() << " y: " << m_Tracker.getY() << " Error: " << angleError(TargetAngle) << std::endl;
   StopMotors();
 }
 
@@ -133,34 +122,26 @@ void RobotController::DriveStraight(double inches, double targetHeading, double 
   double lastError = error;
   double counter = 0;
   dsPID.start(error);
-  dsSC.start();
   aePID.start(headingError);
+  BreakTimer small = BreakTimer(0.3, 0.1);
+  BreakTimer large = BreakTimer(1.5, 0.5);
+
+
   //while loop until close enough to target
-  while (fabs(error) * degreesToInches > 0.2) {
+  while (!small.update(error) && !large.update(error)) {
     counter++;
     //update errors
     error = targetDegrees - m_Tracker.getAxial();
     headingError = angleError(targetHeading);
+
+
 
     //calculate a
     double a = aePID.calculate(headingError);
     a = range(a, 0, maxSpeed);
     //calculate overall
     double out = dsPID.calculate(error);
-    if(fabs(out) < 0.1 && counter > 100 && error < 30 && minSpeed != maxSpeed) {
-      std::cout<<"low output ";
-      break;
-    }
-    if(dsSC.calculate(out)) {
-      std::cout<<"dsSC"<<std::endl;
-      if(fabs(error) * degreesToInches > 0.2) {
-        dsPID.start(error);
-        dsSC.start(); 
-      }
-      else {
-        break;
-      }
-    }
+
     out = range(out, minSpeed, maxSpeed);
     if(minSpeed==maxSpeed && (out * inches <= 0 || error * inches <= 0)) {
       std::cout<<"minMax Break ";
@@ -183,7 +164,7 @@ void RobotController::DriveStraight(double inches, double targetHeading, double 
     //wait
     vex::task::sleep(10);
   }
-  std::cout << "driveStraight done; x: " << m_Tracker.getX() << " y: " << m_Tracker.getY() << std::endl;
+  std::cout << "Small: " << small.update(error) << ", driveStraight done; x: " << m_Tracker.getX() << " y: " << m_Tracker.getY() << std::endl;
   if(minSpeed == maxSpeed) {Output(minSpeed,minSpeed);return;}
   StopMotors();
 }
