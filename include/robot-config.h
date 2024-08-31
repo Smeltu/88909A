@@ -14,7 +14,11 @@ extern motor RightDriveMotorC;
 extern motor_group LeftDrive;
 extern motor_group RightDrive;
 
-extern motor Intake;
+extern motor IntakeA;
+extern motor IntakeB;
+extern motor_group Intake;
+
+extern motor Arm;
 
 extern inertial Inertial;
 extern rotSub Axial;
