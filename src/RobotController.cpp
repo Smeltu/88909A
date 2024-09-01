@@ -108,7 +108,7 @@ void RobotController::RotateTo(double TargetAngle, Event positionEvent /*=NULL*/
   StopMotors();
 }
 
-void RobotController::DriveStraight(double inches, double targetHeading, double maxSpeed, double minSpeed, bool angLimit, Trigger StopTrigger, Event StraightMovingEvent, double EventDistance) {
+void RobotController::DriveStraight(double inches, double targetHeading, double maxSpeed, double minSpeed, bool angLimit, Trigger StopTrigger, Event StraightMovingEvent, double EventDistanceToTarget) {
   std::cout << "Starting DriveStraight; Dist: " << inches << std::endl;
 
   //target values
@@ -126,21 +126,26 @@ void RobotController::DriveStraight(double inches, double targetHeading, double 
   BreakTimer small = BreakTimer(0.3, 0.1);
   BreakTimer large = BreakTimer(1.5, 0.5);
 
+  bool eventHasTriggered = false;
 
   //while loop until close enough to target
-  while (!small.update(error) && !large.update(error)) {
+  while (!small.update(error * degreesToInches) && !large.update(error * degreesToInches)) {
     counter++;
     //update errors
     error = targetDegrees - m_Tracker.getAxial();
     headingError = angleError(targetHeading);
-
-
 
     //calculate a
     double a = aePID.calculate(headingError);
     a = range(a, 0, maxSpeed);
     //calculate overall
     double out = dsPID.calculate(error);
+
+    //call StraightMovingEvent
+    if(fabs(error) * degreesToInches < EventDistanceToTarget && !eventHasTriggered) {
+      StraightMovingEvent();
+      eventHasTriggered = true;
+    }
 
     out = range(out, minSpeed, maxSpeed);
     if(minSpeed==maxSpeed && (out * inches <= 0 || error * inches <= 0)) {

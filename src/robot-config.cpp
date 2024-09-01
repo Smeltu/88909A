@@ -32,6 +32,7 @@ rotSub Axial = rotSub(PORT9, false);
 rotSub Lateral = rotSub(PORT2, false);
 controller Controller1 = controller(primary);
 digital_out Hook = digital_out(Brain.ThreeWirePort.A);
+digital_out Prop = digital_out(Brain.ThreeWirePort.C);
 
 
 // VEXcode generated functions

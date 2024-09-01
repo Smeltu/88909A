@@ -28,6 +28,7 @@ extern optical Optical;
 extern distance Distance;
 
 extern digital_out Hook;
+extern digital_out Prop;
 
 
 /**

@@ -39,6 +39,10 @@ void intakeBackward() {
   }
 }
 
+void toggleProp() {
+  Prop.set(!Prop.value());
+}
+
 void toggleHook() {
   Hook.set(!Hook.value());
 }
@@ -50,6 +54,7 @@ void DriverController::Run(vex::competition Competition) {
   Controller1.ButtonR1.pressed(intakeForward);
   Controller1.ButtonR2.pressed(intakeBackward);
   Controller1.ButtonL1.pressed(toggleHook);
+  Controller1.ButtonL2.pressed(toggleProp);
 
   theTracker.Start();
   Auton.Init(0,0,0);

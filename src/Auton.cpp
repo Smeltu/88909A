@@ -15,8 +15,14 @@ void defensive() {
   
 }
 
-void offensive() {
+void hook() {
+  Hook.set(!Hook.value());
+}
 
+void offensive() {
+  Auton.Init(20.75,24,0);
+  Auton.DriveStraight(-21, 361, 100, 20, false, (Trigger *)__null, hook, 3.7);
+  Hook.set(true);
 }
 
 void offensive2() {
@@ -33,9 +39,9 @@ void skills() {
 
 void test() {
   Auton.Init(0,0,0);
-  Auton.DriveStraight(24);
+  Auton.DriveStraight(72);
   //vex::task::sleep(3000);
-  Auton.RotateTo(90);
+  //Auton.RotateTo(90);
   /*LeftDrive.resetPosition();
   RightDrive.resetPosition();
   LeftDrive.spin(forward,12,vex::voltageUnits::volt);

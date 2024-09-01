@@ -6,6 +6,6 @@ BreakTimer::BreakTimer(double r, double t): range(r), time(t), curr(0) {}
 
 bool BreakTimer::update(double error, double dt) {
     curr += dt;
-    curr *= error < range;
+    curr *= fabs(error) < fabs(range);
     return curr > time;
 }
