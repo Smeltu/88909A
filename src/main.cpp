@@ -77,6 +77,8 @@ void preAutonomous(void) {
   Axial.setdatarate(10);
   Lateral.setdatarate(10);
 
+  Prop.set(true);
+
   Inertial.calibrate();
   while(Inertial.isCalibrating()) {
     vex::task::sleep(10);

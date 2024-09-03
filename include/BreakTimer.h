@@ -9,6 +9,7 @@ class BreakTimer {
 
   public: BreakTimer(double r, double t);
   bool update(double error, double dt = 0.01);
+  void reset();
 };
 
 #endif

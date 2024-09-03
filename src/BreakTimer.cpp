@@ -9,3 +9,7 @@ bool BreakTimer::update(double error, double dt) {
     curr *= fabs(error) < fabs(range);
     return curr > time;
 }
+
+void BreakTimer::reset() {
+    curr = 0;
+}

@@ -30,7 +30,7 @@ class RobotController {
   void Goto(double X, double Y, double AngleCalibrate = 0, bool Forward = true, Trigger StopTrigger = NULL, Event RotationEvent = NULL, double EventAngle = 0, Event StraightMovingEvent = NULL, double EventDistance = 0);
   void Output(double leftPct, double rightPct);
   void RotateTo(double TargetAngle, Event RotationEvent = NULL, double EventAngle = 0);
-  void DriveStraight(double Distance, double targetHeading = 361, double maxSpeed = 100, double minSpeed = 20, bool angLimit = false, Trigger StopTrigger = NULL, Event StraightMovingEvent = NULL, double EventDistanceToTarget = 0);
+  void DriveStraight(double Distance, double targetHeading = 361, double maxSpeed = 100, double minSpeed = 20, bool angLimit = false, Trigger StopTrigger = NULL, Event StraightMovingEvent = NULL, double EventDistance = 0);
   void DriveArc(double X, double Y, bool Forward = true, double maxSpeed = 100, double minSpeed = 20, Trigger StopTrigger = NULL, Event positionEvent = NULL, double EventAngle = 0, Event StraightMovingEvent = NULL, double EventDistance = 0);
   void StopMotors();
   void LockWheels();

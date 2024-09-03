@@ -16,13 +16,37 @@ void defensive() {
 }
 
 void hook() {
-  Hook.set(!Hook.value());
+  Hook.set(true);
+}
+
+bool canHook() {
+  double dist = Distance.objectDistance(mm);
+  return (dist > 65 && dist < 75);
+}
+
+void prop() {
+  Prop.set(!Prop.value());
 }
 
 void offensive() {
-  Auton.Init(20.75,24,0);
-  Auton.DriveStraight(-21, 361, 100, 20, false, (Trigger *)__null, hook, 3.7);
-  Hook.set(true);
+  Auton.Init(20.75,48,180);
+  Auton.DriveStraight(-19.5, 361, 100, 20, false, canHook, hook, 19);//18.2
+  hook();
+  runIntake(forward);
+  vex::task::sleep(500);
+  Auton.Goto(31, 66, 0, true, (Trigger *)__null, (Event)__null, 0, prop, 15);
+  vex::task::sleep(500);
+  Auton.DriveStraight(-10);
+  Auton.DriveStraight(5);
+  vex::task::sleep(500);
+  Auton.Goto(54,42);
+  Hook.set(false);
+  Auton.RotateTo(225);
+  Intake.stop();
+  Auton.DriveStraight(-26);
+  Intake.spin(reverse,12,vex::voltageUnits::volt);
+  Auton.DriveStraight(5);
+  Intake.spin(reverse,3,vex::voltageUnits::volt);
 }
 
 void offensive2() {
