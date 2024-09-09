@@ -26,13 +26,14 @@ motor_group Intake = motor_group(IntakeA,IntakeB);
 motor Arm = motor(PORT14, ratio18_1, false);
 
 inertial Inertial = inertial(PORT21,turnType::left);
-optical Optical = optical(PORT4);
+optical Optical = optical(PORT9);
 distance Distance = distance(PORT14);
 rotSub Axial = rotSub(PORT9, false);
 rotSub Lateral = rotSub(PORT2, false);
 controller Controller1 = controller(primary);
 digital_out Hook = digital_out(Brain.ThreeWirePort.A);
 digital_out Prop = digital_out(Brain.ThreeWirePort.C);
+digital_out Endgame = digital_out(Brain.ThreeWirePort.E);
 
 
 // VEXcode generated functions

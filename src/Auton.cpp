@@ -7,14 +7,6 @@
 extern Tracker theTracker;
 extern RobotController Auton;
 
-void runIntake(vex::directionType dir) {
-  Intake.spin(dir,12,vex::voltageUnits::volt);
-}
-
-void defensive() {
-  
-}
-
 void hook() {
   Hook.set(true);
 }
@@ -28,33 +20,48 @@ void prop() {
   Prop.set(!Prop.value());
 }
 
-void offensive() {
-  Auton.Init(20.75,48,180);
-  Auton.DriveStraight(-19.5, 361, 100, 20, false, canHook, hook, 19);//18.2
+void offensive() { //rel to bottom left corner, alliance side is x-axis
+  Auton.Init(96,19.75,270);
+  Auton.DriveStraight(-21, 361, 70, 20, false, canHook, hook, 19.5);//18.2
   hook();
-  runIntake(forward);
-  vex::task::sleep(500);
-  Auton.Goto(31, 66, 0, true, (Trigger *)__null, (Event)__null, 0, prop, 15);
+  vex::task::sleep(100);
+  theTracker.intakeFwd();
+  vex::task::sleep(300);
+  Auton.Goto(78, 30, 0, true, (Trigger *)__null, (Event)__null, 0, prop, 15);
   vex::task::sleep(500);
   Auton.DriveStraight(-10);
   Auton.DriveStraight(5);
   vex::task::sleep(500);
-  Auton.Goto(54,42);
-  Hook.set(false);
-  Auton.RotateTo(225);
-  Intake.stop();
-  Auton.DriveStraight(-26);
-  Intake.spin(reverse,12,vex::voltageUnits::volt);
-  Auton.DriveStraight(5);
-  Intake.spin(reverse,3,vex::voltageUnits::volt);
+  Auton.Goto(102,54);
+  Auton.RotateTo(315);
+  Auton.DriveStraight(-19.5);
+  theTracker.intakeRev();
+  vex::task::sleep(1000);
+  theTracker.intakeRev();
+}
+
+void defensive() { //rel to bottom left corner, alliance wall is x-axis
+  Auton.Init(48,19.75,270);
+  prop();
+  Auton.DriveStraight(-14.5);//18.2
+  Auton.DriveStraight(-6,361,40,20,false,canHook,hook,6.5);
+  hook();
+  vex::task::sleep(500);
+  theTracker.intakeFwd();
+  vex::task::sleep(1000);
+  Auton.Goto(28,46);
+  vex::task::sleep(300);
+  Auton.Goto(58,58,0,false);
+  theTracker.intakeFwd();
+  Auton.DriveStraight(-4);
 }
 
 void offensive2() {
-
+  offensive();
 }
 
 void defensive2() {
-
+  defensive();
 }
 
 void skills() {

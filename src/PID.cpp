@@ -23,8 +23,7 @@ double PID::calculate(double error, double dt, bool interpolate) {
   prevError = error;
   prevD = derivative;
 
-  //temp output
-  std::cout << kP * error << ", " << kI * integral << ", " << kD * derivative << ", " << kP * error + kI * integral + kD * derivative << ", " << error << std::endl;
+  //std::cout << kP * error << ", " << kI * integral << ", " << kD * derivative << ", " << kP * error + kI * integral + kD * derivative << ", " << error << std::endl;
 
   return kP * error + kI * integral + kD * derivative;
 }

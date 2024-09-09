@@ -13,6 +13,7 @@ class Tracker {
   inertial & m_Inertial;
   rotation & m_Axial;
   rotation & m_Lateral;
+  bool m_Mirrored;
   double m_X;
   double m_Y;
   bool m_Running;
@@ -22,8 +23,12 @@ class Tracker {
   double m_SetRotation;
   double m_X2;
   double m_Y2;
+
+  bool forw;
+  bool back;
+  double counter;
   
-  public: Tracker(motor_group & LeftDrive, motor_group & RightDrive, inertial & Inertial, rotation & Axial, rotation & Lateral);
+  public: Tracker(motor_group & LeftDrive, motor_group & RightDrive, inertial & Inertial, rotation & Axial, rotation & Lateral, bool mirrored);
   void set(double x, double y, double a = 361);
   double getX() {
     return (m_X - cos((getHeading() + oOffsetAngle) * PI / 180.0) * oOffset);
@@ -53,7 +58,23 @@ class Tracker {
     return (m_Inertial.rotation() - m_SetRotation) * inertialCal + m_SetRotation;
   }
   double getHeading() {
+    if(m_Mirrored) {
+      return 180 - fmod(getRotation(),360.0);
+    }
     return fmod(getRotation(),360.0);
+  }
+  double angleError(double a) {
+    double headingError = fmod(a - getHeading(), 360);
+    if (headingError > 180.0) {
+      headingError -= 360.0;
+    }
+    if (headingError < -180.0) {
+      headingError += 360.0;
+    }
+    if(m_Mirrored) {
+      headingError *= -1;
+    }
+    return (headingError);
   }
   double getAxial() {
     if(m_Axial.installed()) {
@@ -64,6 +85,16 @@ class Tracker {
   double getLateral() {
     return m_Lateral.position(vex::rotationUnits::deg);
   }
+
+  void intakeFwd() {
+    back = false;
+    forw = !forw;
+  }
+  void intakeRev() {
+    forw = false;
+    back = !back;
+  }
+  void intakeStall();
 };
 
 #endif

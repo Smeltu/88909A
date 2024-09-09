@@ -38,16 +38,6 @@ class RobotController {
     m_Tracker.set(X0, Y0, Angle0);
     m_Tracker.Start();
   }
-  double angleError(double a) {
-    double headingError = fmod(a - m_Tracker.getHeading(), 360);
-    if (headingError > 180.0) {
-      headingError -= 360.0;
-    }
-    if (headingError < -180.0) {
-      headingError += 360.0;
-    }
-    return (headingError);
-  }
   double range(double val, double min = 0.0, double max = 100.0) {
     bool neg = val < 0;
     val = fabs(val);

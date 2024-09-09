@@ -13,9 +13,6 @@ extern RobotController Auton;
 //for output
 int i=0;
 
-//intake
-bool forw = false;
-bool back = false;
 
 //hook
 bool triggered = false;
@@ -23,23 +20,11 @@ bool triggered = false;
 //callbacks
 
 void intakeForward() {
-  forw = !forw;
-  back = false;
-  if(forw) {
-    Intake.spin(forward,12,vex::voltageUnits::volt);
-  } else {
-    Intake.stop();
-  }
+  theTracker.intakeFwd();
 }
 
 void intakeBackward() {
-  forw = false;
-  back = !back;
-  if(back) {
-    Intake.spin(reverse,12,vex::voltageUnits::volt);
-  } else {
-    Intake.stop();
-  }
+  theTracker.intakeRev();
 }
 
 void toggleProp() {
@@ -53,6 +38,10 @@ void toggleHook() {
   triggered = false;
 }
 
+void runEndgame() {
+  Endgame.set(!Endgame.value());
+}
+
 DriverController::DriverController() {}
 
 //overall run function
@@ -61,6 +50,7 @@ void DriverController::Run(vex::competition Competition) {
   Controller1.ButtonR2.pressed(intakeBackward);
   Controller1.ButtonL1.released(toggleHook);
   Controller1.ButtonL2.pressed(toggleProp);
+  Controller1.ButtonUp.pressed(runEndgame);
 
   theTracker.Start();
   Auton.Init(0,0,0);
@@ -69,7 +59,8 @@ void DriverController::Run(vex::competition Competition) {
     RunDriveTrain();
     RunHook();
     if(i==0) {
-      std::cout<<theTracker.getX()<<", "<<theTracker.getX2()<<", "<<theTracker.getY()<<", "<<theTracker.getY2()<<std::endl;
+      //std::cout<<Optical.hue()<<" "<<Optical.isNearObject()<<" "<<counter<<std::endl;
+      //std::cout<<theTracker.getX()<<", "<<theTracker.getX2()<<", "<<theTracker.getY()<<", "<<theTracker.getY2()<<std::endl;
       //std::cout<<theTracker.getHeading()<<std::endl;
     }
     i = (i+1)%100;

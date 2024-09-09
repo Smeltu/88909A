@@ -7,7 +7,7 @@
 
 using namespace vex;
 
-Tracker::Tracker(motor_group & LeftDrive, motor_group & RightDrive, inertial & Inertial, rotation & Axial, rotation & Lateral): m_LeftDrive(LeftDrive), m_RightDrive(RightDrive), m_Inertial(Inertial), m_Axial(Axial), m_Lateral(Lateral), m_X(cos(oOffsetAngle * PI / 180.0) * oOffset), m_Y(sin(oOffsetAngle * PI / 180.0) * oOffset), m_Running(false), m_LastAxial(0), m_LastLateral(0), m_LastAngle(0), m_X2(cos(oOffsetAngle * PI / 180.0) * oOffset), m_Y2(sin(oOffsetAngle * PI / 180.0) * oOffset) {}
+Tracker::Tracker(motor_group & LeftDrive, motor_group & RightDrive, inertial & Inertial, rotation & Axial, rotation & Lateral, bool mirrored): m_LeftDrive(LeftDrive), m_RightDrive(RightDrive), m_Inertial(Inertial), m_Axial(Axial), m_Lateral(Lateral), m_Mirrored(mirrored), m_X(cos(oOffsetAngle * PI / 180.0) * oOffset), m_Y(sin(oOffsetAngle * PI / 180.0) * oOffset), m_Running(false), m_LastAxial(0), m_LastLateral(0), m_LastAngle(0), m_X2(cos(oOffsetAngle * PI / 180.0) * oOffset), m_Y2(sin(oOffsetAngle * PI / 180.0) * oOffset), forw(false), back(false), counter(12) {}
 
 void Tracker::set(double setX, double setY, double setA) {
   SingleLock sl(m_Mutex);
@@ -78,6 +78,7 @@ void Tracker::Integral() {
   m_Y -= cos(radians) * lMagnitude;
 
   ArcIntegral();
+  intakeStall();
   
   m_LastAxial = axial;
   m_LastLateral = lateral;
@@ -121,6 +122,33 @@ void Tracker::ArcIntegral() {
   /*m_LastAxial = axial;
   m_LastLateral = lateral;
   m_LastAngle = getRotation();*/
+}
+
+void Tracker::intakeStall() {
+  if(!forw && !back) {
+    counter = 12;
+    Intake.stop();
+    return;
+  } else if(counter == -30 || counter == -20 || (IntakeB.velocity(pct) != 0 && counter > 0)) {
+    counter = 12;
+  } else {
+    counter -= 0.5;
+  }
+
+  if(forw && counter > 0) {
+    int color = Optical.hue();
+    if(!Optical.isNearObject()) {
+      Intake.spin(forward,12,vex::voltageUnits::volt);
+    } else if(autonMode != 3 && autonMode != 4 && color >= 50) {
+      counter = -28;
+    } else if((autonMode == 3 || autonMode == 4) && !(color > 150 && color < 210)) {
+      counter = -28;
+    }
+  } else if (counter <= 0 && counter > -20) {
+    Intake.spin(reverse,2,vex::voltageUnits::volt);
+  } else {
+    Intake.spin(reverse,12,vex::voltageUnits::volt);
+  }
 }
 
 int Tracker::TrackingThread(void * pVoid) {

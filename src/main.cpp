@@ -20,21 +20,21 @@
 
 using namespace vex;
 
-const int ofs = 1;
-const int def = 2;
-const int def2 = 3;
-const int ski = 4;
-const int ofs2 = 5;
+const int ofs = 1; //goal side
+const int def = 2; //ring side
+const int ofs2 = 3; //1 and 2 are red, 3 and 4 are blue
+const int def2 = 4;
+const int ski = 5;
 const int tests = 6;
 const int empty = 8;
 
-int autonMode = ofs; // change this for different autons
+int autonMode = ofs2; // change this for different autons
 double iBrightness = 0;
 
 //objects
 DriverController dc;
 vex::competition Competition;
-Tracker theTracker(LeftDrive, RightDrive, Inertial, Axial, Lateral);
+Tracker theTracker(LeftDrive, RightDrive, Inertial, Axial, Lateral, (autonMode == 3 || autonMode == 4));
 RobotController Auton(LeftDrive, RightDrive, theTracker);
 
 //autonomous
