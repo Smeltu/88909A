@@ -65,7 +65,7 @@ void Tracker::Integral() {
   double magnitude = aDif * degreesToInches;
   double radians = (getRotation() + m_LastAngle) * PI / 360.0;
   
-  m_X += cos(radians) * magnitude;
+  m_X += cos(radians) * magnitude * (1 - m_Mirrored * 2);
   m_Y += sin(radians) * magnitude;
 
   //lateral movement
@@ -74,7 +74,7 @@ void Tracker::Integral() {
 
   double lMagnitude = lDif * oDegreesToInches;
   
-  m_X += sin(radians) * lMagnitude;
+  m_X += sin(radians) * lMagnitude * (1 - m_Mirrored * 2);
   m_Y -= cos(radians) * lMagnitude;
 
   ArcIntegral();
@@ -145,7 +145,7 @@ void Tracker::intakeStall() {
       counter = -28;
     }
   } else if (counter <= 0 && counter > -20) {
-    Intake.spin(reverse,2,vex::voltageUnits::volt);
+    Intake.spin(reverse,6,vex::voltageUnits::volt);
   } else {
     Intake.spin(reverse,12,vex::voltageUnits::volt);
   }

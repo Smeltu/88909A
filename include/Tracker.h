@@ -59,12 +59,13 @@ class Tracker {
   }
   double getHeading() {
     if(m_Mirrored) {
-      return 180 - fmod(getRotation(),360.0);
+      return fmod(180 - getRotation(), 360.0);
     }
     return fmod(getRotation(),360.0);
   }
   double angleError(double a) {
-    double headingError = fmod(a - getHeading(), 360);
+    double heading = getHeading();
+    double headingError = fmod(a - heading, 360);
     if (headingError > 180.0) {
       headingError -= 360.0;
     }

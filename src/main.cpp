@@ -28,7 +28,7 @@ const int ski = 5;
 const int tests = 6;
 const int empty = 8;
 
-int autonMode = ofs2; // change this for different autons
+int autonMode = def; // change this for different autons
 double iBrightness = 0;
 
 //objects

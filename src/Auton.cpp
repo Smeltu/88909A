@@ -20,40 +20,47 @@ void prop() {
   Prop.set(!Prop.value());
 }
 
-void offensive() { //rel to bottom left corner, alliance side is x-axis
+void offensive() { //rel to bottom right corner, alliance side is x-axis
   Auton.Init(96,19.75,270);
-  Auton.DriveStraight(-21, 361, 70, 20, false, canHook, hook, 19.5);//18.2
+  Auton.DriveStraight(-12);
+  Auton.DriveStraight(-8, 270, 50, 20, false, canHook, hook, 7);//18.2
   hook();
-  vex::task::sleep(100);
+  vex::task::sleep(600);
   theTracker.intakeFwd();
-  vex::task::sleep(300);
-  Auton.Goto(78, 30, 0, true, (Trigger *)__null, (Event)__null, 0, prop, 15);
-  vex::task::sleep(500);
-  Auton.DriveStraight(-10);
+  Auton.Goto(79, 29, 0, true, (Trigger *)__null, (Event)__null, 0, prop, 15);//96,37.5; 90,39 but 99,42
+  vex::task::sleep(400);
+  Auton.DriveStraight(-14, 361, 60);
   Auton.DriveStraight(5);
   vex::task::sleep(500);
-  Auton.Goto(102,54);
-  Auton.RotateTo(315);
-  Auton.DriveStraight(-19.5);
-  theTracker.intakeRev();
+  Auton.Goto(90, 48, 0, false);
+  Auton.RotateTo(135);
+  theTracker.intakeFwd();
+  Auton.DriveStraight(19);
   vex::task::sleep(1000);
-  theTracker.intakeRev();
 }
 
 void defensive() { //rel to bottom left corner, alliance wall is x-axis
   Auton.Init(48,19.75,270);
   prop();
-  Auton.DriveStraight(-14.5);//18.2
-  Auton.DriveStraight(-6,361,40,20,false,canHook,hook,6.5);
+  Auton.DriveStraight(-12);
+  Auton.DriveStraight(-8, 270, 50, 20, false, canHook, hook, 7);//18.2
   hook();
   vex::task::sleep(500);
   theTracker.intakeFwd();
   vex::task::sleep(1000);
   Auton.Goto(28,46);
   vex::task::sleep(300);
-  Auton.Goto(58,58,0,false);
+  Auton.Goto(45,51,0,false);
+  Auton.RotateTo(225);
   theTracker.intakeFwd();
-  Auton.DriveStraight(-4);
+  Auton.DriveStraight(-16);
+  theTracker.intakeFwd();
+  vex::task::sleep(200);
+  theTracker.intakeFwd();
+  vex::task::sleep(200);
+  theTracker.intakeFwd();
+  vex::task::sleep(200);
+  theTracker.intakeFwd();
 }
 
 void offensive2() {
