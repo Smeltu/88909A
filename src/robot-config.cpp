@@ -10,10 +10,10 @@ brain  Brain;
 
 // VEXcode device constructors
 motor LeftDriveMotorA = motor(PORT6, ratio6_1, true);
-motor LeftDriveMotorB = motor(PORT7, ratio6_1, true);
+motor LeftDriveMotorB = motor(PORT8, ratio6_1, true);
 motor LeftDriveMotorC = motor(PORT10, ratio6_1, true);
 motor RightDriveMotorA = motor(PORT17, ratio6_1, false);
-motor RightDriveMotorB = motor(PORT18, ratio6_1, false);
+motor RightDriveMotorB = motor(PORT15, ratio6_1, false);
 motor RightDriveMotorC = motor(PORT20, ratio6_1, false);
 
 motor_group LeftDrive = motor_group(LeftDriveMotorA, LeftDriveMotorB, LeftDriveMotorC);
@@ -23,17 +23,17 @@ motor IntakeA = motor(PORT5, ratio18_1, false);
 motor IntakeB = motor(PORT12, ratio6_1, false);
 motor_group Intake = motor_group(IntakeA,IntakeB);
 
-motor Arm = motor(PORT14, ratio18_1, false);
+motor Arm = motor(PORT9, ratio18_1, false);
 
 inertial Inertial = inertial(PORT21,turnType::left);
-optical Optical = optical(PORT9);
-distance Distance = distance(PORT14);
-rotSub Axial = rotSub(PORT9, false);
+optical Optical = optical(PORT1);
+distance Distance = distance(PORT3);
+rotSub Axial = rotSub(PORT4, false);
 rotSub Lateral = rotSub(PORT2, false);
 controller Controller1 = controller(primary);
 digital_out Hook = digital_out(Brain.ThreeWirePort.A);
 digital_out Prop = digital_out(Brain.ThreeWirePort.C);
-digital_out Endgame = digital_out(Brain.ThreeWirePort.E);
+digital_out Endgame = digital_out(Brain.ThreeWirePort.G);
 
 
 // VEXcode generated functions

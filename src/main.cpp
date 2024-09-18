@@ -28,7 +28,7 @@ const int ski = 5;
 const int tests = 6;
 const int empty = 8;
 
-int autonMode = def; // change this for different autons
+int autonMode = ofs; // change this for different autons
 double iBrightness = 0;
 
 //objects
@@ -76,6 +76,7 @@ void preAutonomous(void) {
   Lateral.resetPosition();
   Axial.setdatarate(10);
   Lateral.setdatarate(10);
+  Optical.setLightPower(100);
 
   Prop.set(true);
 

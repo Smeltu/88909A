@@ -27,6 +27,7 @@ class Tracker {
   bool forw;
   bool back;
   double counter;
+  int colorSort;
   
   public: Tracker(motor_group & LeftDrive, motor_group & RightDrive, inertial & Inertial, rotation & Axial, rotation & Lateral, bool mirrored);
   void set(double x, double y, double a = 361);
@@ -94,6 +95,9 @@ class Tracker {
   void intakeRev() {
     forw = false;
     back = !back;
+  }
+  void toggleSort() {
+    colorSort = -1 - colorSort;
   }
   void intakeStall();
 };

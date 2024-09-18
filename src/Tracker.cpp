@@ -125,24 +125,30 @@ void Tracker::ArcIntegral() {
 }
 
 void Tracker::intakeStall() {
+  std::cout<<Intake.position(degrees)<<std::endl;
   if(!forw && !back) {
     counter = 12;
     Intake.stop();
     return;
-  } else if(counter == -30 || counter == -20 || (IntakeB.velocity(pct) != 0 && counter > 0)) {
+  } else if(counter == -30 || counter == -15 || (IntakeB.velocity(pct) != 0 && counter > 0)) {
     counter = 12;
   } else {
     counter -= 0.5;
   }
-
   if(forw && counter > 0) {
     int color = Optical.hue();
-    if(!Optical.isNearObject()) {
+    if(colorSort == 1 && fabs(fmod(Intake.position(degrees), 510.056) - 260) < 10) {
+      colorSort = 0;
+      Intake.spin(reverse,6,vex::voltageUnits::volt);
+      counter = -22;  
+    } else if(colorSort == -1) {
       Intake.spin(forward,12,vex::voltageUnits::volt);
-    } else if(autonMode != 3 && autonMode != 4 && color >= 50) {
-      counter = -28;
-    } else if((autonMode == 3 || autonMode == 4) && !(color > 150 && color < 210)) {
-      counter = -28;
+    } else if((autonMode == 3 || autonMode == 4) && color <= 30) {
+      colorSort = 1;
+    } else if(autonMode != 3 && autonMode != 4  && (color > 180 && color < 240)) {
+      colorSort = 1;
+    } else {
+      Intake.spin(forward,12,vex::voltageUnits::volt);
     }
   } else if (counter <= 0 && counter > -20) {
     Intake.spin(reverse,6,vex::voltageUnits::volt);

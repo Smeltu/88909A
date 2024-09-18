@@ -42,6 +42,10 @@ void runEndgame() {
   Endgame.set(!Endgame.value());
 }
 
+void toggleColorSort() {
+  theTracker.toggleSort();
+}
+
 DriverController::DriverController() {}
 
 //overall run function
@@ -51,6 +55,7 @@ void DriverController::Run(vex::competition Competition) {
   Controller1.ButtonL1.released(toggleHook);
   Controller1.ButtonL2.pressed(toggleProp);
   Controller1.ButtonUp.pressed(runEndgame);
+  Controller1.ButtonDown.pressed(toggleColorSort);
 
   theTracker.Start();
   Auton.Init(0,0,0);
