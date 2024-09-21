@@ -34,7 +34,7 @@ double iBrightness = 0;
 //objects
 DriverController dc;
 vex::competition Competition;
-Tracker theTracker(LeftDrive, RightDrive, Inertial, Axial, Lateral, (autonMode == 3 || autonMode == 4));
+Tracker theTracker(LeftDrive, RightDrive, Inertial, Axial, Axial2, Lateral, (autonMode == 3 || autonMode == 4));
 RobotController Auton(LeftDrive, RightDrive, theTracker);
 
 //autonomous
@@ -76,6 +76,7 @@ void preAutonomous(void) {
   Lateral.resetPosition();
   Axial.setdatarate(10);
   Lateral.setdatarate(10);
+  Axial2.setdatarate(10);
   Optical.setLightPower(100);
 
   Prop.set(true);

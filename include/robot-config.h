@@ -22,6 +22,7 @@ extern motor Arm;
 
 extern inertial Inertial;
 extern rotSub Axial;
+extern rotSub Axial2;
 extern rotSub Lateral;
 extern controller Controller1;
 extern optical Optical;

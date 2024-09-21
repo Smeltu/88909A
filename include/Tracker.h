@@ -12,6 +12,7 @@ class Tracker {
   motor_group & m_RightDrive;
   inertial & m_Inertial;
   rotation & m_Axial;
+  rotation & m_Axial2;
   rotation & m_Lateral;
   bool m_Mirrored;
   double m_X;
@@ -29,7 +30,7 @@ class Tracker {
   double counter;
   int colorSort;
   
-  public: Tracker(motor_group & LeftDrive, motor_group & RightDrive, inertial & Inertial, rotation & Axial, rotation & Lateral, bool mirrored);
+  public: Tracker(motor_group & LeftDrive, motor_group & RightDrive, inertial & Inertial, rotation & Axial, rotation & Axial2, rotation & Lateral, bool mirrored);
   void set(double x, double y, double a = 361);
   double getX() {
     return (m_X - cos((getHeading() + oOffsetAngle) * PI / 180.0) * oOffset);
@@ -56,6 +57,9 @@ class Tracker {
     return m_Running;
   }
   double getRotation() {
+    if(m_Axial.installed() && m_Axial2.installed()) {
+      return (m_Axial2.position(degrees) - m_Axial.position(degrees)) * oDegreesToHeading + m_SetRotation;
+    }
     return (m_Inertial.rotation() - m_SetRotation) * inertialCal + m_SetRotation;
   }
   double getHeading() {
@@ -80,6 +84,9 @@ class Tracker {
   }
   double getAxial() {
     if(m_Axial.installed()) {
+      if(m_Axial2.installed()) {
+        return (m_Axial.position(vex::rotationUnits::deg) + m_Axial2.position(vex::rotationUnits::deg))/2.0;
+      }
       return m_Axial.position(vex::rotationUnits::deg);
     }
     return (m_LeftDrive.position(vex::rotationUnits::deg) + m_RightDrive.position(vex::rotationUnits::deg)) / 2.0;
