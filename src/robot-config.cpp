@@ -29,6 +29,7 @@ inertial Inertial = inertial(PORT21,turnType::left);
 optical Optical = optical(PORT1);
 distance Distance = distance(PORT3);
 rotSub Axial = rotSub(PORT4, false);
+rotSub Axial2 = rotSub(PORT19, false);
 rotSub Lateral = rotSub(PORT2, false);
 controller Controller1 = controller(primary);
 digital_out Hook = digital_out(Brain.ThreeWirePort.A);

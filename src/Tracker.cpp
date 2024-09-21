@@ -7,7 +7,7 @@
 
 using namespace vex;
 
-Tracker::Tracker(motor_group & LeftDrive, motor_group & RightDrive, inertial & Inertial, rotation & Axial, rotation & Lateral, bool mirrored): m_LeftDrive(LeftDrive), m_RightDrive(RightDrive), m_Inertial(Inertial), m_Axial(Axial), m_Lateral(Lateral), m_Mirrored(mirrored), m_X(cos(oOffsetAngle * PI / 180.0) * oOffset), m_Y(sin(oOffsetAngle * PI / 180.0) * oOffset), m_Running(false), m_LastAxial(0), m_LastLateral(0), m_LastAngle(0), m_X2(cos(oOffsetAngle * PI / 180.0) * oOffset), m_Y2(sin(oOffsetAngle * PI / 180.0) * oOffset), forw(false), back(false), counter(12) {}
+Tracker::Tracker(motor_group & LeftDrive, motor_group & RightDrive, inertial & Inertial, rotation & Axial, rotation & Axial2, rotation & Lateral, bool mirrored): m_LeftDrive(LeftDrive), m_RightDrive(RightDrive), m_Inertial(Inertial), m_Axial(Axial), m_Axial2(Axial2), m_Lateral(Lateral), m_Mirrored(mirrored), m_X(cos(oOffsetAngle * PI / 180.0) * oOffset), m_Y(sin(oOffsetAngle * PI / 180.0) * oOffset), m_Running(false), m_LastAxial(0), m_LastLateral(0), m_LastAngle(0), m_X2(cos(oOffsetAngle * PI / 180.0) * oOffset), m_Y2(sin(oOffsetAngle * PI / 180.0) * oOffset), forw(false), back(false), counter(12) {}
 
 void Tracker::set(double setX, double setY, double setA) {
   SingleLock sl(m_Mutex);
@@ -15,7 +15,10 @@ void Tracker::set(double setX, double setY, double setA) {
   m_Inertial.setRotation(ang, degrees);
   m_SetRotation = ang;
   m_LastAngle = getRotation();
-  
+  double temp = getAxial();
+  m_Axial.setPosition(temp, degrees);
+  m_Axial2.setPosition(temp, degrees);
+
   m_X = setX + cos((getRotation() + oOffsetAngle) * PI / 180.0) * oOffset;
   m_Y = setY + sin((getRotation() + oOffsetAngle) * PI / 180.0) * oOffset;
   
@@ -30,6 +33,7 @@ void Tracker::Start() {
     m_LeftDrive.resetPosition();
     m_RightDrive.resetPosition();
     m_Axial.resetPosition();
+    m_Axial2.resetPosition();
     m_Lateral.resetPosition();
     
 
