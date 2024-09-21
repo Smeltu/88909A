@@ -4,15 +4,19 @@ using namespace vex;
 extern brain Brain;
 
 // VEXcode devices
-extern motor LeftDriveMotorA;
-extern motor LeftDriveMotorB;
-extern motor LeftDriveMotorC;
-extern motor RightDriveMotorA;
-extern motor RightDriveMotorB;
-extern motor RightDriveMotorC;
+extern motor LeftFrontDriveMotorA;
+extern motor LeftFrontDriveMotorB;
+extern motor LeftBackDriveMotorA;
+extern motor LeftBackDriveMotorB;
+extern motor RightFrontDriveMotorA;
+extern motor RightFrontDriveMotorB;
+extern motor RightBackDriveMotorA;
+extern motor RightBackDriveMotorB;
 
-extern motor_group LeftDrive;
-extern motor_group RightDrive;
+extern motor_group LeftFrontDrive;
+extern motor_group LeftBackDrive;
+extern motor_group RightFrontDrive;
+extern motor_group RightBackDrive;
 
 extern motor IntakeA;
 extern motor IntakeB;

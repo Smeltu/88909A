@@ -280,11 +280,15 @@ void RobotController::Output(double leftPct, double rightPct) {
   }
   leftFirst = !leftFirst;
   if (leftFirst) {
-    LeftDrive.spin(left, leftPct * 3 / 25.0, vex::voltageUnits::volt);
-    RightDrive.spin(right, rightPct * 3 / 25.0, vex::voltageUnits::volt);
+    LeftFrontDrive.spin(left, leftPct * 3 / 25.0, vex::voltageUnits::volt);
+    RightFrontDrive.spin(right, rightPct * 3 / 25.0, vex::voltageUnits::volt);
+    LeftBackDrive.spin(left, leftPct * 3 / 25.0, vex::voltageUnits::volt);
+    RightBackDrive.spin(right, rightPct * 3 / 25.0, vex::voltageUnits::volt);
   } else {
-    RightDrive.spin(right, rightPct * 3 / 25.0, vex::voltageUnits::volt);
-    LeftDrive.spin(left, leftPct * 3 / 25.0, vex::voltageUnits::volt);
+    RightFrontDrive.spin(right, rightPct * 3 / 25.0, vex::voltageUnits::volt);
+    LeftFrontDrive.spin(left, leftPct * 3 / 25.0, vex::voltageUnits::volt);
+    RightBackDrive.spin(right, rightPct * 3 / 25.0, vex::voltageUnits::volt);
+    LeftBackDrive.spin(left, leftPct * 3 / 25.0, vex::voltageUnits::volt);
   }
 }
 

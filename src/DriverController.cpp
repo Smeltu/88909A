@@ -79,15 +79,20 @@ void DriverController::RunDriveTrain() {
 
   //get forward and turn values, multiply by 1.1 to allow for easier maxing
   double forward = fmin(Controller1.Axis3.position(percent) * 1.1, 100);
+  double side = fmin(Controller1.Axis4.position(percent) * 1.1, 100);
   double turn = fmin(Controller1.Axis1.position(percent) * 1.1, 100);
 
   //if values are small enough, do nothing
-  if (fabs(forward) < 5 && fabs(turn) < 5) {
-    RightDrive.stop(vex::brakeType::coast);
-    LeftDrive.stop(vex::brakeType::coast);
+  if (fabs(forward) < 5 && fabs(side) < 5 && fabs(turn) < 5) {
+    RightFrontDriveMotorA.stop(vex::brakeType::coast);
+    LeftFrontDriveMotorA.stop(vex::brakeType::coast);
+    RightBackDriveMotorA.stop(vex::brakeType::coast);
+    LeftBackDriveMotorA.stop(vex::brakeType::coast);
   } else {
-    RightDrive.spin(vex::forward, 3 * (forward - turn) / 25.0, vex::voltageUnits::volt);
-    LeftDrive.spin(vex::forward, 3 * (forward + turn) / 25.0, vex::voltageUnits::volt);
+    RightFrontDriveMotorA.spin(vex::forward, 3 * (forward - side - turn) / 25.0, vex::voltageUnits::volt);
+    LeftFrontDriveMotorA.spin(vex::forward, 3 * (forward + side + turn) / 25.0, vex::voltageUnits::volt);
+    RightBackDriveMotorA.spin(vex::forward, 3 * (-forward - side + turn) / 25.0, vex::voltageUnits::volt);
+    LeftBackDriveMotorA.spin(vex::forward, 3 * (-forward + side - turn) / 25.0, vex::voltageUnits::volt);
   }
 }
 

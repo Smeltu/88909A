@@ -34,8 +34,8 @@ double iBrightness = 0;
 //objects
 DriverController dc;
 vex::competition Competition;
-Tracker theTracker(LeftDrive, RightDrive, Inertial, Axial, Lateral, (autonMode == 3 || autonMode == 4));
-RobotController Auton(LeftDrive, RightDrive, theTracker);
+Tracker theTracker(LeftFrontDrive, RightFrontDrive, Inertial, Axial, Lateral, (autonMode == 3 || autonMode == 4));
+RobotController Auton(LeftFrontDrive, RightFrontDrive, theTracker); //have to change for x-drive
 
 //autonomous
 void auton(void) {
@@ -69,8 +69,10 @@ void driverControl(void) {
 
 //preAuton
 void preAutonomous(void) {
-  LeftDrive.resetPosition();
-  RightDrive.resetPosition();
+  LeftFrontDrive.resetPosition();
+  RightFrontDrive.resetPosition();
+  LeftBackDrive.resetPosition();
+  RightBackDrive.resetPosition();
   Intake.resetPosition();
   Axial.resetPosition();
   Lateral.resetPosition();
@@ -93,7 +95,7 @@ void preAutonomous(void) {
 
   Controller1.Screen.setCursor(2,1);
   Controller1.Screen.print("P-A T: ");
-  Controller1.Screen.print((LeftDriveMotorA.temperature(temperatureUnits::celsius)+LeftDriveMotorB.temperature(temperatureUnits::celsius)+LeftDriveMotorC.temperature(temperatureUnits::celsius)+RightDriveMotorA.temperature(temperatureUnits::celsius)+RightDriveMotorB.temperature(temperatureUnits::celsius)+RightDriveMotorC.temperature(temperatureUnits::celsius))/6.0);
+  Controller1.Screen.print((LeftFrontDriveMotorA.temperature(temperatureUnits::celsius)+LeftFrontDriveMotorB.temperature(temperatureUnits::celsius)+LeftBackDriveMotorA.temperature(temperatureUnits::celsius)+RightFrontDriveMotorA.temperature(temperatureUnits::celsius)+RightFrontDriveMotorB.temperature(temperatureUnits::celsius)+RightBackDriveMotorA.temperature(temperatureUnits::celsius))/6.0);
 }
 
 //main function
