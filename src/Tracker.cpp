@@ -129,7 +129,7 @@ void Tracker::ArcIntegral() {
 }
 
 void Tracker::intakeStall() {
-  std::cout<<Intake.position(degrees)<<std::endl;
+  //std::cout<<Intake.position(degrees)<<std::endl;
   if(!forw && !back) {
     counter = 12;
     Intake.stop();

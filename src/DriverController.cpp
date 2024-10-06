@@ -17,6 +17,11 @@ int i=0;
 //hook
 bool triggered = false;
 
+//arm
+int mode = 0;
+double loadDeg = 230;
+PID armPID = PID(0.6,0.2,0.06);
+
 //callbacks
 
 void intakeForward() {
@@ -46,6 +51,23 @@ void toggleColorSort() {
   theTracker.toggleSort();
 }
 
+void toggleArm() {
+  Arm.setMaxTorque(100000000000,vex::currentUnits::amp);
+  if(mode == 0) {
+    armPID.start(loadDeg);
+    mode = 1;
+  } else {
+    mode = 0;
+  }
+}
+
+void scoreArm() {
+  Arm.setMaxTorque(100000000000,vex::currentUnits::amp);
+  if(fabs(mode) == 1) {
+    mode = 2;
+  }
+}
+
 DriverController::DriverController() {}
 
 //overall run function
@@ -56,6 +78,8 @@ void DriverController::Run(vex::competition Competition) {
   Controller1.ButtonL2.pressed(toggleProp);
   Controller1.ButtonUp.pressed(runEndgame);
   Controller1.ButtonDown.pressed(toggleColorSort);
+  Controller1.ButtonA.pressed(scoreArm);
+  Controller1.ButtonB.pressed(toggleArm);
 
   theTracker.Start();
   Auton.Init(0,0,0);
@@ -63,10 +87,13 @@ void DriverController::Run(vex::competition Competition) {
   while (true) {
     RunDriveTrain();
     RunHook();
+    RunArm();
     if(i==0) {
+      std::cout<<"rot: "<<ArmRot.position(degrees)<<std::endl;
       //std::cout<<Optical.hue()<<" "<<Optical.isNearObject()<<" "<<counter<<std::endl;
       //std::cout<<theTracker.getX()<<", "<<theTracker.getX2()<<", "<<theTracker.getY()<<", "<<theTracker.getY2()<<std::endl;
-      //std::cout<<theTracker.getHeading()<<std::endl;
+      //std::cout<<theTracker.getRotation()<<" "<<theTracker.getHeading()<<std::endl;
+      //std::cout<<Axial.position(degrees)<<" "<<Axial2.position(degrees)<<std::endl;
     }
     i = (i+1)%100;
     vex::task::sleep(5);
@@ -96,5 +123,32 @@ void DriverController::RunHook() {
   if(dist > 65 && dist < 75 && !Hook.value() && Controller1.ButtonL1.pressing()) {
     Hook.set(true);
     triggered = true;
+  }
+}
+
+void DriverController::RunArm() {
+  double target = 950;
+  if(mode == 0) {
+    target = loadDeg;
+  } else if(mode == 1) {
+    target = loadDeg;
+  }
+  if(fabs(ArmRot.position(degrees)) >= 870 && mode == 2) {
+    Arm.stop();
+    mode = 1;
+    target = loadDeg;
+  }
+  if(fabs(ArmRot.position(degrees)) < loadDeg + 50 && mode == 0) {
+    Arm.stop(vex::brakeType::coast);
+  } else {
+    double error = target - ArmRot.position(degrees);
+    double out = armPID.calculate(error,0.005);
+    std::cout<<error<<" "<<out<<std::endl;
+    out = Auton.range(out, 0, 100) * 3 / 25.0;
+    if(out >= 0) {
+      Arm.spin(forward,out,vex::voltageUnits::volt);
+    } else {
+      Arm.spin(reverse,-out,vex::voltageUnits::volt);
+    }
   }
 }

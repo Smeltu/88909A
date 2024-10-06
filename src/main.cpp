@@ -74,9 +74,12 @@ void preAutonomous(void) {
   Intake.resetPosition();
   Axial.resetPosition();
   Lateral.resetPosition();
+  Arm.resetPosition();
+  ArmRot.resetPosition();
   Axial.setdatarate(10);
   Lateral.setdatarate(10);
   Axial2.setdatarate(10);
+  ArmRot.setdatarate(10);
   Optical.setLightPower(100);
 
   Prop.set(true);
