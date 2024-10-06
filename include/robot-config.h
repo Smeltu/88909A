@@ -19,6 +19,7 @@ extern motor IntakeB;
 extern motor_group Intake;
 
 extern motor Arm;
+extern rotSub ArmRot;
 
 extern inertial Inertial;
 extern rotSub Axial;
