@@ -7,7 +7,26 @@
 
 using namespace vex;
 
-Tracker::Tracker(motor_group & LeftDrive, motor_group & RightDrive, inertial & Inertial, rotation & Axial, rotation & Axial2, rotation & Lateral, bool mirrored): m_LeftDrive(LeftDrive), m_RightDrive(RightDrive), m_Inertial(Inertial), m_Axial(Axial), m_Axial2(Axial2), m_Lateral(Lateral), m_Mirrored(mirrored), m_X(cos(oOffsetAngle * PI / 180.0) * oOffset), m_Y(sin(oOffsetAngle * PI / 180.0) * oOffset), m_Running(false), m_LastAxial(0), m_LastLateral(0), m_LastAngle(0), m_X2(cos(oOffsetAngle * PI / 180.0) * oOffset), m_Y2(sin(oOffsetAngle * PI / 180.0) * oOffset), forw(false), back(false), counter(12) {}
+Tracker::Tracker(motor_group & LeftDrive, motor_group & RightDrive, inertial & Inertial, rotation & Axial, rotation & Axial2, rotation & Lateral, bool mirrored):
+m_LeftDrive(LeftDrive),
+m_RightDrive(RightDrive),
+m_Inertial(Inertial),
+m_Axial(Axial),
+m_Axial2(Axial2),
+m_Lateral(Lateral),
+m_Mirrored(mirrored),
+m_X(cos(oOffsetAngle * PI / 180.0) * oOffset),
+m_Y(sin(oOffsetAngle * PI / 180.0) * oOffset),
+m_Running(false),
+m_LastAxial(0),
+m_LastLateral(0),
+m_LastAngle(0),
+m_X2(cos(oOffsetAngle * PI / 180.0) * oOffset),
+m_Y2(sin(oOffsetAngle * PI / 180.0) * oOffset),
+forw(false),
+back(false),
+counter(12),
+lastDetected(0) {}
 
 void Tracker::set(double setX, double setY, double setA) {
   SingleLock sl(m_Mutex);
@@ -82,7 +101,7 @@ void Tracker::Integral() {
   m_Y -= cos(radians) * lMagnitude;
 
   ArcIntegral();
-  intakeStall();
+  RunIntake();
   
   m_LastAxial = axial;
   m_LastLateral = lateral;
@@ -128,35 +147,71 @@ void Tracker::ArcIntegral() {
   m_LastAngle = getRotation();*/
 }
 
-void Tracker::intakeStall() {
-  //std::cout<<Intake.position(degrees)<<std::endl;
+//note that automatic intake functioning is also found in DriverController.cpp
+void Tracker::RunIntake() {
+
+  //if not running intake, reset counter and stop
   if(!forw && !back) {
     counter = 12;
     Intake.stop();
     return;
-  } else if(counter == -30 || counter == -15 || (IntakeB.velocity(pct) != 0 && counter > 0)) {
+  }
+  //if the counter has ticked to a reset value or the intake unstalls by itself, resume
+  if(counter == -30 || counter == -15 || (IntakeB.velocity(pct) != 0 && counter > 0)) {
     counter = 12;
+    //if the arm is in the loading position, have a lower jam delay before outtaking
+    if(ArmRot.position(degrees) > 100) {
+      counter = 4;
+    }
+  } else if (counter == -10 && ArmRot.position(degrees) > 100) {
+    //otherwise, if antistall code has finished executing and arm is in loading position, stop intake
+    forw = false;
   } else {
+    //if the intake is stalled, decrement counter by a half (note that each counter is 20ms)
     counter -= 0.5;
   }
+
+  //get color detected by optical sensor
+  int color = Optical.hue();
+  //if the ring color is opposite the alliance color
+  bool wrongColor = ((autonMode == 3 || autonMode == 4) && color <= 30) || (autonMode != 3 && autonMode != 4  && (color > 180 && color < 240));
+  
   if(forw && counter > 0) {
-    int color = Optical.hue();
-    if(colorSort == 1 && fabs(fmod(Intake.position(degrees), 510.056) - 260) < 10) {
-      colorSort = 0;
-      Intake.spin(reverse,6,vex::voltageUnits::volt);
-      counter = -22;  
-    } else if(colorSort == -1) {
-      Intake.spin(forward,12,vex::voltageUnits::volt);
-    } else if((autonMode == 3 || autonMode == 4) && color <= 30) {
-      colorSort = 1;
-    } else if(autonMode != 3 && autonMode != 4  && (color > 180 && color < 240)) {
-      colorSort = 1;
+    //current position of the hooks in the cycle
+    double deg = fmod(Intake.position(degrees), 1587.152);
+    //sort and decrement sorting queue by 1 if there is a ring at the top
+    if(colorSort > 0 && (fabs(deg - 285.8) < 10 || fabs(deg - 805) < 10 || fabs(deg - 1324.2) < 10)) {//282.8,802,1321.2
+      if(colorSort == 2 || (colorSort == 1 && !wrongColor)) {
+        colorSort--;
+        Intake.spin(reverse,6,vex::voltageUnits::volt);
+        counter = -22;
+      }
     } else {
-      Intake.spin(forward,12,vex::voltageUnits::volt);
+      //if colorSort is toggled off, ignore ring detection and run intake forward
+      if(colorSort == -1) {
+        Intake.spin(forward,12,vex::voltageUnits::volt);
+      } else if(wrongColor) {
+        //if the wrong color is detected and was not previously detected, increment sorting queue
+        if(colorSort == 1 && !lastDetected) {
+          colorSort++;
+        } else {
+          colorSort = 1;
+        }
+        lastDetected = true;
+      } else {
+        //if a ring is not detected, run intake forward
+        lastDetected = false;
+        Intake.spin(forward,12,vex::voltageUnits::volt);
+      }
     }
   } else if (counter <= 0 && counter > -20) {
+    //for antistall, spin intake reverse at half speed
     Intake.spin(reverse,6,vex::voltageUnits::volt);
+  } else if(ArmRot.position(degrees) > 20) {
+    //if arm is raising or raised, spin intake reverse at third speed
+    Intake.spin(reverse,4,vex::voltageUnits::volt);
   } else {
+    //otherwise, spin intake reverse at full speed
     Intake.spin(reverse,12,vex::voltageUnits::volt);
   }
 }

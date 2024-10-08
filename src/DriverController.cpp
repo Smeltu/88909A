@@ -18,9 +18,9 @@ int i=0;
 bool triggered = false;
 
 //arm
-int mode = 0;
-double loadDeg = 230;
-PID armPID = PID(0.6,0.2,0.06);
+double mode = 0;
+double loadDeg = 215;
+PID armPID = PID(0.5,0.1,0.05);
 
 //callbacks
 
@@ -55,8 +55,11 @@ void toggleArm() {
   Arm.setMaxTorque(100000000000,vex::currentUnits::amp);
   if(mode == 0) {
     armPID.start(loadDeg);
-    mode = 1;
+    mode = -1;
+    theTracker.intakeStop();
+    theTracker.intakeRev();
   } else {
+    theTracker.intakeStop();
     mode = 0;
   }
 }
@@ -127,13 +130,11 @@ void DriverController::RunHook() {
 }
 
 void DriverController::RunArm() {
-  double target = 950;
-  if(mode == 0) {
-    target = loadDeg;
-  } else if(mode == 1) {
+  double target = 880;
+  if(mode == 0 || fabs(mode) == 1) {
     target = loadDeg;
   }
-  if(fabs(ArmRot.position(degrees)) >= 870 && mode == 2) {
+  if(fabs(ArmRot.position(degrees)) >= target - 80 && mode == 2) {
     Arm.stop();
     mode = 1;
     target = loadDeg;
@@ -142,6 +143,10 @@ void DriverController::RunArm() {
     Arm.stop(vex::brakeType::coast);
   } else {
     double error = target - ArmRot.position(degrees);
+    if(fabs(error) < 30 && mode == -1) {
+      mode = fabs(mode);
+      theTracker.intakeFwd();
+    }
     double out = armPID.calculate(error,0.005);
     std::cout<<error<<" "<<out<<std::endl;
     out = Auton.range(out, 0, 100) * 3 / 25.0;

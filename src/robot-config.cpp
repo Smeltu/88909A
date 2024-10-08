@@ -27,7 +27,7 @@ motor Arm = motor(PORT17, ratio18_1, true);
 rotSub ArmRot = rotSub(PORT1, false);
 
 inertial Inertial = inertial(PORT21,turnType::left);
-optical Optical = optical(PORT1);
+optical Optical = optical(PORT7);
 distance Distance = distance(PORT3);
 rotSub Axial = rotSub(PORT3, false);
 rotSub Axial2 = rotSub(PORT16, true);
