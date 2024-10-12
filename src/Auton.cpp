@@ -29,17 +29,27 @@ void offensive() { //rel to bottom right corner, alliance side is x-axis
   prop();
   Auton.DriveStraight(-22);
   hook();//grab goal
-  vex::task::sleep(600);
   theTracker.intakeFwd();
   Auton.Goto(117,46);//ring
   Auton.DriveStraight(-24);
   Auton.DriveStraight(12,280,100,20,true);
   Hook.set(false);
-  Auton.RotateTo(183);
   prop();
-  Auton.DriveStraight(30,361,80,20,false,__null,prop,17);
-  wait(500,msec);
-  Auton.DriveStraight(-8,120,60,20,true,__null,stopIntake,6);//-14 to center
+  theTracker.intakeStop();
+  Auton.DriveStraight(20,183,80,20,true,__null,prop,13);
+  theTracker.intakeFwd();
+  Auton.DriveStraight(-5,140);
+  wait(400,msec);
+  theTracker.intakeStop();
+  Auton.DriveStraight(-10,140,100,20,true);
+  Auton.DriveStraight(19,180,100,20,true);//14
+  Auton.Output(-60,-60);
+  wait(200,msec);
+  Auton.DriveStraight(-9,90,60,20,true);
+  theTracker.intakeFwd();
+  wait(1000,msec);
+  theTracker.intakeRev();
+  /*Auton.DriveStraight(-8,120,60,20,true,__null,stopIntake,6);//-14 to center
   Auton.DriveStraight(-3,170,40,20,true);
   Auton.DriveStraight(7,130,40,20,true);
   Auton.Output(-30,-60);
@@ -49,7 +59,7 @@ void offensive() { //rel to bottom right corner, alliance side is x-axis
   Auton.StopMotors();
   theTracker.intakeFwd();
   wait(800,msec);
-  Auton.DriveStraight(36,90,60,20,true,__null,stopIntake,15);
+  Auton.DriveStraight(36,90,60,20,true,__null,stopIntake,15);*/
 }
 
 void defensive() { //rel to bottom left corner, alliance wall is x-axis
@@ -67,7 +77,8 @@ void defensive() { //rel to bottom left corner, alliance wall is x-axis
   Auton.DriveStraight(13);
   Auton.DriveStraight(-4);
   Auton.RotateTo(354);
-  Auton.DriveStraight(32);
+  Auton.DriveStraight(34);
+  //Auton.Output(30,30);
 }
 
 void offensive2() {

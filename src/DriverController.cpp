@@ -81,7 +81,7 @@ void DriverController::Run(vex::competition Competition) {
   Controller1.ButtonL2.pressed(toggleProp);
   Controller1.ButtonUp.pressed(runEndgame);
   Controller1.ButtonDown.pressed(toggleColorSort);
-  Controller1.ButtonA.pressed(scoreArm);
+  Controller1.ButtonY.pressed(scoreArm);
   Controller1.ButtonB.pressed(toggleArm);
 
   theTracker.Start();

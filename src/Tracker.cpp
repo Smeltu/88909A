@@ -150,6 +150,8 @@ void Tracker::ArcIntegral() {
 //note that automatic intake functioning is also found in DriverController.cpp
 void Tracker::RunIntake() {
 
+  bool armLoad = ArmRot.position(degrees) > 100;
+
   //if not running intake, reset counter and stop
   if(!forw && !back) {
     counter = 12;
@@ -157,26 +159,28 @@ void Tracker::RunIntake() {
     return;
   }
   //if the counter has ticked to a reset value or the intake unstalls by itself, resume
-  if(counter == -30 || counter == -15 || (IntakeB.velocity(pct) != 0 && counter > 0)) {
+  if(counter == -33 || counter == -15 || (IntakeB.velocity(pct) != 0 && counter > 0)) {
     counter = 12;
     //if the arm is in the loading position, have a lower jam delay before outtaking
-    if(ArmRot.position(degrees) > 100) {
+    if(armLoad) {
       counter = 4;
     }
-  } else if (counter == -6 && ArmRot.position(degrees) > 100) {
+  } else if(counter == -6 && armLoad) {
+    //if antistall first time with arm up, jump counter and run forward again
+    counter = -16;
+  } else if (counter == -32 && armLoad) {
     //otherwise, if antistall code has finished executing and arm is in loading position, stop intake
     forw = false;
   } else {
     //if the intake is stalled, decrement counter by a half (note that each counter is 20ms)
     counter -= 0.5;
   }
-
   //get color detected by optical sensor
   int color = Optical.hue();
   //if the ring color is opposite the alliance color
   bool wrongColor = ((autonMode == 3 || autonMode == 4) && color <= 30) || (autonMode != 3 && autonMode != 4  && (color > 180 && color < 240));
   
-  if(forw && counter > 0) {
+  if(forw && counter > 0 || (counter <= -16 && counter > -26 && armLoad)) {
     //current position of the hooks in the cycle
     double deg = fmod(Intake.position(degrees), 1587.152);
     //sort and decrement sorting queue by 1 if there is a ring at the top
@@ -184,7 +188,7 @@ void Tracker::RunIntake() {
       if(colorSort == 2 || (colorSort == 1 && !wrongColor)) {
         colorSort--;
         Intake.spin(reverse,6,vex::voltageUnits::volt);
-        counter = -22;
+        counter = -25;
       }
     } else {
       //if colorSort is toggled off, ignore ring detection and run intake forward
