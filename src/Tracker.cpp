@@ -163,7 +163,7 @@ void Tracker::RunIntake() {
     if(ArmRot.position(degrees) > 100) {
       counter = 4;
     }
-  } else if (counter == -10 && ArmRot.position(degrees) > 100) {
+  } else if (counter == -6 && ArmRot.position(degrees) > 100) {
     //otherwise, if antistall code has finished executing and arm is in loading position, stop intake
     forw = false;
   } else {

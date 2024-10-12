@@ -19,8 +19,8 @@ bool triggered = false;
 
 //arm
 double mode = 0;
-double loadDeg = 215;
-PID armPID = PID(0.5,0.1,0.05);
+double loadDeg = 140;//215
+PID armPID = PID(0.25,0.25,0);
 
 //callbacks
 
@@ -92,10 +92,10 @@ void DriverController::Run(vex::competition Competition) {
     RunHook();
     RunArm();
     if(i==0) {
-      std::cout<<"rot: "<<ArmRot.position(degrees)<<std::endl;
+      //std::cout<<"rot: "<<ArmRot.position(degrees)<<std::endl;
       //std::cout<<Optical.hue()<<" "<<Optical.isNearObject()<<" "<<counter<<std::endl;
       //std::cout<<theTracker.getX()<<", "<<theTracker.getX2()<<", "<<theTracker.getY()<<", "<<theTracker.getY2()<<std::endl;
-      //std::cout<<theTracker.getRotation()<<" "<<theTracker.getHeading()<<std::endl;
+      std::cout<<theTracker.getRotation()<<" "<<theTracker.getHeading()<<std::endl;
       //std::cout<<Axial.position(degrees)<<" "<<Axial2.position(degrees)<<std::endl;
     }
     i = (i+1)%100;
@@ -130,16 +130,18 @@ void DriverController::RunHook() {
 }
 
 void DriverController::RunArm() {
-  double target = 880;
-  if(mode == 0 || fabs(mode) == 1) {
+  double target = 830;
+  if(fabs(mode) == 1) {
     target = loadDeg;
+  } else if(mode == 0) {
+    target = loadDeg - 100;
   }
   if(fabs(ArmRot.position(degrees)) >= target - 80 && mode == 2) {
     Arm.stop();
     mode = 1;
     target = loadDeg;
   }
-  if(fabs(ArmRot.position(degrees)) < loadDeg + 50 && mode == 0) {
+  if(fabs(ArmRot.position(degrees)) < loadDeg - 50 && mode == 0) {
     Arm.stop(vex::brakeType::coast);
   } else {
     double error = target - ArmRot.position(degrees);

@@ -10,7 +10,7 @@ using namespace vex;
 const double Degree2Arc = PI / 180.0;
 
 //driveStraight
-PID dsPID = PID(0.33, 0.02, 0.005); //0.6,0.03,0.03
+PID dsPID = PID(0.18, 0.1, 0.02); //0.6,0.03,0.03
 PID aePID = PID(1.1, 0.22, 0.09);
 BreakTimer dsSmall = BreakTimer(0.3, 0.1);
 BreakTimer dsLarge = BreakTimer(1.5, 0.5);

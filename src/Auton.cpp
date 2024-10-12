@@ -20,50 +20,54 @@ void prop() {
   Prop.set(!Prop.value());
 }
 
+void stopIntake() {
+  theTracker.intakeStop();
+}
+
 void offensive() { //rel to bottom right corner, alliance side is x-axis
-  Auton.Init(96,19.75,270);
-  Auton.DriveStraight(-12);
-  Auton.DriveStraight(-8, 270, 50, 20, false, canHook, hook, 7);//18.2
-  hook();
+  Auton.Init(96,19.25,270);
+  prop();
+  Auton.DriveStraight(-22);
+  hook();//grab goal
   vex::task::sleep(600);
   theTracker.intakeFwd();
-  Auton.Goto(79, 29, 0, true, (Trigger *)__null, (Event)__null, 0, prop, 15);//96,37.5; 90,39 but 99,42
-  Prop.set(false);
-  vex::task::sleep(400);
-  Auton.DriveStraight(-14, 361, 60);
-  Auton.DriveStraight(5);
-  vex::task::sleep(500);
-  Auton.Goto(90, 48, 0, false);
-  Auton.RotateTo(135);
+  Auton.Goto(117,46);//ring
+  Auton.DriveStraight(-24);
+  Auton.DriveStraight(12,280,100,20,true);
+  Hook.set(false);
+  Auton.RotateTo(183);
+  prop();
+  Auton.DriveStraight(30,361,80,20,false,__null,prop,17);
+  wait(500,msec);
+  Auton.DriveStraight(-8,120,60,20,true,__null,stopIntake,6);//-14 to center
+  Auton.DriveStraight(-3,170,40,20,true);
+  Auton.DriveStraight(7,130,40,20,true);
+  Auton.Output(-30,-60);
+  wait(500,msec);
+  Auton.Output(20,20);
+  wait(200,msec);
+  Auton.StopMotors();
   theTracker.intakeFwd();
-  Auton.DriveStraight(18);//18.9
-  Intake.setPosition(Intake.position(degrees)-0,degrees);
-  vex::task::sleep(1000);
+  wait(800,msec);
+  Auton.DriveStraight(36,90,60,20,true,__null,stopIntake,15);
 }
 
 void defensive() { //rel to bottom left corner, alliance wall is x-axis
-  Auton.Init(48,19.75,270);
+  Auton.Init(48,19.25,270);
   prop();
-  Auton.DriveStraight(-12, 270, 60);
-  Auton.DriveStraight(-8, 270, 50, 20, false, canHook, hook, 7);//18.2
+  Auton.DriveStraight(-21, 270);//18.2
   hook();
-  vex::task::sleep(500);
+  vex::task::sleep(100);
   theTracker.intakeFwd();
-  vex::task::sleep(1000);
-  Auton.Goto(28,46);
-  vex::task::sleep(300);
-  Auton.Goto(45,51,0,false);
-  Auton.RotateTo(235);
-  theTracker.intakeFwd();
-  Auton.DriveStraight(-14.6);//-16.8
-  theTracker.intakeFwd();
-  vex::task::sleep(200);
-  theTracker.intakeFwd();
-  vex::task::sleep(200);
-  theTracker.intakeFwd();
-  vex::task::sleep(200);
-  theTracker.intakeFwd();
-  Intake.setPosition(Intake.position(degrees)-0,degrees);
+  Auton.Goto(25,63.5);
+  Auton.DriveStraight(-10,160);
+  Auton.DriveStraight(13);
+  Auton.DriveStraight(-4,90);
+  Auton.RotateTo(240);
+  Auton.DriveStraight(13);
+  Auton.DriveStraight(-4);
+  Auton.RotateTo(354);
+  Auton.DriveStraight(32);
 }
 
 void offensive2() {

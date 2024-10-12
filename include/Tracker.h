@@ -58,9 +58,9 @@ class Tracker {
     return m_Running;
   }
   double getRotation() {
-    if(m_Axial.installed() && m_Axial2.installed()) {
+    /*if(m_Axial.installed() && m_Axial2.installed()) {
       return (m_Axial2.position(degrees) - m_Axial.position(degrees)) * oDegreesToHeading + m_SetRotation;
-    }
+    }*/
     return (m_Inertial.rotation() - m_SetRotation) * inertialCal + m_SetRotation;
   }
   double getHeading() {
