@@ -84,13 +84,12 @@ class Tracker {
     return (headingError);
   }
   double getAxial() {
-    if(m_Axial.installed()) {
-      if(m_Axial2.installed()) {
-        return (m_Axial.position(vex::rotationUnits::deg) + m_Axial2.position(vex::rotationUnits::deg))/2.0;
-      }
-      return m_Axial.position(vex::rotationUnits::deg);
+    double sum = m_Axial.position(vex::rotationUnits::deg) + m_Axial2.position(vex::rotationUnits::deg);
+    double count = m_Axial.installed() + m_Axial2.installed();
+    if(count == 0) {
+      return (m_LeftDrive.position(vex::rotationUnits::deg) + m_RightDrive.position(vex::rotationUnits::deg)) / 2.0;
     }
-    return (m_LeftDrive.position(vex::rotationUnits::deg) + m_RightDrive.position(vex::rotationUnits::deg)) / 2.0;
+    return sum / count;
   }
   double getLateral() {
     return m_Lateral.position(vex::rotationUnits::deg);
@@ -114,6 +113,9 @@ class Tracker {
     } else {
       colorSort = -1;
     }
+  }
+  void setCounter(double count) {
+    counter = count;
   }
   void RunIntake();
 };

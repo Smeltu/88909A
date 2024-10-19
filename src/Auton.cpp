@@ -24,42 +24,63 @@ void stopIntake() {
   theTracker.intakeStop();
 }
 
+void hookOff() {
+  Hook.set(false);
+}
+
+
+bool spam() {
+  theTracker.setCounter(12);
+  return false;
+}
+
+
+bool hasSeen = false;
+bool check() {
+  spam();
+  int color = Optical.hue();
+  bool ring = ((autonMode != 3 || autonMode != 4) && color <= 30) || (autonMode == 3 && autonMode == 4  && (color > 180 && color < 240));
+  std::cout<<ring<<std::endl;
+  if(ring) {
+    hasSeen = true;
+  } else if(hasSeen) {
+    hasSeen = false;
+    theTracker.intakeStop();
+  }
+  return false;
+}
+
 void offensive() { //rel to bottom right corner, alliance side is x-axis
   Auton.Init(96,19.25,270);
+
   prop();
   Auton.DriveStraight(-22);
   hook();//grab goal
   theTracker.intakeFwd();
-  Auton.Goto(117,46);//ring
-  Auton.DriveStraight(-24);
-  Auton.DriveStraight(12,280,100,20,true);
-  Hook.set(false);
+  Auton.Goto(120,46);//ring 117
+
+  Auton.RotateTo(90);
+  Auton.DriveStraight(3,90);
+  /*Auton.DriveStraight(-27);
+  Auton.DriveStraight(13.5,274,100,20,true,__null,hookOff,6);//12.4
   prop();
+  Auton.DriveStraight(19.5,183,60,20,true,spam,prop,15.3);
   theTracker.intakeStop();
-  Auton.DriveStraight(20,183,80,20,true,__null,prop,13);
+  wait(15,msec);
   theTracker.intakeFwd();
-  Auton.DriveStraight(-5,140);
-  wait(400,msec);
+  wait(15,msec);
+  Auton.DriveStraight(-6,140,100,20,false,check);
   theTracker.intakeStop();
-  Auton.DriveStraight(-10,140,100,20,true);
-  Auton.DriveStraight(19,180,100,20,true);//14
-  Auton.Output(-60,-60);
-  wait(200,msec);
-  Auton.DriveStraight(-9,90,60,20,true);
   theTracker.intakeFwd();
-  wait(1000,msec);
+  Auton.DriveStraight(-10,80,100,20,true,check);
+  Auton.DriveStraight(14.8,160,100,20,true,check);//14.8
+  Auton.DriveStraight(-2.1,180,true,20,false,check);//???
+  Auton.DriveStraight(-9.55,94,60,20,true,check);//-5.9
+  theTracker.intakeStop();
+  theTracker.intakeFwd();
+  wait(1200,msec);
   theTracker.intakeRev();
-  /*Auton.DriveStraight(-8,120,60,20,true,__null,stopIntake,6);//-14 to center
-  Auton.DriveStraight(-3,170,40,20,true);
-  Auton.DriveStraight(7,130,40,20,true);
-  Auton.Output(-30,-60);
-  wait(500,msec);
-  Auton.Output(20,20);
-  wait(200,msec);
-  Auton.StopMotors();
-  theTracker.intakeFwd();
-  wait(800,msec);
-  Auton.DriveStraight(36,90,60,20,true,__null,stopIntake,15);*/
+  Auton.DriveStraight(29,90,100,20,true);*/
 }
 
 void defensive() { //rel to bottom left corner, alliance wall is x-axis

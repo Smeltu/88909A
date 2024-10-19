@@ -149,7 +149,6 @@ void Tracker::ArcIntegral() {
 
 //note that automatic intake functioning is also found in DriverController.cpp
 void Tracker::RunIntake() {
-
   bool armLoad = ArmRot.position(degrees) > 100;
 
   //if not running intake, reset counter and stop
@@ -182,9 +181,9 @@ void Tracker::RunIntake() {
   
   if(forw && counter > 0 || (counter <= -16 && counter > -26 && armLoad)) {
     //current position of the hooks in the cycle
-    double deg = fmod(Intake.position(degrees), 1587.152);
+    double deg = fmod(Intake.position(degrees), 1568.04);//1587.152 for 86? 1568.04 for 84;
     //sort and decrement sorting queue by 1 if there is a ring at the top
-    if(colorSort > 0 && (fabs(deg - 285.8) < 10 || fabs(deg - 805) < 10 || fabs(deg - 1324.2) < 10)) {//282.8,802,1321.2
+    if(colorSort > 0 && (fabs(deg - 285.8) < 10 || fabs(deg - 808) < 10 || fabs(deg - 1324.2) < 10)) {//295.8,805,1324.2
       if(colorSort == 2 || (colorSort == 1 && !wrongColor)) {
         colorSort--;
         Intake.spin(reverse,6,vex::voltageUnits::volt);
@@ -209,8 +208,8 @@ void Tracker::RunIntake() {
       }
     }
   } else if (counter <= 0 && counter > -20) {
-    //for antistall, spin intake reverse at half speed
-    Intake.spin(reverse,6,vex::voltageUnits::volt);
+    //for antistall
+    Intake.stop(vex::brakeType::coast);
   } else if(ArmRot.position(degrees) > 20) {
     //if arm is raising or raised, spin intake reverse at third speed
     Intake.spin(reverse,4,vex::voltageUnits::volt);

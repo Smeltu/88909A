@@ -83,6 +83,9 @@ void preAutonomous(void) {
   Optical.setLightPower(100);
 
   Prop.set(true);
+  Hook.set(false);
+  Endgame.set(false);
+  Doinker.set(false);
 
   Inertial.calibrate();
   while(Inertial.isCalibrating()) {

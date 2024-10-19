@@ -32,6 +32,7 @@ extern distance Distance;
 extern digital_out Hook;
 extern digital_out Prop;
 extern digital_out Endgame;
+extern digital_out Doinker;
 
 
 /**

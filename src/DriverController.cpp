@@ -71,6 +71,10 @@ void scoreArm() {
   }
 }
 
+void toggleDoinker() {
+  Doinker.set(!Doinker.value());
+}
+
 DriverController::DriverController() {}
 
 //overall run function
@@ -83,6 +87,7 @@ void DriverController::Run(vex::competition Competition) {
   Controller1.ButtonDown.pressed(toggleColorSort);
   Controller1.ButtonY.pressed(scoreArm);
   Controller1.ButtonB.pressed(toggleArm);
+  Controller1.ButtonRight.pressed(toggleDoinker);
 
   theTracker.Start();
   Auton.Init(0,0,0);
@@ -94,9 +99,10 @@ void DriverController::Run(vex::competition Competition) {
     if(i==0) {
       //std::cout<<"rot: "<<ArmRot.position(degrees)<<std::endl;
       //std::cout<<Optical.hue()<<" "<<Optical.isNearObject()<<" "<<counter<<std::endl;
-      //std::cout<<theTracker.getX()<<", "<<theTracker.getX2()<<", "<<theTracker.getY()<<", "<<theTracker.getY2()<<std::endl;
-      std::cout<<theTracker.getRotation()<<" "<<theTracker.getHeading()<<std::endl;
+      std::cout<<theTracker.getX()<<", "<<theTracker.getX2()<<", "<<theTracker.getY()<<", "<<theTracker.getY2()<<std::endl;
+      //std::cout<<theTracker.getRotation()<<" "<<theTracker.getHeading()<<std::endl;
       //std::cout<<Axial.position(degrees)<<" "<<Axial2.position(degrees)<<std::endl;
+      //std::cout<<Intake.position(degrees)<<std::endl;
     }
     i = (i+1)%100;
     vex::task::sleep(5);
