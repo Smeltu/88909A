@@ -22,19 +22,20 @@ using namespace vex;
 
 const int ofs = 1; //goal side
 const int def = 2; //ring side
-const int ofs2 = 3; //1 and 2 are red, 3 and 4 are blue
-const int def2 = 4;
-const int ski = 5;
-const int tests = 6;
+const int solo = 3;//solo
+const int ofs2 = 4; //1-3 are red, 4-6 are blue
+const int def2 = 5;
+const int solo2 = 6;
+const int ski = 7;
 const int empty = 8;
 
-int autonMode = ofs; // change this for different autons
+int autonMode = ski; // change this for different autons
 double iBrightness = 0;
 
 //objects
 DriverController dc;
 vex::competition Competition;
-Tracker theTracker(LeftDrive, RightDrive, Inertial, Axial, Axial2, Lateral, (autonMode == 3 || autonMode == 4));
+Tracker theTracker(LeftDrive, RightDrive, Inertial, Axial, Axial2, Lateral, (fabs(autonMode-5) <= 1));
 RobotController Auton(LeftDrive, RightDrive, theTracker);
 
 //autonomous
@@ -51,11 +52,15 @@ void auton(void) {
       break;
     case(def2):
       defensive2();
+      break;
+    case(solo):
+      soloAWP();
+      break;
+    case(solo2):
+      soloAWP2();
+      break;
     case(ski):
       skills();
-      break;
-    case(tests):
-      test();
       break;
     case(empty):
       break;

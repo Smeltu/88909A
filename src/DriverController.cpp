@@ -51,51 +51,50 @@ void toggleColorSort() {
   theTracker.toggleSort();
 }
 
-void toggleArm() {
-  Arm.setMaxTorque(100000000000,vex::currentUnits::amp);
-  if(mode == 0) {
-    armPID.start(loadDeg);
-    mode = -1;
-    theTracker.intakeStop();
-    theTracker.intakeRev();
-  } else {
-    theTracker.intakeStop();
-    mode = 0;
-  }
+void armToggle() {
+  theTracker.toggleArm();
 }
 
-void scoreArm() {
-  Arm.setMaxTorque(100000000000,vex::currentUnits::amp);
-  if(fabs(mode) == 1) {
-    mode = 2;
-  }
+void armScore() {
+  theTracker.scoreArm();
 }
 
 void toggleDoinker() {
   Doinker.set(!Doinker.value());
 }
 
+int x = 0;
+bool antiStall() {
+  x++;
+  return x > 100;
+}
+
 DriverController::DriverController() {}
 
 //overall run function
 void DriverController::Run(vex::competition Competition) {
+
   Controller1.ButtonR1.pressed(intakeForward);
   Controller1.ButtonR2.pressed(intakeBackward);
   Controller1.ButtonL1.released(toggleHook);
   Controller1.ButtonL2.pressed(toggleProp);
   Controller1.ButtonUp.pressed(runEndgame);
   Controller1.ButtonDown.pressed(toggleColorSort);
-  Controller1.ButtonY.pressed(scoreArm);
-  Controller1.ButtonB.pressed(toggleArm);
+  Controller1.ButtonY.pressed(armScore);
+  Controller1.ButtonB.pressed(armToggle);
   Controller1.ButtonRight.pressed(toggleDoinker);
 
   theTracker.Start();
   Auton.Init(0,0,0);
-
+  if(autonMode == 7) {
+    Prop.set(false);
+    Auton.DriveStraight(3,361,50,20,false,antiStall);
+    intakeForward();
+    Auton.DriveStraight(-3,361,20,20,false,antiStall);
+  }
   while (true) {
     RunDriveTrain();
     RunHook();
-    RunArm();
     if(i==0) {
       //std::cout<<"rot: "<<ArmRot.position(degrees)<<std::endl;
       //std::cout<<Optical.hue()<<" "<<Optical.isNearObject()<<" "<<counter<<std::endl;
@@ -112,7 +111,6 @@ void DriverController::Run(vex::competition Competition) {
 //individual component run functions
 
 void DriverController::RunDriveTrain() {
-
   //get forward and turn values, multiply by 1.1 to allow for easier maxing
   double forward = fmin(Controller1.Axis3.position(percent) * 1.1, 100);
   double turn = fmin(Controller1.Axis1.position(percent) * 1.1, 100);
@@ -132,36 +130,5 @@ void DriverController::RunHook() {
   if(dist > 65 && dist < 75 && !Hook.value() && Controller1.ButtonL1.pressing()) {
     Hook.set(true);
     triggered = true;
-  }
-}
-
-void DriverController::RunArm() {
-  double target = 830;
-  if(fabs(mode) == 1) {
-    target = loadDeg;
-  } else if(mode == 0) {
-    target = loadDeg - 100;
-  }
-  if(fabs(ArmRot.position(degrees)) >= target - 80 && mode == 2) {
-    Arm.stop();
-    mode = 1;
-    target = loadDeg;
-  }
-  if(fabs(ArmRot.position(degrees)) < loadDeg - 50 && mode == 0) {
-    Arm.stop(vex::brakeType::coast);
-  } else {
-    double error = target - ArmRot.position(degrees);
-    if(fabs(error) < 30 && mode == -1) {
-      mode = fabs(mode);
-      theTracker.intakeFwd();
-    }
-    double out = armPID.calculate(error,0.005);
-    std::cout<<error<<" "<<out<<std::endl;
-    out = Auton.range(out, 0, 100) * 3 / 25.0;
-    if(out >= 0) {
-      Arm.spin(forward,out,vex::voltageUnits::volt);
-    } else {
-      Arm.spin(reverse,-out,vex::voltageUnits::volt);
-    }
   }
 }

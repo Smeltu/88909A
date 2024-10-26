@@ -30,6 +30,10 @@ class Tracker {
   double counter;
   int colorSort;
   bool lastDetected;
+
+  int mode;
+  int loadDeg;
+  PID armPID;
   
   public: Tracker(motor_group & LeftDrive, motor_group & RightDrive, inertial & Inertial, rotation & Axial, rotation & Axial2, rotation & Lateral, bool mirrored);
   void set(double x, double y, double a = 361);
@@ -98,14 +102,21 @@ class Tracker {
   void intakeFwd() {
     back = false;
     forw = !forw;
+    if(!forw) {
+      Intake.stop();
+    }
   }
   void intakeRev() {
     forw = false;
     back = !back;
+    if(!back) {
+      Intake.stop();
+    }
   }
   void intakeStop() {
     forw = false;
     back = false;
+    Intake.stop();
   }
   void toggleSort() {
     if(colorSort == -1) {
@@ -118,6 +129,27 @@ class Tracker {
     counter = count;
   }
   void RunIntake();
+
+  void toggleArm() {
+    Arm.setMaxTorque(100000000000,vex::currentUnits::amp);
+    if(mode == 0) {
+      armPID.start(loadDeg);
+      mode = -1;
+      intakeStop();
+      intakeRev();
+    } else {
+      intakeStop();
+      mode = 0;
+    }
+  }
+
+  void scoreArm() {
+    Arm.setMaxTorque(100000000000,vex::currentUnits::amp);
+    if(fabs(mode) == 1) {
+      mode = 2;
+    }
+  }
+
 };
 
 #endif

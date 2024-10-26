@@ -26,7 +26,10 @@ m_Y2(sin(oOffsetAngle * PI / 180.0) * oOffset),
 forw(false),
 back(false),
 counter(12),
-lastDetected(0) {}
+lastDetected(0),
+mode(0),
+loadDeg(140),
+armPID(PID(0.25,0.25,0)) {}
 
 void Tracker::set(double setX, double setY, double setA) {
   SingleLock sl(m_Mutex);
@@ -149,12 +152,45 @@ void Tracker::ArcIntegral() {
 
 //note that automatic intake functioning is also found in DriverController.cpp
 void Tracker::RunIntake() {
+  //armCode
+  double target = 830;
+  if(fabs(mode) == 1) {
+    target = loadDeg;
+  } else if(mode == 0) {
+    target = loadDeg - 100;
+  }
+  if(fabs(ArmRot.position(degrees)) >= target - 80 && mode == 2) {
+    Arm.stop();
+    mode = 1;
+    target = loadDeg;
+  }
+  if(fabs(ArmRot.position(degrees)) < loadDeg - 50 && mode == 0) {
+    Arm.stop(vex::brakeType::coast);
+  } else {
+    double error = target - ArmRot.position(degrees);
+    if(fabs(error) < 30 && mode == -1) {
+      mode = fabs(mode);
+      intakeFwd();
+    }
+    double out = armPID.calculate(error,0.005);
+    if(out > 100) {
+      out = 100;
+    } else if (out < -100) {
+      out = -100;
+    }
+    out *= 3 / 25.0;
+    if(out >= 0) {
+      Arm.spin(forward,out,vex::voltageUnits::volt);
+    } else {
+      Arm.spin(reverse,-out,vex::voltageUnits::volt);
+    }
+  }
+  
   bool armLoad = ArmRot.position(degrees) > 100;
 
   //if not running intake, reset counter and stop
   if(!forw && !back) {
     counter = 12;
-    Intake.stop();
     return;
   }
   //if the counter has ticked to a reset value or the intake unstalls by itself, resume
@@ -169,15 +205,17 @@ void Tracker::RunIntake() {
     counter = -16;
   } else if (counter == -32 && armLoad) {
     //otherwise, if antistall code has finished executing and arm is in loading position, stop intake
-    forw = false;
+    intakeStop();
+    return;
   } else {
     //if the intake is stalled, decrement counter by a half (note that each counter is 20ms)
     counter -= 0.5;
   }
+  
   //get color detected by optical sensor
   int color = Optical.hue();
   //if the ring color is opposite the alliance color
-  bool wrongColor = ((autonMode == 3 || autonMode == 4) && color <= 30) || (autonMode != 3 && autonMode != 4  && (color > 180 && color < 240));
+  bool wrongColor = (m_Mirrored && color <= 30) || (!m_Mirrored  && (color > 180 && color < 240));
   
   if(forw && counter > 0 || (counter <= -16 && counter > -26 && armLoad)) {
     //current position of the hooks in the cycle
@@ -217,6 +255,7 @@ void Tracker::RunIntake() {
     //otherwise, spin intake reverse at full speed
     Intake.spin(reverse,12,vex::voltageUnits::volt);
   }
+
 }
 
 int Tracker::TrackingThread(void * pVoid) {
