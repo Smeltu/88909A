@@ -135,8 +135,6 @@ class Tracker {
     if(mode == 0) {
       armPID.start(loadDeg);
       mode = -1;
-      intakeStop();
-      intakeRev();
     } else {
       intakeStop();
       mode = 0;

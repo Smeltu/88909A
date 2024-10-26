@@ -139,19 +139,23 @@ void soloAWP2() {
 
 void skills() {
   Auton.Init(72,9.75,90);
+  theTracker.toggleSort();
   Prop.set(false);
   Auton.DriveStraight(3,361,50,20);
   theTracker.intakeFwd();
-  Auton.DriveStraight(-3,361,20);
+  Auton.DriveStraight(-3,361,20);//alliance stake
   theTracker.intakeRev();
+
   Auton.DriveStraight(6);
   theTracker.intakeFwd();
-  Auton.DriveStraight(-24,198,100,15,true,__null,hook,19);//195
-  hook();
+  Auton.DriveStraight(-27,195.5,100,15,true,__null,hook,26);//195
+  hook();//goal
+  Auton.DriveStraight(4);
+
   Auton.DriveStraight(23,90,100,15,true);//20
-  Auton.DriveStraight(36,40,100,15,true);
-  Auton.DriveStraight(34,100,100,15,true,__null,arm,30);
-  Auton.DriveStraight(-29,100);
+  Auton.DriveStraight(37,38,100,15,true);
+  Auton.DriveStraight(34.8,102,100,15,true);
+  Auton.DriveStraight(-28.7,100,100,15,true,__null,arm,2);
 
   prop();
   Auton.RotateTo(0);
@@ -164,7 +168,29 @@ void skills() {
   prop();
   Auton.DriveStraight(-10);
   theTracker.intakeFwd();
-  Auton.DriveStraight(30,255,100,15,true);
+
+  Auton.DriveStraight(29.6,263,80,15,true);
+  Auton.DriveStraight(29,269,50,15,true);
+  Auton.DriveStraight(-12,0,50,15,true);
+  Auton.DriveStraight(24,20,100,15,true);
+  Auton.RotateTo(110);
+  Auton.DriveStraight(-4);
+  wait(500,msec);
+  Hook.set(false);
+  Auton.Output(-100,-100);
+  wait(300,msec);
+
+  Auton.DriveStraight(10,130,100,15,true);
+  Auton.DriveStraight(-30,10,100,15,true);
+  Auton.DriveStraight(6,270,100,15,true);
+  Auton.Output(50,50);
+  prop();
+  wait(500,msec);
+  theTracker.set(theTracker.getX(),9.75);
+  Auton.DriveStraight(-10);
+  Auton.DriveStraight(-50,355,100,15,true);
+
+  theTracker.toggleSort();
 }
 
 void test() {

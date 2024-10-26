@@ -170,6 +170,7 @@ void Tracker::RunIntake() {
     double error = target - ArmRot.position(degrees);
     if(fabs(error) < 30 && mode == -1) {
       mode = fabs(mode);
+      intakeStop();
       intakeFwd();
     }
     double out = armPID.calculate(error,0.005);
