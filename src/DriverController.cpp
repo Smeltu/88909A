@@ -16,6 +16,7 @@ int i=0;
 
 //hook
 bool triggered = false;
+int c = -1;
 
 //arm
 double mode = 0;
@@ -39,6 +40,11 @@ void toggleProp() {
 void toggleHook() {
   if(!triggered) {
     Hook.set(!Hook.value());
+    if(Hook.value()) {
+      theTracker.intakeStop();
+      theTracker.intakeRev();
+      c = 30;
+    }
   }
   triggered = false;
 }
@@ -126,9 +132,16 @@ void DriverController::RunDriveTrain() {
 }
 
 void DriverController::RunHook() {
+  if(c>=0) {
+    c--;
+    if(c==0) {
+      theTracker.intakeStop();
+    }
+  }
+
   double dist = Distance.objectDistance(vex::distanceUnits::mm);
   if(dist > 65 && dist < 75 && !Hook.value() && Controller1.ButtonL1.pressing()) {
-    Hook.set(true);
+    toggleHook();
     triggered = true;
   }
 }

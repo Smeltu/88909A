@@ -28,8 +28,8 @@ back(false),
 counter(12),
 lastDetected(0),
 mode(0),
-loadDeg(140),
-armPID(PID(0.25,0.25,0)) {}
+loadDeg(145),
+armPID(PID(0.25,0.4,0)) {}
 
 void Tracker::set(double setX, double setY, double setA) {
   SingleLock sl(m_Mutex);
@@ -188,7 +188,6 @@ void Tracker::RunIntake() {
   }
   
   bool armLoad = ArmRot.position(degrees) > 100;
-
   //if not running intake, reset counter and stop
   if(!forw && !back) {
     counter = 12;
@@ -218,6 +217,7 @@ void Tracker::RunIntake() {
   //if the ring color is opposite the alliance color
   bool wrongColor = (m_Mirrored && color <= 30) || (!m_Mirrored  && (color > 180 && color < 240));
   
+
   if(forw && counter > 0 || (counter <= -16 && counter > -26 && armLoad)) {
     //current position of the hooks in the cycle
     double deg = fmod(Intake.position(degrees), 1568.04);//1587.152 for 86? 1568.04 for 84;
@@ -250,8 +250,8 @@ void Tracker::RunIntake() {
     //for antistall
     Intake.stop(vex::brakeType::coast);
   } else if(ArmRot.position(degrees) > 20) {
-    //if arm is raising or raised, spin intake reverse at third speed
-    Intake.spin(reverse,4,vex::voltageUnits::volt);
+    //if arm is raising or raised, spin intake reverse at two-third speed
+    Intake.spin(reverse,8,vex::voltageUnits::volt);
   } else {
     //otherwise, spin intake reverse at full speed
     Intake.spin(reverse,12,vex::voltageUnits::volt);

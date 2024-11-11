@@ -104,6 +104,8 @@ class Tracker {
     forw = !forw;
     if(!forw) {
       Intake.stop();
+    } else {
+      Intake.spin(forward,12,vex::voltageUnits::volt);
     }
   }
   void intakeRev() {
@@ -111,6 +113,8 @@ class Tracker {
     back = !back;
     if(!back) {
       Intake.stop();
+    } else {
+      Intake.spin(reverse,12,vex::voltageUnits::volt);
     }
   }
   void intakeStop() {

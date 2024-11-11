@@ -27,13 +27,14 @@ const int ofs2 = 4; //1-3 are red, 4-6 are blue
 const int def2 = 5;
 const int solo2 = 6;
 const int ski = 7;
-const int empty = 8;
+const int tests = 8;
 
-int autonMode = ski; // change this for different autons
+int autonMode = def; // change this for different autons
 double iBrightness = 0;
 
 //objects
 DriverController dc;
+ 
 vex::competition Competition;
 Tracker theTracker(LeftDrive, RightDrive, Inertial, Axial, Axial2, Lateral, (fabs(autonMode-5) <= 1));
 RobotController Auton(LeftDrive, RightDrive, theTracker);
@@ -62,7 +63,8 @@ void auton(void) {
     case(ski):
       skills();
       break;
-    case(empty):
+    case(tests):
+      test();
       break;
   }
 }
