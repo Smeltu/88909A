@@ -29,14 +29,13 @@ const int solo2 = 6;
 const int ski = 7;
 const int tests = 8;
 
-int autonMode = def; // change this for different autons
-double iBrightness = 0;
+int autonMode = ofs; // change this for different autons
 
 //objects
 DriverController dc;
  
 vex::competition Competition;
-Tracker theTracker(LeftDrive, RightDrive, Inertial, Axial, Axial2, Lateral, (fabs(autonMode-5) <= 1));
+Tracker theTracker(LeftDrive, RightDrive, Inertial, Axial, Axial2, Lateral, (abs(autonMode-5) <= 1));
 RobotController Auton(LeftDrive, RightDrive, theTracker);
 
 //autonomous
@@ -76,6 +75,11 @@ void driverControl(void) {
 
 //preAuton
 void preAutonomous(void) {
+  Axial.setdatarate(10);
+  Lateral.setdatarate(10);
+  Axial2.setdatarate(10);
+  ArmRot.setdatarate(10);
+  
   LeftDrive.resetPosition();
   RightDrive.resetPosition();
   Intake.resetPosition();
@@ -83,10 +87,6 @@ void preAutonomous(void) {
   Lateral.resetPosition();
   Arm.resetPosition();
   ArmRot.resetPosition();
-  Axial.setdatarate(10);
-  Lateral.setdatarate(10);
-  Axial2.setdatarate(10);
-  ArmRot.setdatarate(10);
   Optical.setLightPower(100);
 
   Prop.set(true);

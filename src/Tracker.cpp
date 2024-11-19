@@ -154,7 +154,7 @@ void Tracker::ArcIntegral() {
 void Tracker::RunIntake() {
   //armCode
   double target = 830;
-  if(fabs(mode) == 1) {
+  if(abs(mode) == 1) {
     target = loadDeg;
   } else if(mode == 0) {
     target = loadDeg - 100;
@@ -169,7 +169,7 @@ void Tracker::RunIntake() {
   } else {
     double error = target - ArmRot.position(degrees);
     if(fabs(error) < 30 && mode == -1) {
-      mode = fabs(mode);
+      mode = abs(mode);
       intakeStop();
       intakeFwd();
     }
@@ -187,7 +187,13 @@ void Tracker::RunIntake() {
     }
   }
   
+  //if arm is in loading position
   bool armLoad = ArmRot.position(degrees) > 100;
+  //get color detected by optical sensor
+  int color = Optical.hue();
+  //if the ring color is opposite the alliance color
+  bool wrongColor = (m_Mirrored && color <= 30) || (!m_Mirrored  && (color > 180 && color < 240));
+
   //if not running intake, reset counter and stop
   if(!forw && !back) {
     counter = 12;
@@ -211,14 +217,8 @@ void Tracker::RunIntake() {
     //if the intake is stalled, decrement counter by a half (note that each counter is 20ms)
     counter -= 0.5;
   }
-  
-  //get color detected by optical sensor
-  int color = Optical.hue();
-  //if the ring color is opposite the alliance color
-  bool wrongColor = (m_Mirrored && color <= 30) || (!m_Mirrored  && (color > 180 && color < 240));
-  
 
-  if(forw && counter > 0 || (counter <= -16 && counter > -26 && armLoad)) {
+  if((forw && counter > 0) || (counter <= -16 && counter > -26 && armLoad)) {
     //current position of the hooks in the cycle
     double deg = fmod(Intake.position(degrees), 1568.04);//1587.152 for 86? 1568.04 for 84;
     //sort and decrement sorting queue by 1 if there is a ring at the top

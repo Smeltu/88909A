@@ -9,18 +9,18 @@ using code = vision::code;
 brain  Brain;
 
 // VEXcode device constructors
-motor LeftDriveMotorA = motor(PORT5, ratio6_1, true);
-motor LeftDriveMotorB = motor(PORT6, ratio6_1, true);
-motor LeftDriveMotorC = motor(PORT8, ratio6_1, true);
-motor RightDriveMotorA = motor(PORT9, ratio6_1, false);
-motor RightDriveMotorB = motor(PORT14, ratio6_1, false);
-motor RightDriveMotorC = motor(PORT15, ratio6_1, false);
+motor LeftDriveMotorA = motor(PORT15, ratio6_1, true);
+motor LeftDriveMotorB = motor(PORT8, ratio6_1, true);
+motor LeftDriveMotorC = motor(PORT20, ratio6_1, false);
+motor RightDriveMotorA = motor(PORT18, ratio6_1, false);
+motor RightDriveMotorB = motor(PORT6, ratio6_1, false);
+motor RightDriveMotorC = motor(PORT21, ratio6_1, true);
 
 motor_group LeftDrive = motor_group(LeftDriveMotorA, LeftDriveMotorB, LeftDriveMotorC);
 motor_group RightDrive = motor_group(RightDriveMotorA, RightDriveMotorB, RightDriveMotorC);
 
-motor IntakeA = motor(PORT21, ratio18_1, true);
-motor IntakeB = motor(PORT20, ratio18_1, false);
+motor IntakeA = motor(PORT2, ratio18_1, false);
+motor IntakeB = motor(PORT1, ratio18_1, true);
 motor_group Intake = motor_group(IntakeA,IntakeB);
 
 motor Arm = motor(PORT17, ratio18_1, true);
