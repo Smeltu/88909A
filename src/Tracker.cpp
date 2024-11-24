@@ -29,7 +29,7 @@ counter(12),
 lastDetected(0),
 mode(0),
 loadDeg(145),
-armPID(PID(0.25,0.4,0)) {}
+armPID(PID(0.3,0.3,0.005,150)) {}
 
 void Tracker::set(double setX, double setY, double setA) {
   SingleLock sl(m_Mutex);

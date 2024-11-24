@@ -69,53 +69,57 @@ bool timeBreak() { //remember to set t to 0
 }
 
 bool distBreak() {
-  return theTracker.getY()>42;//38
+  return theTracker.getY()>38.2;//38
 }
-
-bool distBreak2() {
-  return theTracker.getY()>49;//46.3
-}
-
 void doinker() {
   Doinker.set(!Doinker.value());
 }
 
 void offensive() { //rel to bottom right corner, alliance side is x-axis
   Auton.Init(96,19.25,270);
-
+  
   prop();
-  Auton.DriveStraight(-22);
+  Auton.DriveStraight(-15);
+  Auton.DriveStraight(-7,270,100,15,false,__null,hook,6);
   hook();//grab goal
   theTracker.intakeFwd();
-  Auton.Goto(120,46);//ring 117
+  Auton.Goto(122,46);//ring 117
 
-  Auton.DriveStraight(-27);
-  Auton.DriveStraight(16,274,100,20,true,__null,hookOff,2);//12.4
-  prop();
+
+
+  Auton.DriveStraight(16,325,100,20,true);
+  Auton.DriveStraight(10,280,100,20,true);
+  Doinker.set(true);
+  Auton.Output(50,50);
+  wait(400,msec);
+  Auton.DriveStraight(10,180,100,15,true);
+  Doinker.set(false);
+
+  /*prop();
   Auton.DriveStraight(18.5,183,55,20,true,spam,prop,13.5);//19.4,15.3
-  theTracker.intakeStop();
-  theTracker.intakeFwd();
-  Auton.DriveStraight(-6,140,100,20,false,check);
+  //theTracker.intakeStop();
+  //theTracker.intakeFwd();
+  Auton.DriveStraight(-9,140,100,20,false,check);
   theTracker.intakeStop();
   theTracker.intakeFwd();
   Auton.DriveStraight(-10,80,100,20,true,check);
-  Auton.DriveStraight(13.6,160,100,20,true,check);//12.5
+  Auton.DriveStraight(11.3,160,100,20,true,check);//12.5
   Auton.DriveStraight(-7.55,94,70,20,true,check);//-5.9
   Auton.Output(-40,-40);
   //set hooks somehow?
   Intake.setPosition(fmod(fmod(Intake.position(degrees),522.68)+525,522.68),degrees);
   std::cout<<"hi "<<Intake.position(degrees)<<std::endl;
   Intake.spinToPosition((Intake.position(degrees)>400)?519:-2,degrees,100,vex::velocityUnits::pct,false);
-  wait(1000,msec);
-  Auton.DriveStraight(3,361,80,20,false,check);
+  wait(1300,msec);
+  Auton.DriveStraight(3,90,80,20,false,check);
   theTracker.intakeStop();
   theTracker.intakeFwd();
   t = 50;
   Auton.DriveStraight(-3,90,20,20,true,timeBreak);
   wait(600,msec);
   theTracker.intakeRev();
-  Auton.DriveStraight(29,90,100,30,true,__null,runIntake,5);
-  theTracker.intakeStop();
+  Auton.DriveStraight(29,90,60,30,true,__null,runIntake,5);
+  theTracker.intakeStop();*/
 }
 
 void defensive() { //rel to bottom left corner, alliance wall is x-axis
@@ -128,38 +132,42 @@ void defensive() { //rel to bottom left corner, alliance wall is x-axis
   theTracker.intakeFwd();
   Auton.Goto(25,64);//25,63.5
   Auton.DriveStraight(-9.5,180);
-  Auton.DriveStraight(13.6,120);
+  Auton.DriveStraight(13.7,120);
   Auton.DriveStraight(-4.3,90);
   Auton.RotateTo(240);
   Auton.DriveStraight(13);
   Auton.DriveStraight(-4);
-  Auton.DriveStraight(24,354,100,20,true);//42,354
-  //Auton.Output(30,30);
+  Auton.DriveStraight(27,354,100,20,true);//42,354
+  Auton.Output(20,20);
 }
 
 void soloAWP() {
-    Auton.DriveStraight(24,114,50,10,true,distBreak2,doinker,8);
-    Doinker.set(true);
-    Auton.DriveStraight(-15,85,80,15,true,__null,doinker,14);
-    Doinker.set(false);
-    t = 0;
-    Auton.DriveStraight(-16,258,60,15,true,timeBreak,hook,15);
-    hook();
+  Auton.Init(12,19.25,270);
+  Auton.DriveStraight(-28,361,100,50,false,distBreak);
+  Auton.RotateTo(0);
+  Auton.DriveStraight(-7,0,90,90,true);//5.9
+  Auton.DriveStraight(-13,270,100,15,true);
+  Auton.DriveStraight(-3,270,50,15,true,__null,hook,2);
+  hook();
+  theTracker.intakeFwd();
 
-    theTracker.intakeFwd();
-    Auton.DriveStraight(14.6,270);
-    prop();
-    wait(1500,msec);
-    hookOff();
-
-    Auton.DriveStraight(16,150,100,15,true,check);
-    Auton.DriveStraight(-10,90,70,15,true,check);
-    theTracker.intakeStop();
-    Auton.DriveStraight(-24,355,50,15,true,__null,hook,22);
-    theTracker.intakeStop();
-    hook();
-    theTracker.intakeFwd();
-    Auton.DriveStraight(20,20,100,15,true);
+  prop();
+  wait(500,msec);
+  Auton.DriveStraight(20,247,60,15,true,__null,hookOff,4);
+  wait(200,msec);
+  theTracker.intakeStop();
+  Auton.DriveStraight(-5,361,100,15,true);
+  Auton.DriveStraight(-5.2,20,100,15,true);
+  Auton.DriveStraight(-8.5,345,60,15,true,__null,hook,7.5);
+  theTracker.intakeStop();
+  theTracker.intakeFwd();
+  prop();
+  Auton.DriveStraight(26,226,100,15,true);
+  prop();
+  wait(500,msec);
+  Auton.DriveStraight(-24,361,60);
+  Auton.RotateTo(90);
+  Auton.DriveStraight(18,361,50,15,false,__null,stopIntake,6);
 }
 
 void offensive2() {
@@ -171,7 +179,8 @@ void defensive2() {
 }
 
 void soloAWP2() {
-  Auton.Init(10.5,17,90);
+  soloAWP();
+  /*Auton.Init(10.5,17,90);
   Auton.DriveStraight(48,95,100,15,false,distBreak);//distBreak is the distance
     Auton.DriveStraight(24,154,50,10,true,distBreak2,doinker,8);
     Doinker.set(true);
@@ -194,7 +203,7 @@ void soloAWP2() {
     theTracker.intakeStop();
     hook();
     theTracker.intakeFwd();
-    Auton.DriveStraight(20,20,100,15,true);
+    Auton.DriveStraight(20,20,100,15,true);*/
 }
 
 void skills() {
@@ -318,8 +327,9 @@ void skills() {
 
 void test() {
   Auton.Init(0,0,0);
-  
-  LeftDrive.resetPosition();
+  Auton.DriveStraight(-5);
+
+  /*LeftDrive.resetPosition();
   RightDrive.resetPosition();
   LeftDrive.spin(forward,12,vex::voltageUnits::volt);
   RightDrive.spin(forward,12,vex::voltageUnits::volt);
@@ -360,5 +370,5 @@ void test() {
   RightDriveMotorC.stop();
   vex::task::sleep(2000);
   std::cout<<"LeftDriveC: "<<LeftDriveMotorC.position(degrees)<<std::endl;
-  std::cout<<"RightDriveC: "<<RightDriveMotorC.position(degrees)<<std::endl;
+  std::cout<<"RightDriveC: "<<RightDriveMotorC.position(degrees)<<std::endl;*/
 }

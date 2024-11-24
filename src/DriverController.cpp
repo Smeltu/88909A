@@ -90,6 +90,8 @@ void DriverController::Run(vex::competition Competition) {
   Controller1.ButtonB.pressed(armToggle);
   Controller1.ButtonRight.pressed(toggleDoinker);
 
+  Doinker.set(false);
+
   theTracker.Start();
   Auton.Init(0,0,0);
   if(autonMode == 7) {

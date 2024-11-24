@@ -10,15 +10,15 @@ using namespace vex;
 const double Degree2Arc = PI / 180.0;
 
 //driveStraight
-PID dsPID = PID(0.18, 0.005, 0.01); //0.6,0.03,0.03
+PID dsPID = PID(0.2, 0.05, 0.007, 5); //0.18,0.005,0.01
 PID aePID = PID(1.1, 0.22, 0.09);
 BreakTimer dsSmall = BreakTimer(0.3, 0.1);
 BreakTimer dsLarge = BreakTimer(1.5, 0.5);
 
 //rotateTo
-PID rtPID = PID(2,1.6,0.12); //2, 1, 0.06
+PID rtPID = PID(6, 1.5, 0.3, 10); //2, 1.6, 0.12
 BreakTimer rtSmall = BreakTimer(1, 0.1);
-BreakTimer rtLarge = BreakTimer(5, 0.8);
+BreakTimer rtLarge = BreakTimer(5, 0.5);
 
 //driveArc
 PID daPID = PID(dsPID.get('p') / degreesToInches, dsPID.get('i') / degreesToInches, dsPID.get('d') / degreesToInches); //move PID - remember it's in inches, not degrees
