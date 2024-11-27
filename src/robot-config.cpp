@@ -27,11 +27,11 @@ motor Arm = motor(PORT5, ratio18_1, false);
 rotSub ArmRot = rotSub(PORT10, true);
 
 inertial Inertial = inertial(PORT12,turnType::left);
-optical Optical = optical(PORT7);
+optical Optical = optical(PORT3);
 distance Distance = distance(PORT20);
-rotSub Axial = rotSub(PORT3, false);
+rotSub Axial = rotSub(PORT7, true);
 rotSub Axial2 = rotSub(PORT16, true);
-rotSub Lateral = rotSub(PORT10, false);
+rotSub Lateral = rotSub(PORT4, false);
 controller Controller1 = controller(primary);
 digital_out Hook = digital_out(Brain.ThreeWirePort.A);
 digital_out Prop = digital_out(Brain.ThreeWirePort.C);

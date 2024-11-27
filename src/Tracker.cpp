@@ -136,10 +136,10 @@ void Tracker::ArcIntegral() {
   }
 
   // Update global posixtion
-  m_X2 += localY * sin(radians);
-  m_Y2 += localY * cos(radians);
-  m_X2 += localX * -cos(radians);
-  m_Y2 += localX * sin(radians);
+  m_X2 += localY * cos(radians) * (1 - m_Mirrored * 2);;
+  m_Y2 += localY * sin(radians);
+  m_X2 += localX * -sin(radians) * (1 - m_Mirrored * 2);;
+  m_Y2 += localX * cos(radians);
 }
 
 //note that automatic intake functioning is also found in DriverController.cpp

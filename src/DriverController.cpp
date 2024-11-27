@@ -105,7 +105,7 @@ void DriverController::Run(vex::competition Competition) {
       //std::cout<<"rot: "<<ArmRot.position(degrees)<<std::endl;
       //std::cout<<Optical.hue()<<" "<<Optical.isNearObject()<<" "<<counter<<std::endl;
       std::cout<<theTracker.getX()<<", "<<theTracker.getX2()<<"; "<<theTracker.getY()<<", "<<theTracker.getY2()<<std::endl;
-      //std::cout<<theTracker.getRotation()<<" "<<theTracker.getHeading()<<std::endl;
+      std::cout<<theTracker.getRotation()<<" "<<theTracker.getHeading()<<std::endl;
       //std::cout<<Axial.position(degrees)<<" "<<Axial2.position(degrees)<<std::endl;
       //std::cout<<Intake.position(degrees)<<std::endl;
     }

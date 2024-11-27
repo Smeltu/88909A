@@ -80,8 +80,21 @@ void doinker() {
   Doinker.set(!Doinker.value());
 }
 
+bool distCheck() {
+  return theTracker.getY()>46;
+}
+
 void offensive() { //rel to bottom right corner, alliance side is x-axis
-  Auton.Init(96,19.25,270);
+  Auton.Init(12.5,15.2,74.3077);
+  Auton.DriveStraight(100,361,100,100,false,distCheck);
+  Auton.DriveStraight(-20,361);
+  
+  /*Auton.Init(10.5,17,90);-4,-1.3
+
+  prop();
+  Auton.DriveStraight(48,95,100,15,false,distBreak);//distBreak is the distance
+  Auton.DriveStraight(24,154,50,10,true,distBreak2,doinker,8);
+  /*Auton.Init(96,19.25,270);
 
   prop();
   Auton.DriveStraight(-22);
@@ -115,7 +128,7 @@ void offensive() { //rel to bottom right corner, alliance side is x-axis
   wait(600,msec);
   theTracker.intakeRev();
   Auton.DriveStraight(29,90,100,30,true,__null,runIntake,5);
-  theTracker.intakeStop();
+  theTracker.intakeStop();*/
 }
 
 void defensive() { //rel to bottom left corner, alliance wall is x-axis
