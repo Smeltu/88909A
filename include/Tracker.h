@@ -135,6 +135,7 @@ class Tracker {
   void RunIntake();
 
   void toggleArm() {
+    armPID.start(0);
     Arm.setMaxTorque(100000000000,vex::currentUnits::amp);
     if(mode == 0) {
       armPID.start(loadDeg);
@@ -146,6 +147,7 @@ class Tracker {
   }
 
   void scoreArm() {
+    armPID.start(0);
     Arm.setMaxTorque(100000000000,vex::currentUnits::amp);
     if(fabs(mode) == 1) {
       mode = 2;

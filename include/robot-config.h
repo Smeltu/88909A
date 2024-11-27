@@ -34,6 +34,8 @@ extern digital_out Prop;
 extern digital_out Endgame;
 extern digital_out Doinker;
 
+extern limit HookLimit;
+
 
 /**
  * Used to initialize code/tasks/devices added using tools in VEXcode Pro.

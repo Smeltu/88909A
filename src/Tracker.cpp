@@ -28,8 +28,8 @@ back(false),
 counter(12),
 lastDetected(0),
 mode(0),
-loadDeg(145),
-armPID(PID(0.25,0.4,0)) {}
+loadDeg(32),//25
+armPID(PID(0.6,1.2,0,50)) {}
 
 void Tracker::set(double setX, double setY, double setA) {
   SingleLock sl(m_Mutex);
@@ -114,126 +114,107 @@ void Tracker::Integral() {
 void Tracker::ArcIntegral() {
   SingleLock sl(m_Mutex);
 
-  //axial movement
+  // Get changes in axial and lateral movement
   double axial = getAxial();
-  double aDif = (axial - m_LastAxial) * degreesToInches;
+  double lateral = getLateral();
+  double deltaAxial = (axial - m_LastAxial) * degreesToInches;
+  double deltaLateral = (lateral - m_LastLateral) * oDegreesToInches;
 
-  double radians = (getRotation() + m_LastAngle) * PI / 360.0;
+  // Calculate heading info
+  double radians = (getRotation() + m_LastAngle) * PI / 360.0; // average heading
   double deltaRadians = (getRotation() - m_LastAngle) * PI / 180.0;
 
-  double dx = 0;
-  double dy = aDif;
-  
-  //deltaRadians=0;
-
-  if(deltaRadians!=0) {
-    double arcRadius = aDif / deltaRadians;
-    dx = cos(deltaRadians)*arcRadius-arcRadius;
-    dy = sin(deltaRadians)*arcRadius;
+  // Calculate local x and y coordinates
+  double localX = 0;
+  double localY = 0;
+  if (deltaRadians == 0) {
+    localX = deltaLateral;
+    localY = deltaAxial;
+  } else {
+    localX = 2 * sin(deltaRadians / 2) * (deltaLateral / deltaRadians);
+    localY = 2 * sin(deltaRadians / 2) * (deltaAxial / deltaRadians);
   }
-  double aMagnitude = sqrt(dx*dx+dy*dy) * ((dy<0)?-1:1); //calculating vector of movement based on arc
-  double direction = deltaRadians / 2.0 + radians;
-  m_X2 += cos(direction) * aMagnitude;
-  m_Y2 += sin(direction) * aMagnitude;
 
-  //lateral movement
-  double lateral = getLateral();
-  double lDif = lateral - m_LastLateral;
-
-  double lMagnitude = lDif * oDegreesToInches;
-  
-  m_X2 += sin(radians) * lMagnitude;
-  m_Y2 -= cos(radians) * lMagnitude;
-
-  /*m_LastAxial = axial;
-  m_LastLateral = lateral;
-  m_LastAngle = getRotation();*/
+  // Update global posixtion
+  m_X2 += localY * sin(radians);
+  m_Y2 += localY * cos(radians);
+  m_X2 += localX * -cos(radians);
+  m_Y2 += localX * sin(radians);
 }
 
 //note that automatic intake functioning is also found in DriverController.cpp
 void Tracker::RunIntake() {
-  //armCode
-  double target = 830;
+  // Handle arm movement and positioning
+  double target = 340; //300
   if(abs(mode) == 1) {
     target = loadDeg;
   } else if(mode == 0) {
-    target = loadDeg - 100;
+    target = loadDeg - 20;
   }
-  if(fabs(ArmRot.position(degrees)) >= target - 80 && mode == 2) {
+
+  if(fabs(ArmRot.position(degrees)) >= target - 50 && mode == 2) {
     Arm.stop();
     mode = 1;
     target = loadDeg;
   }
-  if(fabs(ArmRot.position(degrees)) < loadDeg - 50 && mode == 0) {
+
+  if(fabs(ArmRot.position(degrees)) < loadDeg - 10 && mode == 0) {
     Arm.stop(vex::brakeType::coast);
   } else {
     double error = target - ArmRot.position(degrees);
-    if(fabs(error) < 30 && mode == -1) {
+    if(fabs(error) < 15 && mode == -1) {
       mode = abs(mode);
       intakeStop();
       intakeFwd();
     }
-    double out = armPID.calculate(error,0.005);
-    if(out > 100) {
-      out = 100;
-    } else if (out < -100) {
-      out = -100;
-    }
-    out *= 3 / 25.0;
+    
+    double out = armPID.calculate(error, 0.005);
+    out = std::min(std::max(out, -100.0), 100.0) * (3.0/25.0);
+    
     if(out >= 0) {
-      Arm.spin(forward,out,vex::voltageUnits::volt);
+      Arm.spin(forward, out, vex::voltageUnits::volt);
     } else {
-      Arm.spin(reverse,-out,vex::voltageUnits::volt);
+      Arm.spin(reverse, -out, vex::voltageUnits::volt);
     }
   }
-  
-  //if arm is in loading position
-  bool armLoad = ArmRot.position(degrees) > 100;
-  //get color detected by optical sensor
-  int color = Optical.hue();
-  //if the ring color is opposite the alliance color
-  bool wrongColor = (m_Mirrored && color <= 30) || (!m_Mirrored  && (color > 180 && color < 240));
 
-  //if not running intake, reset counter and stop
+  // Intake control logic
+  const bool armLoad = ArmRot.position(degrees) > loadDeg - 20;
+  const int color = Optical.hue();
+  const bool wrongColor = (m_Mirrored && color <= 30) || (!m_Mirrored && (color > 180 && color < 240));
+
   if(!forw && !back) {
     counter = 12;
     return;
   }
-  //if the counter has ticked to a reset value or the intake unstalls by itself, resume
+
+  // Handle counter updates and anti-stall logic
   if(counter == -33 || counter == -15 || (IntakeB.velocity(pct) != 0 && counter > 0)) {
-    counter = 12;
-    //if the arm is in the loading position, have a lower jam delay before outtaking
-    if(armLoad) {
-      counter = 4;
-    }
+    counter = armLoad ? 4 : 12;
   } else if(counter == -6 && armLoad) {
-    //if antistall first time with arm up, jump counter and run forward again
     counter = -16;
-  } else if (counter == -32 && armLoad) {
-    //otherwise, if antistall code has finished executing and arm is in loading position, stop intake
+  } else if(counter == -32 && armLoad) {
     intakeStop();
     return;
   } else {
-    //if the intake is stalled, decrement counter by a half (note that each counter is 20ms)
     counter -= 0.5;
   }
 
+  // Control intake motor based on conditions
   if((forw && counter > 0) || (counter <= -16 && counter > -26 && armLoad)) {
-    //current position of the hooks in the cycle
-    double deg = fmod(Intake.position(degrees), 1568.04);//1587.152 for 86? 1568.04 for 84;
-    //sort and decrement sorting queue by 1 if there is a ring at the top
-    if(colorSort > 0 && (fabs(deg - 285.8) < 10 || fabs(deg - 808) < 10 || fabs(deg - 1324.2) < 10)) {//295.8,805,1324.2
+    double deg = fmod(Intake.position(degrees), 1568.04);
+    const bool atSortingPosition = (fabs(deg - 285.8) < 10 || fabs(deg - 808) < 10 || fabs(deg - 1324.2) < 10);
+    
+    if(colorSort > 0 && atSortingPosition) {
       if(colorSort == 2 || (colorSort == 1 && !wrongColor)) {
         colorSort--;
-        Intake.spin(reverse,6,vex::voltageUnits::volt);
+        Intake.spin(reverse, 6, vex::voltageUnits::volt);
         counter = -25;
       }
     } else {
-      //if colorSort is toggled off, ignore ring detection and run intake forward
       if(colorSort == -1) {
-        Intake.spin(forward,12,vex::voltageUnits::volt);
+        Intake.spin(forward, 12, vex::voltageUnits::volt);
       } else if(wrongColor) {
-        //if the wrong color is detected and was not previously detected, increment sorting queue
         if(colorSort == 1 && !lastDetected) {
           colorSort++;
         } else {
@@ -241,22 +222,17 @@ void Tracker::RunIntake() {
         }
         lastDetected = true;
       } else {
-        //if a ring is not detected, run intake forward
         lastDetected = false;
-        Intake.spin(forward,12,vex::voltageUnits::volt);
+        Intake.spin(forward, 12, vex::voltageUnits::volt);
       }
     }
-  } else if (counter <= 0 && counter > -20) {
-    //for antistall
-    Intake.stop(vex::brakeType::coast);
+  } else if(counter <= 0 && counter > -20) {
+    Intake.spin(forward, 0, vex::voltageUnits::volt);
   } else if(ArmRot.position(degrees) > 20) {
-    //if arm is raising or raised, spin intake reverse at two-third speed
-    Intake.spin(reverse,8,vex::voltageUnits::volt);
+    Intake.spin(reverse, 8, vex::voltageUnits::volt);
   } else {
-    //otherwise, spin intake reverse at full speed
-    Intake.spin(reverse,12,vex::voltageUnits::volt);
+    Intake.spin(reverse, 12, vex::voltageUnits::volt);
   }
-
 }
 
 int Tracker::TrackingThread(void * pVoid) {
