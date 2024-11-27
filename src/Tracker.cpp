@@ -29,7 +29,7 @@ counter(12),
 lastDetected(0),
 mode(0),
 loadDeg(32),//25
-armPID(PID(0.6,1.2,0,50)) {}
+armPID(PID(1,1.5,0.02,15)) {}
 
 void Tracker::set(double setX, double setY, double setA) {
   SingleLock sl(m_Mutex);
@@ -149,7 +149,7 @@ void Tracker::RunIntake() {
   if(abs(mode) == 1) {
     target = loadDeg;
   } else if(mode == 0) {
-    target = loadDeg - 20;
+    target = loadDeg - 15;
   }
 
   if(fabs(ArmRot.position(degrees)) >= target - 50 && mode == 2) {
@@ -158,8 +158,10 @@ void Tracker::RunIntake() {
     target = loadDeg;
   }
 
-  if(fabs(ArmRot.position(degrees)) < loadDeg - 10 && mode == 0) {
+  if(fabs(ArmRot.position(degrees)) < loadDeg - 5 && mode == 0) {
     Arm.stop(vex::brakeType::coast);
+  } else if(fabs(ArmRot.position(degrees) - loadDeg) < 5 && mode == 1) {
+    Arm.stop(vex::brakeType::hold);
   } else {
     double error = target - ArmRot.position(degrees);
     if(fabs(error) < 15 && mode == -1) {
