@@ -93,6 +93,7 @@ void preAutonomous(void) {
   Hook.set(false);
   Endgame.set(false);
   Doinker.set(false);
+  DoinkerClaw.set(false);
 
   Inertial.calibrate();
   while(Inertial.isCalibrating()) {

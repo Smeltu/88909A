@@ -12,7 +12,7 @@ brain  Brain;
 motor LeftDriveMotorA = motor(PORT15, ratio6_1, true);
 motor LeftDriveMotorB = motor(PORT8, ratio6_1, true);
 motor LeftDriveMotorC = motor(PORT20, ratio6_1, false);
-motor RightDriveMotorA = motor(PORT18, ratio6_1, false);
+motor RightDriveMotorA = motor(PORT17, ratio6_1, false);
 motor RightDriveMotorB = motor(PORT6, ratio6_1, false);
 motor RightDriveMotorC = motor(PORT21, ratio6_1, true);
 
@@ -27,16 +27,17 @@ motor Arm = motor(PORT5, ratio18_1, false);
 rotSub ArmRot = rotSub(PORT10, false);
 
 inertial Inertial = inertial(PORT12,turnType::left);
-optical Optical = optical(PORT3);
+optical Optical = optical(PORT14);
 distance Distance = distance(PORT20);
 rotSub Axial = rotSub(PORT7, true);
 rotSub Axial2 = rotSub(PORT16, true);
 rotSub Lateral = rotSub(PORT4, false);
 controller Controller1 = controller(primary);
 digital_out Hook = digital_out(Brain.ThreeWirePort.A);
-digital_out Prop = digital_out(Brain.ThreeWirePort.C);
-digital_out Endgame = digital_out(Brain.ThreeWirePort.E);
-digital_out Doinker = digital_out(Brain.ThreeWirePort.G);
+digital_out Prop = digital_out(Brain.ThreeWirePort.B); //not existent
+digital_out Doinker = digital_out(Brain.ThreeWirePort.C);
+digital_out Endgame = digital_out(Brain.ThreeWirePort.D); //not existent
+digital_out DoinkerClaw = digital_out(Brain.ThreeWirePort.E);
 
 limit HookLimit = limit(Brain.ThreeWirePort.H);
 

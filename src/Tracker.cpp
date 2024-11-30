@@ -28,8 +28,8 @@ back(false),
 counter(12),
 lastDetected(0),
 mode(0),
-loadDeg(32),//25
-armPID(PID(1,1.5,0.02,15)) {}
+loadDeg(36),//25
+armPID(PID(0.8,3,0.02,30)) {}
 
 void Tracker::set(double setX, double setY, double setA) {
   SingleLock sl(m_Mutex);
@@ -145,14 +145,16 @@ void Tracker::ArcIntegral() {
 //note that automatic intake functioning is also found in DriverController.cpp
 void Tracker::RunIntake() {
   // Handle arm movement and positioning
-  double target = 340; //300
+  double target = 340; //340
   if(abs(mode) == 1) {
     target = loadDeg;
   } else if(mode == 0) {
-    target = loadDeg - 15;
+    target = 0;
   }
 
-  if(fabs(ArmRot.position(degrees)) >= target - 50 && mode == 2) {
+  if(mode == 2 && Controller1.ButtonY.pressing()) {
+    target == 370;
+  } else if(fabs(ArmRot.position(degrees)) >= target - 50 && mode == 2) {
     Arm.stop();
     mode = 1;
     target = loadDeg;
@@ -204,8 +206,8 @@ void Tracker::RunIntake() {
 
   // Control intake motor based on conditions
   if((forw && counter > 0) || (counter <= -16 && counter > -26 && armLoad)) {
-    double deg = fmod(Intake.position(degrees), 1568.04);
-    const bool atSortingPosition = (fabs(deg - 285.8) < 10 || fabs(deg - 808) < 10 || fabs(deg - 1324.2) < 10);
+    double deg = fmod(Intake.position(degrees), 48977.0 / 31.0);
+    const bool atSortingPosition = (fabs(deg - 271) < 10 || fabs(deg - 808) < 10 || fabs(deg - 1324.2) < 10);
     
     if(colorSort > 0 && atSortingPosition) {
       if(colorSort == 2 || (colorSort == 1 && !wrongColor)) {
@@ -230,8 +232,8 @@ void Tracker::RunIntake() {
     }
   } else if(counter <= 0 && counter > -20) {
     Intake.spin(forward, 0, vex::voltageUnits::volt);
-  } else if(ArmRot.position(degrees) > 20) {
-    Intake.spin(reverse, 8, vex::voltageUnits::volt);
+  } else if(armLoad && counter < 4) {
+    Intake.spin(reverse, 4, vex::voltageUnits::volt);
   } else {
     Intake.spin(reverse, 12, vex::voltageUnits::volt);
   }

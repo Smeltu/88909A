@@ -135,12 +135,12 @@ class Tracker {
   void RunIntake();
 
   void toggleArm() {
-    armPID.start(0);
     Arm.setMaxTorque(100000000000,vex::currentUnits::amp);
     if(mode == 0) {
       armPID.start(loadDeg);
       mode = -1;
     } else {
+      armPID.start(-ArmRot.position(degrees));
       intakeStop();
       mode = 0;
     }

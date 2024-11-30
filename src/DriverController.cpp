@@ -17,11 +17,7 @@ int i=0;
 //hook
 bool triggered = false;
 int c = -1;
-
-//arm
-double mode = 0;
-double loadDeg = 140;//215
-PID armPID = PID(0.25,0.25,0);
+BreakTimer clampTime(0.5,0.05);
 
 //callbacks
 
@@ -69,6 +65,10 @@ void toggleDoinker() {
   Doinker.set(!Doinker.value());
 }
 
+void toggleDoinkerClaw() {
+  DoinkerClaw.set(!DoinkerClaw.value());
+}
+
 int x = 0;
 bool antiStall() {
   x++;
@@ -83,12 +83,13 @@ void DriverController::Run(vex::competition Competition) {
   Controller1.ButtonR1.pressed(intakeForward);
   Controller1.ButtonR2.pressed(intakeBackward);
   Controller1.ButtonL1.released(toggleHook);
-  Controller1.ButtonL2.pressed(toggleProp);
+  //Controller1.ButtonL2.pressed(toggleProp);
   Controller1.ButtonUp.pressed(runEndgame);
   Controller1.ButtonDown.pressed(toggleColorSort);
   Controller1.ButtonY.pressed(armScore);
   Controller1.ButtonB.pressed(armToggle);
-  Controller1.ButtonRight.pressed(toggleDoinker);
+  Controller1.ButtonL2.pressed(toggleDoinker);
+  Controller1.ButtonRight.pressed(toggleDoinkerClaw);
 
   theTracker.Start();
   Auton.Init(0,0,0);
@@ -141,7 +142,8 @@ void DriverController::RunHook() {
 
   /*double dist = Distance.objectDistance(vex::distanceUnits::mm);
   if(dist > 65 && dist < 75 && !Hook.value() && Controller1.ButtonL1.pressing()) {*/
-  if(HookLimit.PRESSED && Controller1.ButtonL1.pressing()) {
+  if(clampTime.update(1 - (HookLimit.pressing() && Controller1.ButtonL1.pressing()), 0.005)) {
+    clampTime.reset();
     toggleHook();
     triggered = true;
   }
