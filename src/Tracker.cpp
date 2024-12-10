@@ -27,6 +27,7 @@ forw(false),
 back(false),
 counter(12),
 lastDetected(0),
+stall(true),
 mode(0),
 loadDeg(36),//25
 armPID(PID(0.8,3,0.02,30)) {}
@@ -81,7 +82,7 @@ void Tracker::WaitUntilCompleteStop() {
   return;
 }
 
-void Tracker::Integral() {
+void Tracker::Integral() { //LEGACY
   SingleLock sl(m_Mutex);
 
   //axial movement
@@ -91,8 +92,8 @@ void Tracker::Integral() {
   double magnitude = aDif * degreesToInches;
   double radians = (getRotation() + m_LastAngle) * PI / 360.0;
   
-  m_X += cos(radians) * magnitude * (1 - m_Mirrored * 2);
-  m_Y += sin(radians) * magnitude;
+  m_X2 += cos(radians) * magnitude * (1 - m_Mirrored * 2);
+  m_Y2 += sin(radians) * magnitude;
 
   //lateral movement
   double lateral = getLateral();
@@ -100,8 +101,8 @@ void Tracker::Integral() {
 
   double lMagnitude = lDif * oDegreesToInches;
   
-  m_X += sin(radians) * lMagnitude * (1 - m_Mirrored * 2);
-  m_Y -= cos(radians) * lMagnitude;
+  m_X2 += sin(radians) * lMagnitude * (1 - m_Mirrored * 2);
+  m_Y2 -= cos(radians) * lMagnitude;
 
   ArcIntegral();
   RunIntake();
@@ -136,10 +137,10 @@ void Tracker::ArcIntegral() {
   }
 
   // Update global posixtion
-  m_X2 += localY * cos(radians) * (1 - m_Mirrored * 2);;
-  m_Y2 += localY * sin(radians);
-  m_X2 += localX * -sin(radians) * (1 - m_Mirrored * 2);;
-  m_Y2 += localX * cos(radians);
+  m_X += localY * cos(radians) * (1 - m_Mirrored * 2);;
+  m_Y += localY * sin(radians);
+  m_X += localX * -sin(radians) * (1 - m_Mirrored * 2);;
+  m_Y += localX * cos(radians);
 }
 
 //note that automatic intake functioning is also found in DriverController.cpp
@@ -230,7 +231,7 @@ void Tracker::RunIntake() {
         Intake.spin(forward, 12, vex::voltageUnits::volt);
       }
     }
-  } else if(counter <= 0 && counter > -20) {
+  } else if(counter <= 0 && counter > -20 && stall) {
     Intake.spin(forward, 0, vex::voltageUnits::volt);
   } else if(armLoad && counter < 4) {
     Intake.spin(reverse, 4, vex::voltageUnits::volt);

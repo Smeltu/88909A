@@ -81,73 +81,100 @@ void doinker() {
 }
 
 bool distCheck() {
-  return theTracker.getY()>46;
+  return theTracker.getY()>50.5;
 }
 
-void offensive() { //rel to bottom right corner, alliance side is x-axis
-  Auton.Init(12.5,15.2,74.3077);
-  Auton.DriveStraight(100,361,100,100,false,distCheck);
-  Auton.DriveStraight(-20,361);
+int ah = 10;
+bool autoHook() {
+  if(HookLimit.pressing()) {
+    ah--;
+    if(ah==0) {
+      Hook.set(true);
+    }
+  }
+  return false;
+}
+
+void doinkerClawToggle() {
+  DoinkerClaw.set(!DoinkerClaw.value());
+}
+
+int ones = 0;
+bool quartSec() {
+  ones++;
+  if(ones>=25) {
+    ones = 0;
+    return true;
+  }
+  return false;
+}
+
+bool distCheck2() {
+  return theTracker.getX() < 43;
+}
+
+void doinkerOff() {
+  Doinker.set(false);
+}
+
+void offensive() { //rel to bottom left corner, alliance side is x-axis
+  Auton.Init(132,19,90);
+  Doinker.set(true);
+  theTracker.intakeFwd();
+  Auton.DriveStraight(100,112,100,100,true,distCheck);
+  Auton.DriveStraight(-20,120,100,15,true,distCheck2,stopIntake,6);
+  DoinkerClaw.set(true);
+  Auton.DriveStraight(2,120,70,15,false,quartSec);
+  Auton.DriveStraight(-4,120,70,15,false,quartSec);
+  Doinker.set(false);
   
-  /*Auton.Init(10.5,17,90);-4,-1.3
-
-  prop();
-  Auton.DriveStraight(48,95,100,15,false,distBreak);//distBreak is the distance
-  Auton.DriveStraight(24,154,50,10,true,distBreak2,doinker,8);
-  /*Auton.Init(96,19.25,270);
-
-  prop();
-  Auton.DriveStraight(-22);
-  hook();//grab goal
+  Auton.DriveStraight(-19,285,50,15,true,autoHook);
+  Auton.DriveStraight(-3,361,30,15,false,quartSec);
+  hook();
   theTracker.intakeFwd();
-  Auton.Goto(120,46);//ring 117
-
-  Auton.DriveStraight(-27);
-  Auton.DriveStraight(16,274,100,20,true,__null,hookOff,2);//12.4
-  prop();
-  Auton.DriveStraight(18.5,183,55,20,true,spam,prop,13.5);//19.4,15.3
+  wait(800,msec);
   theTracker.intakeStop();
+
+  hookOff();
+  Auton.DriveStraight(5);
+  Auton.DriveStraight(-22.5,355,50,15,true,autoHook);//23.5
+  Auton.DriveStraight(-2,361,30,15,false,quartSec);
+  hook();
+
   theTracker.intakeFwd();
-  Auton.DriveStraight(-6,140,100,20,false,check);
-  theTracker.intakeStop();
-  theTracker.intakeFwd();
-  Auton.DriveStraight(-10,80,100,20,true,check);
-  Auton.DriveStraight(13.6,160,100,20,true,check);//12.5
-  Auton.DriveStraight(-7.55,94,70,20,true,check);//-5.9
-  Auton.Output(-40,-40);
-  //set hooks somehow?
-  Intake.setPosition(fmod(fmod(Intake.position(degrees),522.68)+525,522.68),degrees);
-  std::cout<<"hi "<<Intake.position(degrees)<<std::endl;
-  Intake.spinToPosition((Intake.position(degrees)>400)?519:-2,degrees,100,vex::velocityUnits::pct,false);
-  wait(1000,msec);
-  Auton.DriveStraight(3,361,80,20,false,check);
-  theTracker.intakeStop();
-  theTracker.intakeFwd();
-  t = 50;
-  Auton.DriveStraight(-3,90,20,20,true,timeBreak);
-  wait(600,msec);
-  theTracker.intakeRev();
-  Auton.DriveStraight(29,90,100,30,true,__null,runIntake,5);
-  theTracker.intakeStop();*/
+  Auton.DriveStraight(26,260,100,15,true);
+  t = 100;
+  Doinker.set(true);
+  Auton.DriveStraight(34,340,100,15,true,timeBreak);
+  t = 100;
+  Auton.DriveStraight(23,90,100,15,true,timeBreak);
+  t = 0;
+  Auton.DriveStraight(60,153,100,15,true,timeBreak,doinkerOff,10);
+  Auton.Output(20,20);
+  //Auton.DriveStraight(30,170,100,100,true);
+
+  /*Auton.DriveStraight(6,270,100,15,true);
+  Auton.RotateTo(180);
+  hookOff();
+  Auton.Goto(96,48,0,false,clampDistCheck);
+  Auton.DriveStraight(-3,361,40,15,true);
+  hook();*/
 }
 
 void defensive() { //rel to bottom left corner, alliance wall is x-axis
-  Auton.Init(48,19.25,270);
-  prop();
-  Auton.DriveStraight(-17,270,100,20);
-  Auton.DriveStraight(-4.2,270,60,20,false,__null,hook,1);//18.2
+  Auton.Init(48,20.5,270);
+  theTracker.toggleSort();
+  Auton.DriveStraight(-19,270,100,15,false,autoHook);
   hook();
-  vex::task::sleep(100);
-  theTracker.intakeFwd();
-  Auton.Goto(25,64);//25,63.5
-  Auton.DriveStraight(-9.5,180);
-  Auton.DriveStraight(13.6,120);
+  Auton.Goto(31,61,0.0,true,__null,__null,0,runIntake,0.1);//25,63.5
+  theTracker.toggleSort();
+  Auton.DriveStraight(-6,180,100,15);
+  Auton.DriveStraight(14,90,100,15);
   Auton.DriveStraight(-4.3,90);
-  Auton.RotateTo(240);
+  Auton.RotateTo(270);
   Auton.DriveStraight(13);
-  Auton.DriveStraight(-4);
-  Auton.DriveStraight(24,354,100,20,true);//42,354
-  //Auton.Output(30,30);
+  Auton.RotateTo(90);
+  Auton.DriveStraight(5);
 }
 
 void soloAWP() {

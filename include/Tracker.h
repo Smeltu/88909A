@@ -29,6 +29,7 @@ class Tracker {
   bool back;
   double counter;
   int colorSort;
+  bool stall;
   bool lastDetected;
 
   int mode;
@@ -36,10 +37,13 @@ class Tracker {
   PID armPID;
   
   public: Tracker(motor_group & LeftDrive, motor_group & RightDrive, inertial & Inertial, rotation & Axial, rotation & Axial2, rotation & Lateral, bool mirrored);
+  
   void set(double x, double y, double a = 361);
+
   double getX() {
     return (m_X - cos((getHeading() + oOffsetAngle) * PI / 180.0) * oOffset);
   }
+
   double getY() {
     return (m_Y - sin((getHeading() + oOffsetAngle) * PI / 180.0) * oOffset);
   }
@@ -47,6 +51,7 @@ class Tracker {
   double getX2() {
     return (m_X2 - cos((getHeading() + oOffsetAngle) * PI / 180.0) * oOffset);
   }
+
   double getY2() {
     return (m_Y2 - sin((getHeading() + oOffsetAngle) * PI / 180.0) * oOffset);
   }
@@ -57,22 +62,26 @@ class Tracker {
   void Integral();
   void ArcIntegral();
   static int TrackingThread(void * pVoid);
+
   bool Running() {
     SingleLock sl(m_Mutex);
     return m_Running;
   }
+
   double getRotation() {
     /*if(m_Axial.installed() && m_Axial2.installed()) {
       return (m_Axial2.position(degrees) - m_Axial.position(degrees)) * oDegreesToHeading + m_SetRotation;
     }*/
     return (m_Inertial.rotation() - m_SetRotation) * inertialCal + m_SetRotation;
   }
+
   double getHeading() {
     if(m_Mirrored) {
       return fmod(180 - getRotation(), 360.0);
     }
     return fmod(getRotation(),360.0);
   }
+
   double angleError(double a) {
     double heading = getHeading();
     double headingError = fmod(a - heading, 360);
@@ -87,6 +96,7 @@ class Tracker {
     }
     return (headingError);
   }
+
   double getAxial() {
     double sum = m_Axial.position(vex::rotationUnits::deg) + m_Axial2.position(vex::rotationUnits::deg);
     double count = m_Axial.installed() + m_Axial2.installed();
@@ -95,6 +105,7 @@ class Tracker {
     }
     return sum / count;
   }
+
   double getLateral() {
     return m_Lateral.position(vex::rotationUnits::deg);
   }
@@ -108,6 +119,7 @@ class Tracker {
       Intake.spin(forward,12,vex::voltageUnits::volt);
     }
   }
+
   void intakeRev() {
     forw = false;
     back = !back;
@@ -117,11 +129,13 @@ class Tracker {
       Intake.spin(reverse,12,vex::voltageUnits::volt);
     }
   }
+
   void intakeStop() {
     forw = false;
     back = false;
     Intake.stop();
   }
+
   void toggleSort() {
     if(colorSort == -1) {
       colorSort = 0;
@@ -129,9 +143,15 @@ class Tracker {
       colorSort = -1;
     }
   }
+
+  void toggleStall() {
+    stall = !stall;
+  }
+
   void setCounter(double count) {
     counter = count;
   }
+
   void RunIntake();
 
   void toggleArm() {
