@@ -35,8 +35,10 @@ int autonMode = ofs; // change this for different autons
 DriverController dc;
  
 vex::competition Competition;
-Tracker theTracker(LeftDrive, RightDrive, Inertial, Axial, Axial2, Lateral, (abs(autonMode-5) <= 1));
+Assist Assistant(abs(autonMode-5) <= 1);
+Tracker theTracker(LeftDrive, RightDrive, Inertial, Axial, Axial2, Lateral, Assistant.isMirrored());
 RobotController Auton(LeftDrive, RightDrive, theTracker);
+
 
 //autonomous
 void auton(void) {

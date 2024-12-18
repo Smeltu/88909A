@@ -1,10 +1,7 @@
 #ifndef __TRACKER__
 #define __TRACKER__
 
-#include "vex.h"
-#include "SingleLock.h"
-#include "constants.h"
-#include "PID.h"
+#include "Assist.h"
 
 class Tracker {
   private: vex::mutex m_Mutex;
@@ -24,20 +21,10 @@ class Tracker {
   double m_SetRotation;
   double m_X2;
   double m_Y2;
-
-  bool forw;
-  bool back;
-  double counter;
-  int colorSort;
-  bool stall;
-  bool lastDetected;
-
-  int mode;
-  int loadDeg;
-  PID armPID;
   
-  public: Tracker(motor_group & LeftDrive, motor_group & RightDrive, inertial & Inertial, rotation & Axial, rotation & Axial2, rotation & Lateral, bool mirrored);
+  public: Tracker(motor_group & LeftDrive, motor_group & RightDrive, inertial & Inertial, rotation & Axial, rotation & Axial2, rotation & Lateral, /*Assist & Assistant,*/ bool mirrored);
   
+
   void set(double x, double y, double a = 361);
 
   double getX() {
@@ -109,71 +96,6 @@ class Tracker {
   double getLateral() {
     return m_Lateral.position(vex::rotationUnits::deg);
   }
-
-  void intakeFwd() {
-    back = false;
-    forw = !forw;
-    if(!forw) {
-      Intake.stop();
-    } else {
-      Intake.spin(forward,12,vex::voltageUnits::volt);
-    }
-  }
-
-  void intakeRev() {
-    forw = false;
-    back = !back;
-    if(!back) {
-      Intake.stop();
-    } else {
-      Intake.spin(reverse,12,vex::voltageUnits::volt);
-    }
-  }
-
-  void intakeStop() {
-    forw = false;
-    back = false;
-    Intake.stop();
-  }
-
-  void toggleSort() {
-    if(colorSort == -1) {
-      colorSort = 0;
-    } else {
-      colorSort = -1;
-    }
-  }
-
-  void toggleStall() {
-    stall = !stall;
-  }
-
-  void setCounter(double count) {
-    counter = count;
-  }
-
-  void RunIntake();
-
-  void toggleArm() {
-    Arm.setMaxTorque(100000000000,vex::currentUnits::amp);
-    if(mode == 0) {
-      armPID.start(loadDeg);
-      mode = -1;
-    } else {
-      armPID.start(-ArmRot.position(degrees));
-      intakeStop();
-      mode = 0;
-    }
-  }
-
-  void scoreArm() {
-    armPID.start(0);
-    Arm.setMaxTorque(100000000000,vex::currentUnits::amp);
-    if(fabs(mode) == 1) {
-      mode = 2;
-    }
-  }
-
 };
 
 #endif

@@ -17,12 +17,12 @@ BreakTimer dsLarge = BreakTimer(1.5, 0.5);
 
 //rotateTo
 PID rtPID = PID(6.5, 0.05, 0.305, 15); //2, 1, 0.06
-BreakTimer rtSmall = BreakTimer(1, 0.1);
-BreakTimer rtLarge = BreakTimer(5, 0.8);
+BreakTimer rtSmall = BreakTimer(0.5, 0.1);
+BreakTimer rtLarge = BreakTimer(2, 0.8);
 
 //driveArc
 PID daPID = PID(dsPID.get('p') / degreesToInches, dsPID.get('i') / degreesToInches, dsPID.get('d') / degreesToInches); //move PID - remember it's in inches, not degrees
-PID arPID = PID(rtPID.get('p'),rtPID.get('i'),rtPID.get('d')); //rotate PID
+PID arPID = PID(rtPID.get('p')/2.0,rtPID.get('i')/2.0,rtPID.get('d')/2.0); //rotate PID
 PID lePID = PID(aePID.get('p'),aePID.get('i'),aePID.get('d')); //rotate lowError PID
 
 RobotController::RobotController(motor_group & LeftDrive, motor_group & RightDrive, Tracker & theTracker): m_LeftDrive(LeftDrive), m_RightDrive(RightDrive), m_Tracker(theTracker) {

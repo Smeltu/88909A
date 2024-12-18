@@ -9,6 +9,7 @@ using namespace vex;
 
 extern Tracker theTracker;
 extern RobotController Auton;
+extern Assist Assistant;
 
 //for output
 int i=0;
@@ -22,11 +23,11 @@ BreakTimer clampTime(0.5,0.05);
 //callbacks
 
 void intakeForward() {
-  theTracker.intakeFwd();
+  Assistant.intakeFwd();
 }
 
 void intakeBackward() {
-  theTracker.intakeRev();
+  Assistant.intakeRev();
 }
 
 void toggleProp() {
@@ -37,8 +38,8 @@ void toggleHook() {
   if(!triggered) {
     Hook.set(!Hook.value());
     if(Hook.value()) {
-      theTracker.intakeStop();
-      theTracker.intakeRev();
+      Assistant.intakeStop();
+      Assistant.intakeRev();
       c = 30;
     }
   }
@@ -50,22 +51,25 @@ void runEndgame() {
 }
 
 void toggleColorSort() {
-  theTracker.toggleSort();
+  Assistant.toggleSort();
 }
 
 void toggleStallCode() {
-  theTracker.toggleStall();
+  Assistant.toggleStall();
 }
 
 void armToggle() {
-  theTracker.toggleArm();
+  Assistant.toggleArm();
 }
 
 void armScore() {
-  theTracker.scoreArm();
+  Assistant.scoreArm();
 }
 
 void toggleDoinker() {
+  if(Doinker.value()) {
+    DoinkerClaw.set(false);
+  }
   Doinker.set(!Doinker.value());
 }
 
@@ -95,14 +99,15 @@ void DriverController::Run(vex::competition Competition) {
   Controller1.ButtonB.pressed(armToggle);
   Controller1.ButtonL2.pressed(toggleDoinker);
   Controller1.ButtonRight.pressed(toggleDoinkerClaw);
+  std::cout<<(abs(autonMode-5) <= 1)<<std::endl;
 
   theTracker.Start();
   Auton.Init(0,0,0);
+
   if(autonMode == 7) {
-    Prop.set(false);
-    Auton.DriveStraight(3,361,50,20,false,antiStall);
-    intakeForward();
-    Auton.DriveStraight(-3,361,20,20,false,antiStall);
+    Assistant.intakeFwd();
+    Auton.DriveStraight(1.5,361,15,15);
+    wait(100,msec);
   }
   while (true) {
     RunDriveTrain();
@@ -111,12 +116,13 @@ void DriverController::Run(vex::competition Competition) {
       Brain.Screen.clearLine();
     }
     if(i==0) {
-      std::cout<<"rot: "<<ArmRot.position(degrees)<<std::endl;
-      //std::cout<<Optical.hue()<<" "<<Optical.isNearObject()<<" "<<counter<<std::endl;
+      //std::cout<<"rot: "<<ArmRot.position(degrees)<<std::endl;
+      //std::cout<<Optical.hue()<<" "<<std::endl;
       std::cout<<theTracker.getX()<<", "<<theTracker.getX2()<<"; "<<theTracker.getY()<<", "<<theTracker.getY2()<<std::endl;
       //std::cout<<theTracker.getRotation()<<" "<<theTracker.getHeading()<<std::endl;
       //std::cout<<Axial.position(degrees)<<" "<<Axial2.position(degrees)<<std::endl;
       //std::cout<<Intake.position(degrees)<<std::endl;
+      
       Controller1.Screen.setCursor(3,1);
       Controller1.Screen.print(theTracker.getX());
       Controller1.Screen.print(", ");
@@ -148,7 +154,7 @@ void DriverController::RunHook() {
   if(c>=0) {
     c--;
     if(c==0) {
-      theTracker.intakeStop();
+      Assistant.intakeStop();
     }
   }
 
