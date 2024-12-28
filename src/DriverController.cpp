@@ -99,7 +99,6 @@ void DriverController::Run(vex::competition Competition) {
   Controller1.ButtonB.pressed(armToggle);
   Controller1.ButtonL2.pressed(toggleDoinker);
   Controller1.ButtonRight.pressed(toggleDoinkerClaw);
-  std::cout<<(abs(autonMode-5) <= 1)<<std::endl;
 
   theTracker.Start();
   Auton.Init(0,0,0);
@@ -118,7 +117,7 @@ void DriverController::Run(vex::competition Competition) {
     if(i==0) {
       //std::cout<<"rot: "<<ArmRot.position(degrees)<<std::endl;
       //std::cout<<Optical.hue()<<" "<<std::endl;
-      std::cout<<theTracker.getX()<<", "<<theTracker.getX2()<<"; "<<theTracker.getY()<<", "<<theTracker.getY2()<<std::endl;
+      //std::cout<<theTracker.getX()<<", "<<theTracker.getX2()<<"; "<<theTracker.getY()<<", "<<theTracker.getY2()<<std::endl;
       //std::cout<<theTracker.getRotation()<<" "<<theTracker.getHeading()<<std::endl;
       //std::cout<<Axial.position(degrees)<<" "<<Axial2.position(degrees)<<std::endl;
       //std::cout<<Intake.position(degrees)<<std::endl;

@@ -29,7 +29,7 @@ const int solo2 = 6;
 const int ski = 7;
 const int tests = 8;
 
-int autonMode = ofs; // change this for different autons
+int autonMode = ofs2; // change this for different autons
 
 //objects
 DriverController dc;
@@ -89,6 +89,7 @@ void preAutonomous(void) {
   Lateral.resetPosition();
   Arm.resetPosition();
   ArmRot.resetPosition();
+  Optical.gestureEnable();
   Optical.setLightPower(100);
 
   Prop.set(true);

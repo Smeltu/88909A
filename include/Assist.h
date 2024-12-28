@@ -7,25 +7,28 @@
 #include "PID.h"
 
 class Assist {
-  private:
 
+  private:
+  
   bool m_Mirrored;
   bool forw;
   bool back;
   double counter;
   int colorSort;
   bool stall;
-  int lastDetected;
+  double averageColor;
 
   int mode;
   int loadDeg;
   PID armPID;
-  
+
   public: Assist(bool mirrored);
 
+  void Init();
   void Run();
   void RunIntake();
   void RunArm();
+  void gestureCheck();
 
   bool isMirrored() {
     return m_Mirrored;
