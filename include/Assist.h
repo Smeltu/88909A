@@ -17,6 +17,7 @@ class Assist {
   int colorSort;
   bool stall;
   double averageColor;
+  double averageDist;
 
   int mode;
   int loadDeg;

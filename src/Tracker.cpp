@@ -26,12 +26,6 @@ m_LastAngle(0),
 m_X2(cos(oOffsetAngle * PI / 180.0) * oOffset),
 m_Y2(sin(oOffsetAngle * PI / 180.0) * oOffset) {}
 
-
-void gesture() {
-  Assistant.gestureCheck();
-}
-
-
 void Tracker::set(double setX, double setY, double setA) {
   SingleLock sl(m_Mutex);
   double ang = ((setA == 361) ? getRotation() : setA);
@@ -65,12 +59,6 @@ void Tracker::Start() {
 
     m_LastAngle = getRotation();
     m_Running = true;
-
-    Optical.gestureEnable();
-    Optical.gestureUp(gesture);
-    Optical.gestureLeft(gesture);
-    Optical.gestureRight(gesture);
-    Optical.gestureDown(gesture);
 
     vex::task track(TrackingThread, this);
   }

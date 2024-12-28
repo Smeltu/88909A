@@ -29,7 +29,7 @@ const int solo2 = 6;
 const int ski = 7;
 const int tests = 8;
 
-int autonMode = ofs2; // change this for different autons
+int autonMode = ofs; // change this for different autons
 
 //objects
 DriverController dc;
