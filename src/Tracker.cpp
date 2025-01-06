@@ -9,7 +9,7 @@ using namespace vex;
 
 extern Assist Assistant;
 
-Tracker::Tracker(motor_group & LeftDrive, motor_group & RightDrive, inertial & Inertial, rotation & Axial, rotation & Axial2, rotation & Lateral, bool mirrored):
+Tracker::Tracker(motor_group & LeftDrive, motor_group & RightDrive, inertial & Inertial, rotSub & Axial, rotSub & Axial2, rotSub & Lateral, bool mirrored):
 m_LeftDrive(LeftDrive),
 m_RightDrive(RightDrive),
 m_Inertial(Inertial),
@@ -17,27 +17,29 @@ m_Axial(Axial),
 m_Axial2(Axial2),
 m_Lateral(Lateral),
 m_Mirrored(mirrored),
-m_X(cos(oOffsetAngle * PI / 180.0) * oOffset),
-m_Y(sin(oOffsetAngle * PI / 180.0) * oOffset),
+m_X(0),
+m_Y(0),
 m_Running(false),
 m_LastAxial(0),
 m_LastLateral(0),
 m_LastAngle(0),
-m_X2(cos(oOffsetAngle * PI / 180.0) * oOffset),
-m_Y2(sin(oOffsetAngle * PI / 180.0) * oOffset) {}
+m_X2(0),
+m_Y2(0) {}
 
 void Tracker::set(double setX, double setY, double setA) {
   SingleLock sl(m_Mutex);
   double ang = ((setA == 361) ? getRotation() : setA);
   m_Inertial.setRotation(ang, degrees);
   m_SetRotation = ang;
+  setRotation = m_SetRotation;
+  
   m_LastAngle = getRotation();
   double temp = getAxial();
   m_Axial.setPosition(temp, degrees);
   m_Axial2.setPosition(temp, degrees);
 
-  m_X = setX + cos((getRotation() + oOffsetAngle) * PI / 180.0) * oOffset;
-  m_Y = setY + sin((getRotation() + oOffsetAngle) * PI / 180.0) * oOffset;
+  m_X = setX;
+  m_Y = setY;
   
   m_X2 = m_X;
   m_Y2 = m_Y;
@@ -85,7 +87,7 @@ void Tracker::Integral() { // LEGACY
   double axial = getAxial();
   double aDif = axial - m_LastAxial;
 
-  double magnitude = aDif * degreesToInches;
+  double magnitude = aDif * ((Axial.installed() || Axial2.installed()) ? oDegreesToInches : degreesToInches);
   double radians = (getRotation() + m_LastAngle) * PI / 360.0;
   
   m_X2 += cos(radians) * magnitude * (1 - m_Mirrored * 2);
@@ -96,7 +98,7 @@ void Tracker::Integral() { // LEGACY
   double lDif = lateral - m_LastLateral;
 
   double lMagnitude = lDif * oDegreesToInches;
-  
+
   m_X2 += sin(radians) * lMagnitude * (1 - m_Mirrored * 2);
   m_Y2 -= cos(radians) * lMagnitude;
 
@@ -113,8 +115,12 @@ void Tracker::ArcIntegral() {
   // Get changes in axial and lateral movement
   double axial = getAxial();
   double lateral = getLateral();
-  double deltaAxial = (axial - m_LastAxial) * degreesToInches;
+
+  //std::cout<<axial<<" "<<lateral<<" "<<getRotation()<<std::endl;
+
+  double deltaAxial = (axial - m_LastAxial) * ((Axial.installed() || Axial2.installed()) ? oDegreesToInches : degreesToInches);
   double deltaLateral = (lateral - m_LastLateral) * oDegreesToInches;
+
 
   // Calculate heading info
   double radians = (getRotation() + m_LastAngle) * PI / 360.0; // average heading
@@ -123,6 +129,7 @@ void Tracker::ArcIntegral() {
   // Calculate local x and y coordinates
   double localX = 0;
   double localY = 0;
+
   if (deltaRadians == 0) {
     localX = deltaLateral;
     localY = deltaAxial;

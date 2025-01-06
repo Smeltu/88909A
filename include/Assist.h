@@ -69,6 +69,10 @@ class Assist {
     }
   }
 
+  void scheduleIntakeStop() {
+    colorSort = -2;
+  }
+
   void toggleStall() {
     stall = !stall;
   }

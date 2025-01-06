@@ -94,14 +94,16 @@ void DriverController::Run(vex::competition Competition) {
   //Controller1.ButtonL2.pressed(toggleProp);
   //Controller1.ButtonUp.pressed(runEndgame);
   Controller1.ButtonDown.pressed(toggleColorSort);
-  Controller1.ButtonUp.pressed(toggleStallCode);
+  Controller1.ButtonDown.pressed(toggleStallCode);
   Controller1.ButtonY.pressed(armScore);
   Controller1.ButtonB.pressed(armToggle);
-  Controller1.ButtonL2.pressed(toggleDoinker);
-  Controller1.ButtonRight.pressed(toggleDoinkerClaw);
+  Controller1.ButtonRight.pressed(toggleDoinker);
+  //Controller1.ButtonL2.pressed(toggleDoinkerClaw);
 
   theTracker.Start();
   Auton.Init(0,0,0);
+
+  Doinker.set(false);
 
   if(autonMode == 7) {
     Assistant.intakeFwd();
@@ -119,9 +121,9 @@ void DriverController::Run(vex::competition Competition) {
       //std::cout<<Optical.hue()<<" "<<std::endl;
       //std::cout<<theTracker.getX()<<", "<<theTracker.getX2()<<"; "<<theTracker.getY()<<", "<<theTracker.getY2()<<std::endl;
       //std::cout<<theTracker.getRotation()<<" "<<theTracker.getHeading()<<std::endl;
-      //std::cout<<Axial.position(degrees)<<" "<<Axial2.position(degrees)<<std::endl;
+      //std::cout<<Axial.getPosition()<<", "<<Axial.position(degrees)<<"; "<<Lateral.getPosition()<<", "<<Lateral.position(degrees)<<std::endl;
       //std::cout<<Intake.position(degrees)<<std::endl;
-      
+      std::cout<<""<<std::endl;
       Controller1.Screen.setCursor(3,1);
       Controller1.Screen.print(theTracker.getX());
       Controller1.Screen.print(", ");

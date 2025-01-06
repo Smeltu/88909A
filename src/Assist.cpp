@@ -8,10 +8,11 @@ m_Mirrored(mirrored),
 forw(false),
 back(false),
 counter(12),
+colorSort(0),
 stall(true),
 averageColor(0),
 mode(0),
-loadDeg(20),//25
+loadDeg(13),//13
 armPID(PID(2.4,0,0.04,17)) {}
 
 //note that automatic intake functioning is also found in DriverController.cpp
@@ -19,8 +20,12 @@ armPID(PID(2.4,0,0.04,17)) {}
 void Assist::gestureCheck() {
   const bool wrongColor = (m_Mirrored && averageColor <= 25) || (!m_Mirrored && (averageColor > 180));
   std::cout<<averageDist<<", "<<averageColor<<", "<<(wrongColor?180:20)<<std::endl;
+
   if (wrongColor) {
     colorSort++;
+  } else if(colorSort == -2) {
+    intakeStop();
+    colorSort == 0;
   }
 }
 
@@ -35,15 +40,15 @@ void Assist::RunIntake() {
   const int color = Optical.hue();
   const int dist = Distance.value();
 
-  averageColor *= 0.875;
-  averageColor += color/8.0;
+  averageColor /= 1.5;
+  averageColor += color/3.0;
 
-  if(averageDist>110 && averageDist*0.75+dist/4.0<=110) {
+  if(averageDist>110 && averageDist*0.5+dist/2.0<=110) {
     gestureCheck();
   }
 
-  averageDist *= 0.75;
-  averageDist += dist/4.0;
+  averageDist /= 2.0;
+  averageDist += dist/2.0;
 
   if(!forw && !back) {
     counter = 12;
@@ -51,7 +56,7 @@ void Assist::RunIntake() {
   }
 
   // Handle counter updates and anti-stall logic
-  if(counter == -33 || counter == -15 || (IntakeB.velocity(pct) != 0 && counter > 0)) {
+  if(counter == -33 || counter == -15 || (IntakeA.velocity(pct) != 0 && counter > 0)) {
     counter = armLoad ? 4 : 12;
   } else if(counter == -6 && armLoad) {
     counter = -16;
@@ -63,8 +68,8 @@ void Assist::RunIntake() {
   }
   // Control intake motor based on conditions
   if((forw && counter > 0) || (counter <= -16 && armLoad)) {
-    double deg = fmod(Intake.position(degrees), 48977.0 / 31.0);
-    const bool atSortingPosition = (fabs(deg - 271.5) < 10 || fabs(deg - 808) < 10 || fabs(deg - 1324.2) < 10); //271
+    double deg = fmod(Intake.position(degrees), 1053.268817);
+    const bool atSortingPosition = (fabs(deg - 181) < 10 || fabs(deg - 538.67) < 10 || fabs(deg - 882.8) < 7); //271
     if(atSortingPosition && colorSort > 0) {
       colorSort--;
       Intake.spin(reverse, 6, vex::voltageUnits::volt);
@@ -83,7 +88,7 @@ void Assist::RunIntake() {
 
 void Assist::RunArm() {
   // Handle arm movement and positioning
-  double target = 140; //113
+  double target = loadDeg + 124; //113
   if(abs(mode) == 1) {
     target = loadDeg;
   } else if(mode == 0) {

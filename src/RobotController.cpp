@@ -8,6 +8,7 @@ using namespace vex;
 
 //consts
 const double Degree2Arc = PI / 180.0;
+const double dti = (Axial.installed() || Axial2.installed()) ? oDegreesToInches : degreesToInches;
 
 //driveStraight
 PID dsPID = PID(0.3, 0.01, 0.015, 5); //0.6,0.03,0.03
@@ -21,7 +22,7 @@ BreakTimer rtSmall = BreakTimer(0.5, 0.1);
 BreakTimer rtLarge = BreakTimer(2, 0.8);
 
 //driveArc
-PID daPID = PID(dsPID.get('p') / degreesToInches, dsPID.get('i') / degreesToInches, dsPID.get('d') / degreesToInches); //move PID - remember it's in inches, not degrees
+PID daPID = PID(dsPID.get('p') / dti, dsPID.get('i') / dti, dsPID.get('d') / dti); //move PID - remember it's in inches, not degrees
 PID arPID = PID(rtPID.get('p')/2.0,rtPID.get('i')/2.0,rtPID.get('d')/2.0); //rotate PID
 PID lePID = PID(aePID.get('p'),aePID.get('i'),aePID.get('d')); //rotate lowError PID
 
@@ -121,7 +122,7 @@ void RobotController::RotateTo(double TargetAngle, Event positionEvent /*=NULL*/
 void RobotController::DriveStraight(double inches, double targetHeading, double maxSpeed, double minSpeed, bool angLimit, Trigger StopTrigger, Event StraightMovingEvent, double EventDistance) {
 
   //target values
-  double targetDegrees = inches / degreesToInches + m_Tracker.getAxial();
+  double targetDegrees = inches / dti + m_Tracker.getAxial();
   if (targetHeading == 361) {
     targetHeading = m_Tracker.getHeading();
   }
@@ -130,7 +131,7 @@ void RobotController::DriveStraight(double inches, double targetHeading, double 
 
   //errors
   double headingError = targetHeading - m_Tracker.getHeading();
-  double error = inches / degreesToInches;
+  double error = inches / dti;
   double lastError = error;
   dsPID.start(error);
   aePID.start(headingError);
@@ -142,7 +143,7 @@ void RobotController::DriveStraight(double inches, double targetHeading, double 
   bool eventHasTriggered = (StraightMovingEvent == NULL);
 
   //while loop until close enough to target
-  while (!dsSmall.update(error * degreesToInches) && !dsLarge.update(error * degreesToInches)) {
+  while (!dsSmall.update(error * dti) && !dsLarge.update(error * dti)) {
 
     //update errors
     error = targetDegrees - m_Tracker.getAxial();
@@ -163,7 +164,7 @@ void RobotController::DriveStraight(double inches, double targetHeading, double 
     }
 
     //call StraightMovingEvent
-    if(fabs(error) * degreesToInches < eventDistanceToTarget && !eventHasTriggered) {
+    if(fabs(error) * dti < eventDistanceToTarget && !eventHasTriggered) {
       StraightMovingEvent();
       eventHasTriggered = true;
       std::cout<<"StraightMovingEvent"<<std::endl;

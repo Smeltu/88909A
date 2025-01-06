@@ -31,6 +31,8 @@ const int tests = 8;
 
 int autonMode = ofs; // change this for different autons
 
+double setRotation = 0;
+
 //objects
 DriverController dc;
  

@@ -8,9 +8,9 @@ class Tracker {
   motor_group & m_LeftDrive;
   motor_group & m_RightDrive;
   inertial & m_Inertial;
-  rotation & m_Axial;
-  rotation & m_Axial2;
-  rotation & m_Lateral;
+  rotSub & m_Axial;
+  rotSub & m_Axial2;
+  rotSub & m_Lateral;
   bool m_Mirrored;
   double m_X;
   double m_Y;
@@ -22,25 +22,25 @@ class Tracker {
   double m_X2;
   double m_Y2;
   
-  public: Tracker(motor_group & LeftDrive, motor_group & RightDrive, inertial & Inertial, rotation & Axial, rotation & Axial2, rotation & Lateral, /*Assist & Assistant,*/ bool mirrored);
+  public: Tracker(motor_group & LeftDrive, motor_group & RightDrive, inertial & Inertial, rotSub & Axial, rotSub & Axial2, rotSub & Lateral, bool mirrored);
   
 
   void set(double x, double y, double a = 361);
 
   double getX() {
-    return (m_X - cos((getHeading() + oOffsetAngle) * PI / 180.0) * oOffset);
+    return (m_X);
   }
 
   double getY() {
-    return (m_Y - sin((getHeading() + oOffsetAngle) * PI / 180.0) * oOffset);
+    return (m_Y);
   }
 
   double getX2() {
-    return (m_X2 - cos((getHeading() + oOffsetAngle) * PI / 180.0) * oOffset);
+    return (m_X2);
   }
 
   double getY2() {
-    return (m_Y2 - sin((getHeading() + oOffsetAngle) * PI / 180.0) * oOffset);
+    return (m_Y2);
   }
 
   void Start();
@@ -56,9 +56,6 @@ class Tracker {
   }
 
   double getRotation() {
-    /*if(m_Axial.installed() && m_Axial2.installed()) {
-      return (m_Axial2.position(degrees) - m_Axial.position(degrees)) * oDegreesToHeading + m_SetRotation;
-    }*/
     return (m_Inertial.rotation() - m_SetRotation) * inertialCal + m_SetRotation;
   }
 
@@ -85,16 +82,17 @@ class Tracker {
   }
 
   double getAxial() {
-    double sum = m_Axial.position(vex::rotationUnits::deg) + m_Axial2.position(vex::rotationUnits::deg);
+    double sum = m_Axial.getPosition() + m_Axial2.getPosition();
     double count = m_Axial.installed() + m_Axial2.installed();
     if(count == 0) {
       return (m_LeftDrive.position(vex::rotationUnits::deg) + m_RightDrive.position(vex::rotationUnits::deg)) / 2.0;
     }
+
     return sum / count;
   }
 
   double getLateral() {
-    return m_Lateral.position(vex::rotationUnits::deg);
+    return m_Lateral.getPosition();
   }
 };
 

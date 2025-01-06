@@ -108,13 +108,13 @@ bool quartSec() {
 
 bool distCheck() {
   check();
-  return theTracker.getY()>48.7;//51.3
+  return theTracker.getY()>46.7;//51.3
 }
 
 
 bool distCheck2() {
   check();
-  return theTracker.getX() < 45;
+  return theTracker.getY() < 40;
 }
 
 void doinkerOff() {
@@ -125,49 +125,47 @@ void offensive() { //rel to bottom left corner, alliance side is x-axis
   Auton.Init(132,19,90);
   Doinker.set(true);
   Assistant.intakeFwd();
-  Auton.DriveStraight(100,111.3,100,100,true,distCheck);
-  Auton.DriveStraight(-20,120,100,15,true,distCheck2,stopIntake,3);
-  DoinkerClaw.set(true);
-  Auton.DriveStraight(2,120,70,15,false,quartSec);
-  ones = 0;
-  Auton.DriveStraight(-4,120,70,15,false,quartSec);
-  ones = 0;
-  Doinker.set(false);
+  Assistant.scheduleIntakeStop();
+  Auton.DriveStraight(100,113,100,100,true,distCheck);
+  Auton.DriveStraight(-13,105,100,15,true);//15
+  Auton.DriveStraight(2,105,70,15,false,quartSec);
   
-  Auton.DriveStraight(-19,285,50,15,true,autoHook);
-  Auton.DriveStraight(-3,361,30,15,false,quartSec);
-  ones = 0;
-  hook();
-  Assistant.intakeFwd();
-  wait(800,msec);
   Assistant.intakeStop();
+  Assistant.toggleSort();
+  Assistant.toggleSort();
 
+  Doinker.set(false);
+  ones = 0;
+  Auton.DriveStraight(-5,105,70,15,false,quartSec);
+  ones = 0;
+  
+  Auton.DriveStraight(-20,270,100,15,true);
+  Auton.DriveStraight(-5,361,30,15,false,autoHook);
+  Assistant.intakeFwd();
+  hook();
+  wait(500,msec);
+  Assistant.intakeStop();
   hookOff();
+
   Auton.DriveStraight(5);//3
-  Auton.DriveStraight(-18,355,80,15,true,autoHook);//23.5
-  Auton.DriveStraight(-5,361,30,15,false);
+  Auton.DriveStraight(-20,348,80,15,true,autoHook);//23.5
+  Auton.DriveStraight(-7,361,30,15,false);
   ones = 0;
   hook();
 
   Assistant.intakeFwd();
   wait(100,msec);
 
-  Auton.DriveStraight(32,272,100,15,true,timeBreak);
+  t = 0;
+  Auton.DriveStraight(29.5,272,60,15,true,timeBreak,doinker,28);
+  Doinker.set(true);
   t = 100;
-  Auton.DriveStraight(40,342,100,15,true,timeBreak,doinker,0.5);
+  Auton.DriveStraight(35,340,60,15,true,timeBreak);
   t = 100;
-  Auton.DriveStraight(23,90,100,15,true,timeBreak);
-  t = 125;
-  Auton.DriveStraight(12,120,100,55,true,timeBreak,doinkerOff,10);
-  wait(200,msec);
-  Auton.Output(-100,-100);
-  wait(1200,msec);
-  Assistant.intakeStop();
-  Assistant.intakeRev();
-  hookOff();
-  wait(200,msec);
-  Auton.DriveStraight(10);
-  Auton.RotateTo(290);
+  Auton.DriveStraight(28,90,70,15,true,timeBreak);
+  Auton.DriveStraight(48,151,90,55,true);
+  t = 50;
+  Auton.DriveStraight(3,200,40,15,true,timeBreak);
 }
 
 void defensive() { //rel to bottom left corner, alliance wall is x-axis
