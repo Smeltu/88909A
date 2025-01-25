@@ -81,6 +81,13 @@ class Assist {
     counter = count;
   }
 
+  double armRotation() {
+    if(ArmRot.installed()) {
+      return ArmRot.position(degrees);
+    }
+    return Arm.position(degrees);
+  }
+
   void toggleArm() {
     Arm.setMaxTorque(100000000000,vex::currentUnits::amp);
     if(mode == 0) {

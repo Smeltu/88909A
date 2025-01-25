@@ -19,12 +19,12 @@ motor RightDriveMotorC = motor(PORT21, ratio6_1, true);
 motor_group LeftDrive = motor_group(LeftDriveMotorA, LeftDriveMotorB, LeftDriveMotorC);
 motor_group RightDrive = motor_group(RightDriveMotorA, RightDriveMotorB, RightDriveMotorC);
 
-motor IntakeA = motor(PORT2, ratio18_1, true);
-motor IntakeB = motor(PORT10, ratio18_1, true);
+motor IntakeA = motor(PORT2, ratio18_1, false);
+motor IntakeB = motor(PORT10, ratio18_1, false);
 motor_group Intake = motor_group(IntakeA,IntakeB);
 
-motor Arm = motor(PORT5, ratio18_1, false);
-rotSub ArmRot = rotSub(PORT1, false);
+motor Arm = motor(PORT16, ratio18_1, false); // 5
+rotSub ArmRot = rotSub(PORT1, false); // 16
 
 inertial Inertial = inertial(PORT12,turnType::left);
 optical Optical = optical(PORT3);

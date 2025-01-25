@@ -18,14 +18,18 @@ armPID(PID(2.4,0,0.04,17)) {}
 //note that automatic intake functioning is also found in DriverController.cpp
 
 void Assist::gestureCheck() {
-  const bool wrongColor = (m_Mirrored && averageColor <= 25) || (!m_Mirrored && (averageColor > 180));
+  if(!Optical.installed()) {
+    return;
+  }
+  const bool wrongColor = (m_Mirrored && averageColor <= 25) || (!m_Mirrored && (averageColor > 50));
   std::cout<<averageDist<<", "<<averageColor<<", "<<(wrongColor?180:20)<<std::endl;
-
-  if (wrongColor) {
-    colorSort++;
-  } else if(colorSort == -2) {
+  if(colorSort == -2) {
     intakeStop();
     colorSort == 0;
+    return;
+  }
+  if (wrongColor && colorSort >= 0) {
+    colorSort++;
   }
 }
 
@@ -36,14 +40,22 @@ void Assist::Run() {
 
 void Assist::RunIntake() {
   // Intake control logic
-  const bool armLoad = ArmRot.position(degrees) > loadDeg - 10;
+  const bool armLoad = fabs(ArmRot.position(degrees)) > loadDeg - 10;
   const int color = Optical.hue();
+  /*if(color > 50) {
+    std::cout<<color<<std::endl;
+    averageColor = 40;
+  } else {
+    averageColor--;
+    if(averageColor < 0) {
+      averageColor = 0;
+    }
+  }*/
   const int dist = Distance.value();
-
-  averageColor /= 1.5;
+  averageColor *= 2/3.0;
   averageColor += color/3.0;
 
-  if(averageDist>110 && averageDist*0.5+dist/2.0<=110) {
+  if(Distance.installed() && averageDist>110 && averageDist*0.5+dist/2.0<=110) {
     gestureCheck();
   }
 
@@ -56,7 +68,7 @@ void Assist::RunIntake() {
   }
 
   // Handle counter updates and anti-stall logic
-  if(counter == -33 || counter == -15 || (IntakeA.velocity(pct) != 0 && counter > 0)) {
+  if(counter == -33 || counter == -15 || ((IntakeA.velocity(pct) != 0 || IntakeB.velocity(pct) != 0) && counter > 0)) {
     counter = armLoad ? 4 : 12;
   } else if(counter == -6 && armLoad) {
     counter = -16;
@@ -87,6 +99,8 @@ void Assist::RunIntake() {
 }
 
 void Assist::RunArm() {
+  double pos = fabs(ArmRot.position(degrees));
+
   // Handle arm movement and positioning
   double target = loadDeg + 124; //113
   if(abs(mode) == 1) {
@@ -97,18 +111,18 @@ void Assist::RunArm() {
 
   if(mode == 2 && Controller1.ButtonY.pressing()) {
     target == 123;
-  } else if(fabs(ArmRot.position(degrees)) >= target - 17 && mode == 2) {
+  } else if(pos >= target - 17 && mode == 2) {
     Arm.stop();
     mode = 1;
-    target = loadDeg;
+    target = loadDeg; 
   }
 
-  if(fabs(ArmRot.position(degrees)) < loadDeg - 1.7 && mode == 0) {
+  if(pos < loadDeg - 1.7 && mode == 0) {
     Arm.stop(vex::brakeType::coast);
-  } else if(fabs(ArmRot.position(degrees) - loadDeg) < 1.7 && mode == 1) {
+  } else if(fabs(pos - loadDeg) < 1.7 && mode == 1) {
     Arm.stop(vex::brakeType::hold);
   } else {
-    double error = target - ArmRot.position(degrees);
+    double error = target - pos;
     if(fabs(error) < 5 && mode == -1) {
       mode = abs(mode);
       intakeStop();

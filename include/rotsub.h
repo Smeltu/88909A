@@ -30,6 +30,9 @@ class rotSub : public vex::rotation {
 
         double getPosition() {
             double pos = position(vex::rotationUnits::deg);
+            if(xOffset == 0 && yOffset == 0) {
+                return pos;
+            }
             double radius = (getRotation() / 360.0) * (sqrt(xOffset*xOffset + yOffset*yOffset) * 2 * PI) / oDegreesToInches;
             
             if(axial) {

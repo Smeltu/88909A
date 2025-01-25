@@ -144,7 +144,6 @@ void RobotController::DriveStraight(double inches, double targetHeading, double 
 
   //while loop until close enough to target
   while (!dsSmall.update(error * dti) && !dsLarge.update(error * dti)) {
-
     //update errors
     error = targetDegrees - m_Tracker.getAxial();
     headingError = m_Tracker.angleError(targetHeading);

@@ -110,6 +110,8 @@ void DriverController::Run(vex::competition Competition) {
     Auton.DriveStraight(1.5,361,15,15);
     wait(100,msec);
   }
+
+
   while (true) {
     RunDriveTrain();
     RunHook();
@@ -117,20 +119,19 @@ void DriverController::Run(vex::competition Competition) {
       Brain.Screen.clearLine();
     }
     if(i==0) {
-      //std::cout<<"rot: "<<ArmRot.position(degrees)<<std::endl;
+      std::cout<<"rot: "<<ArmRot.position(degrees)<<std::endl;
       //std::cout<<Optical.hue()<<" "<<std::endl;
       //std::cout<<theTracker.getX()<<", "<<theTracker.getX2()<<"; "<<theTracker.getY()<<", "<<theTracker.getY2()<<std::endl;
       //std::cout<<theTracker.getRotation()<<" "<<theTracker.getHeading()<<std::endl;
       //std::cout<<Axial.getPosition()<<", "<<Axial.position(degrees)<<"; "<<Lateral.getPosition()<<", "<<Lateral.position(degrees)<<std::endl;
       //std::cout<<Intake.position(degrees)<<std::endl;
-      std::cout<<""<<std::endl;
       Controller1.Screen.setCursor(3,1);
       Controller1.Screen.print(theTracker.getX());
       Controller1.Screen.print(", ");
       Controller1.Screen.print(theTracker.getY());
     }
     i = (i+1)%100;
-    vex::task::sleep(5);
+    vex::task::sleep(10);
   }
 }
 
