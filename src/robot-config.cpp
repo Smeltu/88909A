@@ -23,8 +23,8 @@ motor IntakeA = motor(PORT2, ratio18_1, false);
 motor IntakeB = motor(PORT10, ratio18_1, false);
 motor_group Intake = motor_group(IntakeA,IntakeB);
 
-motor Arm = motor(PORT16, ratio18_1, false); // 5
-rotSub ArmRot = rotSub(PORT1, false); // 16
+motor Arm = motor(PORT5, ratio18_1, false); // 16
+rotSub ArmRot = rotSub(PORT16, false); // 1
 
 inertial Inertial = inertial(PORT12,turnType::left);
 optical Optical = optical(PORT3);
