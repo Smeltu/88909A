@@ -9,11 +9,11 @@ forw(false),
 back(false),
 counter(12),
 colorSort(0),
-stall(true),
+stall(true),//true
 averageColor(0),
 mode(0),
-loadDeg(13),//13
-armPID(PID(2.4,0,0.04,17)) {}
+loadDeg(73),//13
+armPID(PID(2.5,0.4,0.013,15)) {}
 
 //note that automatic intake functioning is also found in DriverController.cpp
 
@@ -21,11 +21,11 @@ void Assist::gestureCheck() {
   if(!Optical.installed()) {
     return;
   }
-  const bool wrongColor = (m_Mirrored && averageColor <= 25) || (!m_Mirrored && (averageColor > 50));
-  std::cout<<averageDist<<", "<<averageColor<<", "<<(wrongColor?180:20)<<std::endl;
+  const bool wrongColor = (m_Mirrored && averageColor <= 30) || (!m_Mirrored && (averageColor > 36));
+  std::cout<<averageDist<<", "<<averageColor<<" "<<(wrongColor?"sorting":"pass")<<std::endl;
   if(colorSort == -2) {
     intakeStop();
-    colorSort == 0;
+    colorSort = 0;
     return;
   }
   if (wrongColor && colorSort >= 0) {
@@ -40,48 +40,47 @@ void Assist::Run() {
 
 void Assist::RunIntake() {
   // Intake control logic
-  const bool armLoad = fabs(ArmRot.position(degrees)) > loadDeg - 10;
+  const bool armLoad = fabs(armRotation()) > loadDeg - 20 && fabs(armRotation()) < loadDeg * 2;
   const int color = Optical.hue();
-  /*if(color > 50) {
-    std::cout<<color<<std::endl;
-    averageColor = 40;
-  } else {
-    averageColor--;
-    if(averageColor < 0) {
-      averageColor = 0;
-    }
-  }*/
-  const int dist = Distance.value();
-  averageColor *= 2/3.0;
-  averageColor += color/3.0;
-
-  if(Distance.installed() && averageDist>110 && averageDist*0.5+dist/2.0<=110) {
-    gestureCheck();
-  }
-
-  averageDist /= 2.0;
-  averageDist += dist/2.0;
+  averageColor = color;
 
   if(!forw && !back) {
     counter = 12;
     return;
   }
 
+  /*const int dist = Distance.value();*/
+  /*if(Distance.installed() && averageDist>200 && dist<=200) {
+    gestureCheck();
+  }*/
+  
+  const bool dist = Optical.isNearObject();
+  //std::cout<<dist * 100 + 75<<", "<<color<<std::endl;
+
+  if(averageDist < 0.5 && averageDist * 0.80 + dist * 0.2 >= 0.5) {
+    gestureCheck();
+  }
+
+  averageDist = averageDist * 0.80 + dist * 0.2;
+
+
   // Handle counter updates and anti-stall logic
   if(counter == -33 || counter == -15 || ((IntakeA.velocity(pct) != 0 || IntakeB.velocity(pct) != 0) && counter > 0)) {
-    counter = armLoad ? 4 : 12;
-  } else if(counter == -6 && armLoad) {
-    counter = -16;
+    counter = armLoad ? 5 : 12;
+  } else if(counter == -4 && armLoad) {
+    counter = -18;
   } else if(counter == -25 && armLoad) {
     intakeStop();
     return;
+  } else if(!stall && !armLoad) {
+
   } else {
     counter -= 0.5;
   }
   // Control intake motor based on conditions
-  if((forw && counter > 0) || (counter <= -16 && armLoad)) {
-    double deg = fmod(Intake.position(degrees), 1053.268817);
-    const bool atSortingPosition = (fabs(deg - 181) < 10 || fabs(deg - 538.67) < 10 || fabs(deg - 882.8) < 7); //271
+  if((forw && counter > 0) || (counter > -24 && counter <= -16 && armLoad)) {
+    double deg = fmod(intakeRotation(), 1460.025);
+    const bool atSortingPosition = (fabs(deg - 414) < 10 || fabs(deg - 1110) < 10);
     if(atSortingPosition && colorSort > 0) {
       colorSort--;
       Intake.spin(reverse, 6, vex::voltageUnits::volt);
@@ -89,35 +88,47 @@ void Assist::RunIntake() {
     } else {
       Intake.spin(forward, 12, vex::voltageUnits::volt);
     }
-  } else if(counter <= 0 && counter > -20 && stall) {
-    Intake.spin(reverse, 2, vex::voltageUnits::volt);
-  } else if(armLoad && counter < 4) {
-    Intake.spin(reverse, 4, vex::voltageUnits::volt);
+  } else if(armLoad && counter <= -24) {
+    Intake.spin(forward, 1, vex::voltageUnits::volt);
+  } else if((armLoad && counter < 4) || (counter <= 0 && counter > -20)) {
+    Intake.spin(reverse, 3, vex::voltageUnits::volt);
   } else {
+    if(!back && !forw) {
+      return;
+    }
     Intake.spin(reverse, 12, vex::voltageUnits::volt);
   }
 }
 
 void Assist::RunArm() {
-  double pos = fabs(ArmRot.position(degrees));
+  double pos = armRotation();
+  pos = fabs(pos);
 
   // Handle arm movement and positioning
-  double target = loadDeg + 124; //113
+  bool pressing = Controller1.ButtonY.pressing();
+  double target = 440; //- pressing * 0;
   if(abs(mode) == 1) {
     target = loadDeg;
   } else if(mode == 0) {
     target = 0;
+  } else if(mode == 2) {
+    if(!pressing && armB.update(pos-target,0.01)) {
+      Arm.stop();
+      mode = 1;
+      target = loadDeg;
+    }
+  } else if(mode == 3) {
+    target = 650;
+    if(!pressing && pos >= target - 17) {
+      Arm.stop();
+      mode = 0;
+      target = 0;
+    }
+  } else if(mode >= 4) {
+    target = mode;
   }
 
-  if(mode == 2 && Controller1.ButtonY.pressing()) {
-    target == 123;
-  } else if(pos >= target - 17 && mode == 2) {
-    Arm.stop();
-    mode = 1;
-    target = loadDeg; 
-  }
-
-  if(pos < loadDeg - 1.7 && mode == 0) {
+  if(pos < std::max(loadDeg - 20,5) && mode == 0) {
     Arm.stop(vex::brakeType::coast);
   } else if(fabs(pos - loadDeg) < 1.7 && mode == 1) {
     Arm.stop(vex::brakeType::hold);
@@ -138,4 +149,10 @@ void Assist::RunArm() {
       Arm.spin(reverse, -out, vex::voltageUnits::volt);
     }
   }
+}
+
+void Assist::resetAfterAuton() {
+  Arm.spin(forward, 0, vex::voltageUnits::volt);
+  Arm.resetPosition();
+  armPID.start(0);
 }

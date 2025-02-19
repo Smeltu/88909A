@@ -29,7 +29,7 @@ const int solo2 = 6;
 const int ski = 7;
 const int tests = 8;
 
-int autonMode = ofs; // change this for different autons
+int autonMode = def; // change this for different autons
 
 double setRotation = 0;
 
@@ -40,7 +40,6 @@ vex::competition Competition;
 Assist Assistant(abs(autonMode-5) <= 1);
 Tracker theTracker(LeftDrive, RightDrive, Inertial, Axial, Axial2, Lateral, Assistant.isMirrored());
 RobotController Auton(LeftDrive, RightDrive, theTracker);
-
 
 //autonomous
 void auton(void) {
@@ -86,12 +85,14 @@ void preAutonomous(void) {
   
   LeftDrive.resetPosition();
   RightDrive.resetPosition();
-  Intake.resetPosition();
+  IntakeA.resetPosition();
+  IntakeB.resetPosition();
+  IntakeRot.resetPosition();
   Axial.resetPosition();
   Lateral.resetPosition();
   Arm.resetPosition();
   ArmRot.resetPosition();
-  Optical.gestureEnable();
+  Optical.gestureDisable();//Optical.gestureEnable();
   Optical.setLightPower(100);
 
   Prop.set(true);

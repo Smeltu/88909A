@@ -11,15 +11,15 @@ const double Degree2Arc = PI / 180.0;
 const double dti = (Axial.installed() || Axial2.installed()) ? oDegreesToInches : degreesToInches;
 
 //driveStraight
-PID dsPID = PID(0.3, 0.01, 0.015, 5); //0.6,0.03,0.03
+PID dsPID = PID(1.5, 0.0, 0.05, 5); //0.6,0.03,0.03
 PID aePID = PID(1.1, 0.22, 0.09);
 BreakTimer dsSmall = BreakTimer(0.3, 0.1);
 BreakTimer dsLarge = BreakTimer(1.5, 0.5);
 
 //rotateTo
-PID rtPID = PID(6.5, 0.05, 0.305, 15); //2, 1, 0.06
+PID rtPID = PID(7, 0.08, 0.35, 10); //2, 1, 0.06
 BreakTimer rtSmall = BreakTimer(0.5, 0.1);
-BreakTimer rtLarge = BreakTimer(2, 0.8);
+BreakTimer rtLarge = BreakTimer(3, 0.5);
 
 //driveArc
 PID daPID = PID(dsPID.get('p') / dti, dsPID.get('i') / dti, dsPID.get('d') / dti); //move PID - remember it's in inches, not degrees

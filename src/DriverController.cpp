@@ -58,6 +58,11 @@ void toggleStallCode() {
   Assistant.toggleStall();
 }
 
+void toggleColorSortAndStallCode() {
+  toggleColorSort();
+  toggleStallCode();
+}
+
 void armToggle() {
   Assistant.toggleArm();
 }
@@ -93,8 +98,7 @@ void DriverController::Run(vex::competition Competition) {
   Controller1.ButtonL1.released(toggleHook);
   //Controller1.ButtonL2.pressed(toggleProp);
   //Controller1.ButtonUp.pressed(runEndgame);
-  Controller1.ButtonDown.pressed(toggleColorSort);
-  Controller1.ButtonDown.pressed(toggleStallCode);
+  Controller1.ButtonDown.pressed(toggleColorSortAndStallCode);
   Controller1.ButtonY.pressed(armScore);
   Controller1.ButtonB.pressed(armToggle);
   Controller1.ButtonRight.pressed(toggleDoinker);
@@ -111,6 +115,9 @@ void DriverController::Run(vex::competition Competition) {
     wait(100,msec);
   }
 
+  if(autonMode == 1 || autonMode == 2 || autonMode == 4 || autonMode == 5) {
+    Arm.setPosition(fmax(Arm.position(degrees),0),degrees);
+  }
 
   while (true) {
     RunDriveTrain();
@@ -119,12 +126,13 @@ void DriverController::Run(vex::competition Competition) {
       Brain.Screen.clearLine();
     }
     if(i==0) {
-      std::cout<<"rot: "<<ArmRot.position(degrees)<<std::endl;
+      //std::cout<<"rot: "<<ArmRot.position(degrees)<<std::endl;
       //std::cout<<Optical.hue()<<" "<<std::endl;
       //std::cout<<theTracker.getX()<<", "<<theTracker.getX2()<<"; "<<theTracker.getY()<<", "<<theTracker.getY2()<<std::endl;
-      //std::cout<<theTracker.getRotation()<<" "<<theTracker.getHeading()<<std::endl;
       //std::cout<<Axial.getPosition()<<", "<<Axial.position(degrees)<<"; "<<Lateral.getPosition()<<", "<<Lateral.position(degrees)<<std::endl;
-      //std::cout<<Intake.position(degrees)<<std::endl;
+      std::cout<<IntakeRot.position(degrees)<<std::endl;
+      //std::cout<<IntakeA.position(degrees)<<std::endl;
+      //std::cout<<std::flush;
       Controller1.Screen.setCursor(3,1);
       Controller1.Screen.print(theTracker.getX());
       Controller1.Screen.print(", ");

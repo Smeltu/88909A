@@ -18,6 +18,7 @@ extern motor_group RightDrive;
 extern motor IntakeA;
 extern motor IntakeB;
 extern motor_group Intake;
+extern rotSub IntakeRot;
 
 extern motor Arm;
 extern rotSub ArmRot;

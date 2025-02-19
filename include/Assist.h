@@ -5,6 +5,7 @@
 #include "SingleLock.h"
 #include "constants.h"
 #include "PID.h"
+#include "BreakTimer.h"
 
 class Assist {
 
@@ -19,6 +20,8 @@ class Assist {
   double averageColor;
   double averageDist;
 
+  BreakTimer armB = BreakTimer(17,0.02);
+
   int mode;
   int loadDeg;
   PID armPID;
@@ -30,6 +33,7 @@ class Assist {
   void RunIntake();
   void RunArm();
   void gestureCheck();
+  void resetAfterAuton();
 
   bool isMirrored() {
     return m_Mirrored;
@@ -88,6 +92,13 @@ class Assist {
     return Arm.position(degrees);
   }
 
+  double intakeRotation() {
+    if(IntakeRot.installed()) {
+      return IntakeRot.position(degrees);
+    }
+    return Intake.position(degrees);
+  }
+
   void toggleArm() {
     Arm.setMaxTorque(100000000000,vex::currentUnits::amp);
     if(mode == 0) {
@@ -105,7 +116,15 @@ class Assist {
     Arm.setMaxTorque(100000000000,vex::currentUnits::amp);
     if(fabs(mode) == 1) {
       mode = 2;
+      armB.reset();
+    } else {
+      mode = 3;
     }
+  }
+
+  void setArmMode(int m) {
+    armPID.start(0);
+    mode = m;
   }
 };
 
