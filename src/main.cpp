@@ -29,7 +29,7 @@ const int solo2 = 6;
 const int ski = 7;
 const int tests = 8;
 
-int autonMode = def; // change this for different autons
+int autonMode = ofs; // change this for different autons
 
 double setRotation = 0;
 
@@ -114,9 +114,10 @@ void preAutonomous(void) {
 
   Controller1.Screen.setCursor(2,1);
   Controller1.Screen.print("Dt:");
-  Controller1.Screen.print((LeftDriveMotorA.temperature(temperatureUnits::celsius)+LeftDriveMotorB.temperature(temperatureUnits::celsius)+LeftDriveMotorC.temperature(temperatureUnits::celsius)+RightDriveMotorA.temperature(temperatureUnits::celsius)+RightDriveMotorB.temperature(temperatureUnits::celsius)+RightDriveMotorC.temperature(temperatureUnits::celsius))/6.0);
-  Controller1.Screen.print(" In:");
-  Controller1.Screen.print((IntakeA.temperature(temperatureUnits::celsius)+IntakeB.temperature(temperatureUnits::celsius))/2.0);
+  Controller1.Screen.print((int)(LeftDriveMotorA.temperature(temperatureUnits::celsius)+LeftDriveMotorB.temperature(temperatureUnits::celsius)+LeftDriveMotorC.temperature(temperatureUnits::celsius)+RightDriveMotorA.temperature(temperatureUnits::celsius)+RightDriveMotorB.temperature(temperatureUnits::celsius)+RightDriveMotorC.temperature(temperatureUnits::celsius))/6.0);
+  /*Controller1.Screen.setCursor(2,2);
+  Controller1.Screen.print(", In:");
+  Controller1.Screen.print((int)(IntakeA.temperature(temperatureUnits::celsius)+IntakeB.temperature(temperatureUnits::celsius))/2.0);*/
 
   Controller1.Screen.setCursor(3,1);
 

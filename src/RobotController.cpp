@@ -11,19 +11,19 @@ const double Degree2Arc = PI / 180.0;
 const double dti = (Axial.installed() || Axial2.installed()) ? oDegreesToInches : degreesToInches;
 
 //driveStraight
-PID dsPID = PID(1.5, 0.0, 0.05, 5); //0.6,0.03,0.03
+PID dsPID = PID(0.18, 0.0, 0.005, 5); //0.6,0.03,0.03
 PID aePID = PID(1.1, 0.22, 0.09);
 BreakTimer dsSmall = BreakTimer(0.3, 0.1);
 BreakTimer dsLarge = BreakTimer(1.5, 0.5);
 
 //rotateTo
-PID rtPID = PID(7, 0.08, 0.35, 10); //2, 1, 0.06
-BreakTimer rtSmall = BreakTimer(0.5, 0.1);
-BreakTimer rtLarge = BreakTimer(3, 0.5);
+PID rtPID = PID(2.5, 40, 0.09, 5); //2, 1, 0.06
+BreakTimer rtSmall = BreakTimer(0.3, 0.1);
+BreakTimer rtLarge = BreakTimer(1.5, 0.5);
 
 //driveArc
 PID daPID = PID(dsPID.get('p') / dti, dsPID.get('i') / dti, dsPID.get('d') / dti); //move PID - remember it's in inches, not degrees
-PID arPID = PID(rtPID.get('p')/2.0,rtPID.get('i')/2.0,rtPID.get('d')/2.0); //rotate PID
+PID arPID = PID(3.5, 0.04, 0.175); //rotate PID, also used in anglimit
 PID lePID = PID(aePID.get('p'),aePID.get('i'),aePID.get('d')); //rotate lowError PID
 
 RobotController::RobotController(motor_group & LeftDrive, motor_group & RightDrive, Tracker & theTracker): m_LeftDrive(LeftDrive), m_RightDrive(RightDrive), m_Tracker(theTracker) {
@@ -102,8 +102,16 @@ void RobotController::RotateTo(double TargetAngle, Event positionEvent /*=NULL*/
   rtSmall.reset();
   rtLarge.reset();
   
+  bool eventHasTriggered = false;
 
   while (!rtSmall.update(error) && !rtLarge.update(error)) {
+
+    if(fabs(m_Tracker.getHeading() - EventAngle) < 10 && !eventHasTriggered) {
+      positionEvent();
+      eventHasTriggered = true;
+      std::cout<<"StraightMovingEvent"<<std::endl;
+    }
+
     error = m_Tracker.angleError(TargetAngle);
     if(error * lastError <= 0) { //reset integral if past target
       rtPID.start(error);
