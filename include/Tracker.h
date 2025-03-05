@@ -19,8 +19,6 @@ class Tracker {
   double m_LastLateral;
   double m_LastAngle;
   double m_SetRotation;
-  double m_X2;
-  double m_Y2;
   
   public: Tracker(motor_group & LeftDrive, motor_group & RightDrive, inertial & Inertial, rotSub & Axial, rotSub & Axial2, rotSub & Lateral, bool mirrored);
   
@@ -33,14 +31,6 @@ class Tracker {
 
   double getY() {
     return (m_Y);
-  }
-
-  double getX2() {
-    return (m_X2);
-  }
-
-  double getY2() {
-    return (m_Y2);
   }
 
   void Start();
@@ -87,7 +77,6 @@ class Tracker {
     if(count == 0) {
       return (m_LeftDrive.position(vex::rotationUnits::deg) + m_RightDrive.position(vex::rotationUnits::deg)) / 2.0;
     }
-
     return sum / count;
   }
 

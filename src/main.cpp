@@ -29,7 +29,7 @@ const int solo2 = 6;
 const int ski = 7;
 const int tests = 8;
 
-int autonMode = ofs; // change this for different autons
+int autonMode = ski; // change this for different autons
 
 double setRotation = 0;
 

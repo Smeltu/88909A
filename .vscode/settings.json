@@ -93,6 +93,10 @@
 		"tuple": "cpp",
 		"type_traits": "cpp",
 		"utility": "cpp",
-		"typeinfo": "cpp"
+		"typeinfo": "cpp",
+		"deque": "cpp",
+		"string": "cpp",
+		"algorithm": "cpp",
+		"numeric": "cpp"
 	}
 }

@@ -12,8 +12,8 @@ colorSort(0),
 stall(true),//true
 averageColor(0),
 mode(0),
-loadDeg(73),//13
-armPID(PID(2.5,10,0.013,3)) {}
+loadDeg(74),//13
+armPID(PID(2.5,30,0.013,5)) {}
 
 //note that automatic intake functioning is also found in DriverController.cpp
 
@@ -23,13 +23,20 @@ void Assist::gestureCheck() {
   }
   const bool wrongColor = (m_Mirrored && averageColor <= 80) || (!m_Mirrored && (averageColor > 100));
   std::cout<<averageDist * 100 <<", "<<averageColor<<", "<<(wrongColor?"sorting":"pass")<<std::endl;
+  if (wrongColor && colorSort >= 0) {
+    colorSort++;
+  }
+}
+
+void Assist::scheduleCheck() {
+  if(colorSort < -2) {
+    colorSort++;
+    return;
+  }
   if(colorSort == -2) {
     intakeStop();
     colorSort = 0;
     return;
-  }
-  if (wrongColor && colorSort >= 0) {
-    colorSort++;
   }
 }
 
@@ -55,8 +62,8 @@ void Assist::RunIntake() {
   }*/
   
   const bool dist = Optical.isNearObject();
-
   if(averageDist > 0.5 && averageDist * 0.9 + dist * 0.1 <= 0.5) {
+    scheduleCheck();
     gestureCheck();
   }
 
@@ -103,7 +110,7 @@ void Assist::RunIntake() {
 
 void Assist::RunArm() {
   double pos = armRotation();
-  pos = fabs(pos);
+  //pos = fabs(pos);
 
   // Handle arm movement and positioning
   bool pressing = Controller1.ButtonY.pressing();
@@ -111,7 +118,7 @@ void Assist::RunArm() {
   if(abs(mode) == 1) {
     target = loadDeg;
   } else if(mode == 0) {
-    target = 0;
+    target = -200;
   } else if(mode == 2) {
     if(!pressing && armB.update(pos-target,0.01)) {
       Arm.stop();
@@ -129,9 +136,9 @@ void Assist::RunArm() {
     target = mode;
   }
 
-  if(pos < 50 && mode == 0) {
-    Arm.stop(vex::brakeType::coast);
-  } else if(fabs(pos - loadDeg) < 1.7 && mode == 1) {
+  if(pos < 20 && mode == 0) {
+    Arm.stop(vex::brakeType::coast); //coast
+  } else if(fabs(pos - loadDeg) < 1 && mode == 1) {
     Arm.stop(vex::brakeType::hold);
   } else {
     double error = target - pos;
