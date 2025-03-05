@@ -22,9 +22,7 @@ m_Y(0),
 m_Running(false),
 m_LastAxial(0),
 m_LastLateral(0),
-m_LastAngle(0),
-m_X2(0),
-m_Y2(0) {}
+m_LastAngle(0) {}
 
 void Tracker::set(double setX, double setY, double setA) {
   SingleLock sl(m_Mutex);
@@ -40,9 +38,6 @@ void Tracker::set(double setX, double setY, double setA) {
 
   m_X = setX;
   m_Y = setY;
-  
-  m_X2 = m_X;
-  m_Y2 = m_Y;
 }
 
 void Tracker::Start() {
@@ -79,38 +74,9 @@ void Tracker::WaitUntilCompleteStop() {
   return;
 }
 
-void Tracker::Integral() { // LEGACY
-  SingleLock sl(m_Mutex);
-  Assistant.Run();
-
-  //axial movement
-  double axial = getAxial();
-  double aDif = axial - m_LastAxial;
-
-  double magnitude = aDif * ((Axial.installed() || Axial2.installed()) ? oDegreesToInches : degreesToInches);
-  double radians = (getRotation() + m_LastAngle) * PI / 360.0;
-  
-  m_X2 += cos(radians) * magnitude * (1 - m_Mirrored * 2);
-  m_Y2 += sin(radians) * magnitude;
-
-  //lateral movement
-  double lateral = getLateral();
-  double lDif = lateral - m_LastLateral;
-
-  double lMagnitude = lDif * oDegreesToInches;
-
-  m_X2 += sin(radians) * lMagnitude * (1 - m_Mirrored * 2);
-  m_Y2 -= cos(radians) * lMagnitude;
-
-  ArcIntegral();
-  
-  m_LastAxial = axial;
-  m_LastLateral = lateral;
-  m_LastAngle = getRotation();
-}
-
 void Tracker::ArcIntegral() {
   SingleLock sl(m_Mutex);
+  Assistant.Run();
 
   // Get changes in axial and lateral movement
   double axial = getAxial();
@@ -143,12 +109,16 @@ void Tracker::ArcIntegral() {
   m_Y += localY * sin(radians);
   m_X += localX * -sin(radians) * (1 - m_Mirrored * 2);
   m_Y += localX * cos(radians);
+
+  m_LastAxial = axial;
+  m_LastLateral = lateral;
+  m_LastAngle = getRotation();
 }
 
 int Tracker::TrackingThread(void * pVoid) {
   Tracker * pThis = (Tracker * ) pVoid;
   do {
-    pThis -> Integral();
+    pThis -> ArcIntegral();
     vex::task::sleep(10);
   } while (pThis -> Running());
   return 0;

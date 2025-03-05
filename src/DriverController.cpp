@@ -82,6 +82,12 @@ void toggleDoinkerClaw() {
   DoinkerClaw.set(!DoinkerClaw.value());
 }
 
+void moveForward() {
+  if(autonMode==7) {
+    Auton.DriveStraight(1,361,100,15,true);
+  }
+}
+
 int x = 0;
 bool antiStall() {
   x++;
@@ -103,22 +109,23 @@ void DriverController::Run(vex::competition Competition) {
   Controller1.ButtonB.pressed(armToggle);
   Controller1.ButtonRight.pressed(toggleDoinker);
   //Controller1.ButtonL2.pressed(toggleDoinkerClaw);
+  Controller1.ButtonUp.pressed(moveForward);
 
   theTracker.Start();
-  Auton.Init(0,0,0);
+  Auton.Init(0,0,90);
 
   Doinker.set(false);
 
   if(autonMode == 7) {
+    Auton.Init(72,9.75,90);
     Assistant.intakeFwd();
-    Auton.DriveStraight(1.5,361,15,15);
-    wait(100,msec);
+    Auton.DriveStraight(1);
   }
 
   if(autonMode == 1 || autonMode == 2 || autonMode == 4 || autonMode == 5) {
     Arm.setPosition(fmax(Arm.position(degrees),0),degrees);
   }
-
+  Assistant.scheduleIntakeStop();
   while (true) {
     RunDriveTrain();
     RunHook();
@@ -128,12 +135,13 @@ void DriverController::Run(vex::competition Competition) {
     if(i==0) {
       //std::cout<<"rot: "<<Arm.position(degrees)<<std::endl;
       //std::cout<<Optical.hue()<<" "<<std::endl;
-      //std::cout<<theTracker.getX()<<", "<<theTracker.getX2()<<"; "<<theTracker.getY()<<", "<<theTracker.getY2()<<std::endl;
+      //std::cout<<theTracker.getX()<<", "<<theTracker.getY()<<std::endl;
       //std::cout<<Axial.getPosition()<<", "<<Axial.position(degrees)<<"; "<<Lateral.getPosition()<<", "<<Lateral.position(degrees)<<std::endl;
       //std::cout<<IntakeRot.position(degrees)<<std::endl;
       //std::cout<<IntakeA.position(degrees)<<std::endl;
       //std::cout<<theTracker.getRotation()<<std::endl;
       //std::cout<<std::flush;
+      std::cout<<Distance.objectDistance(inches)<<" "<<Distance.value()<<std::endl;
       Controller1.Screen.setCursor(3,1);
       Controller1.Screen.print(theTracker.getX());
       Controller1.Screen.print(", ");
@@ -151,7 +159,7 @@ void DriverController::Run(vex::competition Competition) {
 void DriverController::RunDriveTrain() {
   //get forward and turn values, multiply by 1.1 to allow for easier maxing
   double forward = fmin(Controller1.Axis3.position(percent) * 1.1, 100);
-  double turn = fmin(Controller1.Axis1.position(percent) * 1.1, 100);
+  double turn = fmin(Controller1.Axis1.position(percent) * 0.8, 100);
 
   //if values are small enough, do nothing
   if (fabs(forward) < 5 && fabs(turn) < 5) {

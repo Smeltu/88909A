@@ -33,6 +33,7 @@ class Assist {
   void RunIntake();
   void RunArm();
   void gestureCheck();
+  void scheduleCheck();
   void resetAfterAuton();
 
   bool isMirrored() {
@@ -74,6 +75,10 @@ class Assist {
   }
 
   void scheduleIntakeStop() {
+    if(colorSort <= -2) {
+      colorSort--;
+      return;
+    }
     colorSort = -2;
   }
 
@@ -104,6 +109,9 @@ class Assist {
     if(mode == 0) {
       armPID.start(loadDeg);
       mode = -1;
+    } else if(Controller1.ButtonY.pressing() && mode == 2) {
+      armPID.start(0);
+      mode = 3;
     } else {
       armPID.start(-ArmRot.position(degrees));
       intakeStop();

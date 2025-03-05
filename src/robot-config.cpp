@@ -24,15 +24,15 @@ motor IntakeB = motor(PORT5, ratio18_1, false);
 motor_group Intake = motor_group(IntakeA,IntakeB);
 rotSub IntakeRot = rotSub(PORT3, false);
 
-motor Arm = motor(PORT12, ratio18_1, true); // 5
+motor Arm = motor(PORT15, ratio18_1, true); // 5
 rotSub ArmRot = rotSub(PORT1, false); // 16
 
 inertial Inertial = inertial(PORT11,turnType::left);
 optical Optical = optical(PORT13);
-distance Distance = distance(PORT21);
-rotSub Axial = rotSub(PORT9, true, -1.5, -2.25, true); //-1.5, -2.25
+distance Distance = distance(PORT10);
+rotSub Axial = rotSub(PORT9, true, -0.25, -3.375, true); //-1.5, -2.25
 rotSub Axial2 = rotSub(PORT16, true, 1, 1, true);
-rotSub Lateral = rotSub(PORT7, false, 0.75, -0.75, false); //0.75, -0.75
+rotSub Lateral = rotSub(PORT19, true, -3.4375, 2, false); //0.75, -0.75
 controller Controller1 = controller(primary);
 digital_out Hook = digital_out(Brain.ThreeWirePort.A);
 digital_out Prop = digital_out(Brain.ThreeWirePort.B); //not existent

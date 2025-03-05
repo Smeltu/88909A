@@ -11,7 +11,7 @@ const double Degree2Arc = PI / 180.0;
 const double dti = (Axial.installed() || Axial2.installed()) ? oDegreesToInches : degreesToInches;
 
 //driveStraight
-PID dsPID = PID(0.18, 0.0, 0.005, 5); //0.6,0.03,0.03
+PID dsPID = PID(0.16, 0.08, 0.004, 5 / oDegreesToInches); //0.18,0,0.005
 PID aePID = PID(1.1, 0.22, 0.09);
 BreakTimer dsSmall = BreakTimer(0.3, 0.1);
 BreakTimer dsLarge = BreakTimer(1.5, 0.5);
@@ -143,6 +143,7 @@ void RobotController::DriveStraight(double inches, double targetHeading, double 
   double lastError = error;
   dsPID.start(error);
   aePID.start(headingError);
+  arPID.start(headingError);
 
   dsSmall.reset();
   dsLarge.reset();
@@ -178,10 +179,6 @@ void RobotController::DriveStraight(double inches, double targetHeading, double 
     }
 
     out = range(out, minSpeed, maxSpeed);
-    if(minSpeed==maxSpeed && (out * inches <= 0 || error * inches <= 0)) {
-      std::cout<<"minMax Break; ";
-      break;
-    }
 
     //angLimit
     if(angLimit) {
@@ -219,14 +216,14 @@ void RobotController::DriveArc(double X, double Y, bool Forward, double maxSpeed
 
   double error = sqrt(dx*dx+dy*dy) * (Forward * 2 - 1);
   double lastError = error;
-  double counter = 0;
   daPID.start(error);
   arPID.start(headingError);
   lePID.start(headingError);
 
+  double eventDistFromEnd = error - EventDistance;
+
   //while loop until close enough to target
   while (fabs(error) > 0.2) {
-    counter++;
     //update errors
     dx = X - m_Tracker.getX();
     dy = Y - m_Tracker.getY();
@@ -237,23 +234,18 @@ void RobotController::DriveArc(double X, double Y, bool Forward, double maxSpeed
 
     //calculate a
     double a = arPID.calculate(headingError);
-    if(fabs(headingError) < 8) {
+    /*if(fabs(headingError) < 5) {
       a = lePID.calculate(headingError);
-    }
+    }*/
     a = range(a, 0, maxSpeed);
     //calculate overall
     double out = daPID.calculate(error);
 
-
-    if(fabs(out) < 1 && counter > 100 && error < 0.5 && minSpeed != maxSpeed) {
-      std::cout<<"low output ";
+    if(fabs(headingError) < fmax(6,0.25*error)) {
+      DriveStraight(error,targetHeading,maxSpeed,minSpeed,true,StopTrigger,StraightMovingEvent,error-eventDistFromEnd);
       break;
     }
-    else if(minSpeed == maxSpeed && (fabs(headingError) < 10 || fabs(error) < 10)) {
-      std::cout<<"minmax; x:"<<m_Tracker.getX()<<", y:"<<m_Tracker.getY()<<"; transition to "<<std::endl;
-      DriveStraight(error,targetHeading,maxSpeed,minSpeed);
-      break;
-    }
+    
     out = range(out, minSpeed, maxSpeed);
     out *= cos(fmin(fabs(headingError),90.0) / 180.0 * PI);
     //output
@@ -266,10 +258,6 @@ void RobotController::DriveArc(double X, double Y, bool Forward, double maxSpeed
     //std::cout<<error<<" "<<out<<" "<<targetHeading<<std::endl;
   }
   std::cout << "driveArc done; x: " << m_Tracker.getX() << " y: " << m_Tracker.getY() << std::endl;
-  if(minSpeed == maxSpeed) {
-    Output(minSpeed, minSpeed);
-    return;
-  }
   StopMotors();
 }
 

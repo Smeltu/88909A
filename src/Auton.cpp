@@ -4,6 +4,8 @@
 #include "Auton.h"
 #include "RobotController.h"
 #include <chrono>
+#include <vector>
+#include <algorithm>
 
 extern Tracker theTracker;
 extern RobotController Auton;
@@ -108,12 +110,12 @@ bool quartSec() {
 }
 
 bool distCheck() {
-  return theTracker.getY()> 55.5;
+  return theTracker.getY()> 49;
 }
 
 
 bool distCheck2() {
-  return theTracker.getY() > 43.8;
+  return theTracker.getY() > 36.5;
 }
 
 void doinkerOff() {
@@ -174,6 +176,34 @@ void scheduleIntake() {
   Assistant.scheduleIntakeStop();
 }
 
+std::vector<double> dists;
+bool trackDist() {
+  dists.push_back(Distance.objectDistance(inches) - 1.83);
+  return false;
+}
+
+double getTrackedDist() {
+  sort(dists.begin(),dists.end());
+  int startIndex = (dists.size() - 1) / 4;
+  int endIndex = (3 * dists.size()) / 4;
+
+  double sum = std::accumulate(dists.begin() + startIndex, dists.begin() + endIndex, 0.0);
+  double count = endIndex - startIndex;
+  dists.clear();
+  if(count == 0) {
+    return -1;
+  }
+  return sum / count;
+}
+
+void scheduleTwo() {
+  Assistant.scheduleIntakeStop();
+  Assistant.scheduleIntakeStop();
+}
+
+bool hookCheck() {
+  return Hook.value();
+}
 
 void offensive() { //rel to bottom left corner, alliance side is x-axis
   Auton.Init(132,19,90);
@@ -182,36 +212,34 @@ void offensive() { //rel to bottom left corner, alliance side is x-axis
   Assistant.toggleArm();
   Assistant.toggleSort();
   Auton.DriveStraight(100,113,100,100,true,distCheck2);
-  Auton.DriveStraight(100,101,100,100,true,distCheck);
-  Auton.DriveStraight(-15.6,110,100,15,true);//15
+  Auton.DriveStraight(100,100,100,100,true,distCheck);
+  Auton.DriveStraight(-13,110,100,15,true);//15
 
   Assistant.intakeStop();
-  Auton.DriveStraight(2.4,110,20,15,true,__null,doinkerOff,0.6);
+  Auton.DriveStraight(2.5,110,15,15,true,__null,doinkerOff,1.5);
   Assistant.toggleSort();
   Assistant.intakeFwd();
   Auton.DriveStraight(-6,110,100,15,true);
-  Auton.DriveStraight(11.3,90.5,100,15,true,__null,setArmDown,6);
+  Auton.DriveStraight(11,94,100,15,true,__null,setArmDown,6);
   Assistant.intakeStop();
   wait(500,msec);
 
-  Auton.DriveStraight(-13.2,355,100,15,true,__null,setArmMid,3.6);
+  Auton.DriveStraight(-13.2,355,100,15,true,__null,setArmMid,2);
   Auton.DriveStraight(-19.2,355,70,15,true,__null,hook,16.8);
   hook();
   
-  ones = -175;
+  ones = -150;
   restartIntake();
-  Auton.DriveStraight(36.6,285,100,15,true,quartSec,doinker,34.8);
+  Auton.DriveStraight(36.8,285,100,15,true,quartSec,doinker,35.8);
   setArmToZero();
   ones = -175;
-  Auton.DriveStraight(20.4,345,80,15,true,quartSec);
+  Auton.DriveStraight(19,350,70,15,true,quartSec);
   ones = -50;
-  Auton.DriveStraight(10.2,335,60,15,true,quartSec);
+  Auton.DriveStraight(9.5,345,60,15,true,quartSec);
   Auton.DriveStraight(15.6,115,80,15,true);
-  Auton.DriveStraight(28.8,180,100,15,true,__null,doinkerOff,3.6);
+  Auton.DriveStraight(12,185,100,15,true,__null,doinkerOff,3.6);
   ones = -125;
-  //Assistant.resetAfterAuton();
-  Auton.DriveStraight(38.4,140,50,15,true,quartSec,doinker,18);
-  Assistant.intakeStop();
+  Auton.DriveStraight(40,156,40,15,true,quartSec,stopIntake,20);
 }
 
 void defensive() { //rel to bottom left corner, alliance wall is x-axis
@@ -224,26 +252,27 @@ void defensive() { //rel to bottom left corner, alliance wall is x-axis
   Assistant.setArmMode(600);
   wait(450,msec);
   Assistant.toggleSort();
-  Auton.DriveStraight(-8.2,308,100,15,true,__null,setArmMid,2);
+  Auton.DriveStraight(-8.2,309,100,15,true,__null,setArmMid,2);
   Auton.RotateTo(45,doinker,15);
   Auton.RotateTo(100,doinkerOff,85);
   //Auton.DriveStraight(-5,120,70,15,true,__null,doinkerOff,3);
-  Auton.DriveStraight(-14.5,320,100,15,true);
+  Auton.DriveStraight(-12,320,100,15,true);
   ones = -175;
-  Auton.DriveStraight(-26,263,60,15,true,quartSec,hook,21);
+  Auton.DriveStraight(-25,263,40,15,true,quartSec,hook,22.5);
 
-  Assistant.intakeFwd();
+  restartIntake();
   setArmToZero();
-  Auton.DriveStraight(15.2,151,100,15,true);
+  Auton.DriveStraight(12.5,151,100,15,true);//15.1
   ones = -125;
-  Auton.DriveStraight(20.2,178,60,15,true,quartSec);
+  Auton.DriveStraight(17.5,178,60,15,true,quartSec);
 
   Auton.DriveStraight(-5,165,100,15,true);
-  Auton.DriveStraight(18.6,292,40,15,true);
+  Auton.DriveStraight(19,292,40,15,true);
   Auton.DriveStraight(-10,270,100,15,true);
   Auton.DriveStraight(35,332,100,15,true);
-  wait(700,msec);
-  Auton.DriveStraight(10,50,70,15,true,__null,stopIntake,2);
+  wait(100,msec);
+  Auton.DriveStraight(20,50,60,15,true,__null,stopIntake,3);
+  //Auton.DriveStraight(50,0,100,15,true,__null,stopIntake,20);
 }
 
 void soloAWP() {
@@ -273,40 +302,44 @@ void soloAWP() {
 }
 
 void offensive2() {
-  Auton.Init(132,19,90);
+  Auton.Init(108,19,90);
   Doinker.set(true);
   Assistant.intakeFwd();
-  Assistant.scheduleIntakeStop();
-  Arm.setPosition(-7,degrees);
   Assistant.toggleArm();
-  Auton.DriveStraight(100,114,100,100,true,distCheck2);//note: distance is not 100 rn, 114
-  Auton.DriveStraight(100,99.7,100,100,true,distCheck,setArmToZeroAndRestartIntake,5);//note: distance is not 100 rn, 95
-  Auton.DriveStraight(-13.5,125,100,15,true);////15
-  Auton.DriveStraight(4.3,65,70,15,true,__null,setArmDown,2.5);
-  Auton.DriveStraight(-1);
-  Arm.setPosition(Arm.position(degrees)+75,degrees);
-  //wait(300,msec);
-  Auton.DriveStraight(-9,130,100,15,true);
-  Assistant.setArmMode(250);
-  Auton.DriveStraight(4,361,100,15,true,__null,doinkerOff,2);
-  Assistant.intakeFwd();
-  Assistant.scheduleIntakeStop();
-  Auton.DriveStraight(-16,350,100,15,true,__null,stopIntake,3);//344
-  Auton.DriveStraight(-14,344,70,15,true,__null,hook,12);
-  hook();
-  ones = -175;
-  Auton.DriveStraight(30.8,280,100,15,true,quartSec,restartIntake,10);
-  ones = -175;
-  Auton.DriveStraight(19,353,50,15,true,quartSec,doinker,1);
-  ones = -125;
-  setArmToZero();
-  Auton.DriveStraight(9,350,60,15,true,quartSec,stopIntake,2.5);
-  Auton.DriveStraight(10,90,80,15,true,__null,restartIntake,5);
-  Assistant.resetAfterAuton();
-  Auton.DriveStraight(27.5,180,90,15,true,__null,doinkerOff,2);
-  ones = -125;
-  Auton.DriveStraight(32,140,50,15,true,quartSec,doinker,15);
+  Assistant.toggleSort();
+  Auton.DriveStraight(100,67,100,100,true,distCheck2);
+  Auton.DriveStraight(100,80,100,100,true,distCheck);
+  Auton.DriveStraight(-13,90,100,15,true);//15
+
   Assistant.intakeStop();
+  Auton.DriveStraight(2.5,90,15,15,true,__null,doinkerOff,1);
+  Assistant.toggleSort();
+  Assistant.intakeFwd();
+  Auton.DriveStraight(-6,90,100,15,true);
+  Auton.DriveStraight(9,102.5,100,15,true,__null,setArmDown,6);//10
+  Assistant.intakeStop();
+  wait(500,msec);
+
+  Auton.DriveStraight(7,45,100,15,true,__null,setArmMid,3);
+  Auton.DriveStraight(-15,0,100,15,true);
+  Auton.DriveStraight(-14.5,356,70,15,true,__null,hook,13.5);
+  setArmToZero();
+  Auton.DriveStraight(22.5,290,100,15,true,__null,runIntake,2);
+  ones = -125;
+  Auton.DriveStraight(37,17,100,15,true,quartSec);
+  doinker();
+  Auton.DriveStraight(9,280,40,15,true);
+  stopIntake();
+  ones = -25;
+  Auton.DriveStraight(7.5,275,100,15,true,quartSec);
+  Auton.DriveStraight(7,160,100,15,true,quartSec,runIntake,3);
+  restartIntake();
+  Auton.DriveStraight(8,210,100,15,true,__null,doinkerOff,2);
+  Auton.DriveStraight(30,140,100,15,true,__null);
+  //Auton.DriveStraight(30,165,60,15,true,__null,stopIntake,15);
+  Auton.DriveStraight(15,310,100,15,true,__null,hookOff,5);
+  Auton.DriveStraight(-9,255,75,15,true);
+
 }
 
 void defensive2() {
@@ -317,8 +350,8 @@ void defensive2() {
   Assistant.toggleSort();
   wait(750,msec);
   Assistant.setArmMode(600);
-  Auton.DriveStraight(4.3,311,75,15,true);
-  wait(250,msec);
+  Auton.DriveStraight(4.1,311,75,15,true);//4.3
+  wait(350,msec); 
   Assistant.toggleSort();
   Auton.DriveStraight(-11.4,312,100,15,true,__null,setArmMid,2.4);
   Auton.DriveStraight(2.4,350,100,15,true,__null,doinker,1.2);
@@ -326,16 +359,16 @@ void defensive2() {
   Auton.DriveStraight(-4.8,55,100,15,true,__null,doinkerOff,2.4);
   wait(300,msec);
   Auton.DriveStraight(-13.2,310,100,15,true);
-  Auton.DriveStraight(-26.2,263,70,15,true,__null,hook,19.2);
+  Auton.DriveStraight(-26,264,70,15,true,__null,hook,23.5);
 
   Assistant.intakeFwd();
   setArmToZero();
-  Auton.DriveStraight(18.35,150,90,15,true);
+  Auton.DriveStraight(18.3,150,90,15,true);
 
   Auton.DriveStraight(9.1,182,40,15,true);
   auto start = std::chrono::high_resolution_clock::now();
   ones = -125;
-  Auton.DriveStraight(15,190,70,15,true,quartSec);
+  Auton.DriveStraight(15,195,50,15,true,quartSec);
   auto end = std::chrono::high_resolution_clock::now();
   auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
   bool jammed = duration.count() > 1450; //failsafe
@@ -346,9 +379,8 @@ void defensive2() {
   //Auton.DriveStraight(-7,280,100,15,true);
   Auton.DriveStraight(20 + jammed * 1.5,3,100,15,true);
   Auton.DriveStraight(19.5,322 - jammed * 15,100,15,true);
-  wait(600,msec);
   ones = 0;
-  Auton.DriveStraight(10,60,70,15,true,__null,stopIntake,1.8);
+  Auton.DriveStraight(50,0,100,15,true,__null,stopIntake,20);
 }
 
 void soloAWP2() {
@@ -379,7 +411,35 @@ void soloAWP2() {
 }
 
 void skills() {
-  Auton.Init(72,8.9,90);
+  Auton.Init(72,9.75,90);
+  Assistant.intakeFwd();
+  Assistant.toggleSort();
+  Auton.DriveStraight(1);
+  Auton.DriveStraight(8);
+  Auton.DriveArc(84,24,false);
+  Auton.DriveStraight(-5,361,100,15,true,hookCheck,hook,3);
+  Auton.DriveArc(92,44);
+  ones = 5;
+  Auton.DriveStraight(7,50,100,100,true,quartSec);
+  Auton.DriveArc(128,118,true,80,20,__null,__null,__null,scheduleTwo,20);
+  Auton.DriveStraight(-30,45,100,15,true,__null,toggleArm,2);
+  Auton.DriveStraight(18.3,272,100,15,true,__null,restartIntake,2);
+  restartIntake();
+  Auton.DriveStraight(17,0,100,15,true,__null,stopIntake,15);
+  Auton.Output(20,20);
+  Assistant.scoreArm();
+  wait(500,msec);
+  Auton.DriveStraight(-4);
+  restartIntake();
+  Auton.DriveStraight(3);
+  wait(400,msec);
+  Auton.Output(20,20);
+  Assistant.scoreArm();
+
+  while(true) {
+    wait(1000,msec);
+  }
+  /*Auton.Init(72,8.9,90);
   Assistant.toggleSort();
 
   Assistant.intakeFwd();
@@ -507,17 +567,16 @@ void skills() {
 }
 
 void test() {
-  Auton.Init(0,0,90);
 
-  auto start = std::chrono::high_resolution_clock::now();
+  /*auto start = std::chrono::high_resolution_clock::now();
 
-  /*Auton.DriveStraight(24);
+  Auton.DriveStraight(24);
   wait(500,msec);
   Auton.DriveStraight(-24);
   wait(500,msec);
   Auton.DriveStraight(5);
   wait(500,msec);
-  Auton.DriveStraight(-5);*/
+  Auton.DriveStraight(-5);
 
   Auton.RotateTo(0);
   //wait(500,msec);
@@ -530,32 +589,9 @@ void test() {
   auto end = std::chrono::high_resolution_clock::now();
   auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
 
-  std::cout << "Average: " << (duration.count() - 1500) / 4.0 << " milliseconds" << std::endl;
+  std::cout << "Average: " << (duration.count() - 1500) / 4.0 << " milliseconds" << std::endl;*/
 
-
-  //Assistant.intakeFwd();
-  //Assistant.scheduleIntakeStop();
-  /*Auton.DriveStraight(100,112,100,100,true,distCheck2);//note: distance is not 100 rn, 114
-  Auton.DriveStraight(100,100,100,100,true,distCheck,setArmToZeroAndRestartIntake,5);//note: distance is not 100 rn, 95
-  Auton.DriveStraight(-13,125,100,15,true);//15
-  Auton.DriveStraight(5,80,40,15,true,__null,setArmDown,2);
-  Arm.setPosition(Arm.position(degrees)+75,degrees);
-  wait(300,msec);
-  Auton.DriveStraight(-9,130,100,15,true);
-  setArmToZero();
-  Auton.DriveStraight(4,361,100,15,true,__null,doinkerOff,2);*/
-  /*Auton.Init(0,0,0);
-  IntakeB.resetPosition();
-  IntakeB.spin(forward,12,vex::voltageUnits::volt);
-  vex::task::sleep(2000);
-  IntakeB.stop();
-  vex::task::sleep(2000);
-  std::cout<<"Intake: "<<IntakeB.position(degrees)<<std::endl;
-  IntakeB.resetPosition();
-
-  vex::task::sleep(100000);
-
-  LeftDrive.resetPosition();
+  /*LeftDrive.resetPosition();
   RightDrive.resetPosition();
   LeftDrive.spin(forward,12,vex::voltageUnits::volt);
   RightDrive.spin(forward,12,vex::voltageUnits::volt);
@@ -585,9 +621,9 @@ void test() {
   RightDriveMotorB.stop();
   vex::task::sleep(2000);
   std::cout<<"LeftDriveB: "<<LeftDriveMotorB.position(degrees)<<std::endl;
-  std::cout<<"RightDriveB: "<<RightDriveMotorB.position(degrees)<<std::endl;
+  std::cout<<"RightDriveB: "<<RightDriveMotorB.position(degrees)<<std::endl;*/
 
-  LeftDrive.resetPosition();
+  /*LeftDrive.resetPosition();
   LeftDriveMotorC.spin(forward,12,vex::voltageUnits::volt);
   RightDrive.resetPosition();
   RightDriveMotorC.spin(forward,12,vex::voltageUnits::volt);
@@ -596,5 +632,12 @@ void test() {
   RightDriveMotorC.stop();
   vex::task::sleep(2000);
   std::cout<<"LeftDriveC: "<<LeftDriveMotorC.position(degrees)<<std::endl;
-  std::cout<<"RightDriveC: "<<RightDriveMotorC.position(degrees)<<std::endl;*/
+  std::cout<<"RightDriveC: "<<RightDriveMotorC.position(degrees)<<std::endl; */
+  Auton.Init(0,0,180);
+  Auton.DriveStraight(24,361,100,15,false,trackDist);
+  wait(500,msec);
+  std::cout<<getTrackedDist()<<std::endl;
+  //Auton.DriveArc(24,24);
+  //Auton.RotateTo(90);
+  //Auton.DriveArc(24,48);
 }
