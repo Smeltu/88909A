@@ -12,7 +12,7 @@ const double dti = (Axial.installed() || Axial2.installed()) ? oDegreesToInches 
 
 //driveStraight
 PID dsPID = PID(0.16, 0.08, 0.004, 5 / oDegreesToInches); //0.18,0,0.005
-PID aePID = PID(1.1, 0.22, 0.09);
+PID aePID = PID(1.1, 0.22, 0.09, 15);
 BreakTimer dsSmall = BreakTimer(0.3, 0.1);
 BreakTimer dsLarge = BreakTimer(1.5, 0.5);
 
@@ -23,7 +23,7 @@ BreakTimer rtLarge = BreakTimer(1.5, 0.5);
 
 //driveArc
 PID daPID = PID(dsPID.get('p') / dti, dsPID.get('i') / dti, dsPID.get('d') / dti); //move PID - remember it's in inches, not degrees
-PID arPID = PID(3.5, 0.04, 0.175); //rotate PID, also used in anglimit
+PID arPID = PID(3.5, 5, 0.175, 10); //rotate PID, also used in anglimit
 PID lePID = PID(aePID.get('p'),aePID.get('i'),aePID.get('d')); //rotate lowError PID
 
 RobotController::RobotController(motor_group & LeftDrive, motor_group & RightDrive, Tracker & theTracker): m_LeftDrive(LeftDrive), m_RightDrive(RightDrive), m_Tracker(theTracker) {
@@ -74,7 +74,7 @@ void RobotController::Goto(double X, double Y, double AngleCalibrate, bool Forwa
   double delta = arfa < a ? 360 : -360;
   while (fabs(arfa - a) > 180) arfa += delta;
 
-  RotateTo(arfa + AngleCalibrate, positionEvent, EventAngle);
+  RotateTo(arfa + AngleCalibrate, __null, positionEvent, EventAngle);
 
   // second step : MoveStraight
   x = m_Tracker.getX();
@@ -85,7 +85,7 @@ void RobotController::Goto(double X, double Y, double AngleCalibrate, bool Forwa
   DriveStraight((Forward ? delta : -delta), arfa + AngleCalibrate, 100, 20, false, StopTrigger, StraightMovingEvent, EventDistance);
 }
 
-void RobotController::RotateTo(double TargetAngle, Event positionEvent /*=NULL*/ , double EventAngle /*= 0*/ ) {
+void RobotController::RotateTo(double TargetAngle, Trigger StopTrigger, Event positionEvent /*=NULL*/ , double EventAngle /*= 0*/ ) {
   double angle = m_Tracker.getHeading();
   if (fabs(TargetAngle - angle) < 0.3) { // Don't rotate if less than 0.3 degree
     std::cout << "RotateTo Exited (Low Error)" << std::endl;
@@ -117,6 +117,13 @@ void RobotController::RotateTo(double TargetAngle, Event positionEvent /*=NULL*/
       rtPID.start(error);
     }
 
+    if(StopTrigger != NULL) {
+      if(StopTrigger()) {
+        std::cout<<"Stop Trigger; ";
+        break;
+      }
+    }
+
     double speed = range(rtPID.calculate(error), 0); //23
     Output(-speed, speed);
     lastError = error;
@@ -138,8 +145,8 @@ void RobotController::DriveStraight(double inches, double targetHeading, double 
   std::cout << "Starting DriveStraight; Dist: " << inches << ", Heading: " << targetHeading << std::endl;
 
   //errors
-  double headingError = targetHeading - m_Tracker.getHeading();
-  double error = inches / dti;
+  double headingError = m_Tracker.angleError(targetHeading);
+  double error = targetDegrees - m_Tracker.getAxial();
   double lastError = error;
   dsPID.start(error);
   aePID.start(headingError);
@@ -157,11 +164,19 @@ void RobotController::DriveStraight(double inches, double targetHeading, double 
     error = targetDegrees - m_Tracker.getAxial();
     headingError = m_Tracker.angleError(targetHeading);
 
+    //calculate overall
+    double out = dsPID.calculate(error);
+
     //calculate a
     double a = aePID.calculate(headingError);
     a = range(a, 0, maxSpeed);
-    //calculate overall
-    double out = dsPID.calculate(error);
+
+    //angLimit
+    if(angLimit) {
+      a = arPID.calculate(headingError);
+      a = range(a, 0, maxSpeed);
+      out *= pow(cos(fmin(fabs(headingError), 90.0) / 180.0 * PI), 2);
+    }
 
     //call StopTrigger
     if(StopTrigger != NULL) {
@@ -179,13 +194,6 @@ void RobotController::DriveStraight(double inches, double targetHeading, double 
     }
 
     out = range(out, minSpeed, maxSpeed);
-
-    //angLimit
-    if(angLimit) {
-      a = arPID.calculate(headingError);
-      a = range(a, 0, maxSpeed);
-      out *= pow(cos(fmin(fabs(headingError), 90.0) / 180.0 * PI), 2);
-    }
 
     //output 
     Output(out - a, out + a);

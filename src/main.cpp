@@ -93,7 +93,7 @@ void preAutonomous(void) {
   Arm.resetPosition();
   ArmRot.resetPosition();
   Optical.gestureDisable();//Optical.gestureEnable();
-  Optical.setLightPower(100);
+  Optical.setLightPower(50);
 
   Prop.set(true);
   Hook.set(false);

@@ -82,16 +82,41 @@ void toggleDoinkerClaw() {
   DoinkerClaw.set(!DoinkerClaw.value());
 }
 
-void moveForward() {
-  if(autonMode==7) {
-    Auton.DriveStraight(1,361,100,15,true);
-  }
-}
-
 int x = 0;
 bool antiStall() {
   x++;
   return x > 100;
+}
+
+void wallstakeMacro() {
+  /*if(autonMode != 7) {
+    return;
+  }*/
+  Assistant.setArmMode(129);
+  Assistant.intakeStop();
+  Assistant.intakeFwd();
+  Assistant.scheduleIntakeStop();
+}
+
+void moveForward() {
+  if(autonMode == 7) {
+    Auton.DriveStraight(1);
+    Assistant.intakeStop();
+    wait(15,msec);
+    Assistant.intakeFwd();
+  }
+}
+
+bool hookChecking() {
+  return Hook.value();
+}
+
+void hookOn() {
+  Hook.set(true);
+}
+
+bool quickBreak() {
+  return theTracker.getY() > 14.5;
 }
 
 DriverController::DriverController() {}
@@ -110,22 +135,36 @@ void DriverController::Run(vex::competition Competition) {
   Controller1.ButtonRight.pressed(toggleDoinker);
   //Controller1.ButtonL2.pressed(toggleDoinkerClaw);
   Controller1.ButtonUp.pressed(moveForward);
+  Controller1.ButtonL2.pressed(wallstakeMacro);
 
   theTracker.Start();
   Auton.Init(0,0,90);
+  //Assistant.setArmMode(0);
 
   Doinker.set(false);
 
   if(autonMode == 7) {
+    while(Inertial.isCalibrating()) {
+      wait(50,msec);
+    }
     Auton.Init(72,9.75,90);
     Assistant.intakeFwd();
+    Assistant.toggleSort();
     Auton.DriveStraight(1);
+    Auton.DriveStraight(9,90,100,100,true,quickBreak);
+    Auton.DriveArc(85,21,false);
+    Auton.DriveStraight(-5,361,100,15,true,hookChecking,hookOn,3);
+    Auton.Output(100,-100);
+    while(theTracker.getHeading()>155) {
+      wait(10,msec);
+    }
+    Auton.Output(100,60);
+    wait(10,msec);
   }
 
-  if(autonMode == 1 || autonMode == 2 || autonMode == 4 || autonMode == 5) {
+  /*if(autonMode == 1 || autonMode == 2 || autonMode == 4 || autonMode == 5) {
     Arm.setPosition(fmax(Arm.position(degrees),0),degrees);
-  }
-  Assistant.scheduleIntakeStop();
+  }*/
   while (true) {
     RunDriveTrain();
     RunHook();
@@ -134,7 +173,7 @@ void DriverController::Run(vex::competition Competition) {
     }
     if(i==0) {
       //std::cout<<"rot: "<<Arm.position(degrees)<<std::endl;
-      //std::cout<<Optical.hue()<<" "<<std::endl;
+      //std::cout<<Optical.hue()<<" "<<Optical.isNearObject()<<" "<<" "<<std::endl;
       //std::cout<<theTracker.getX()<<", "<<theTracker.getY()<<std::endl;
       //std::cout<<Axial.getPosition()<<", "<<Axial.position(degrees)<<"; "<<Lateral.getPosition()<<", "<<Lateral.position(degrees)<<std::endl;
       //std::cout<<IntakeRot.position(degrees)<<std::endl;

@@ -10,10 +10,13 @@ back(false),
 counter(12),
 colorSort(0),
 stall(true),//true
-averageColor(0),
+averageColor(38),
+newRing(-1),
+maxColor(0),
+minColor(255),
 mode(0),
-loadDeg(74),//13
-armPID(PID(2.5,30,0.013,5)) {}
+loadDeg(73),//74
+armPID(PID(1.8,50,0.03,9)) {}
 
 //note that automatic intake functioning is also found in DriverController.cpp
 
@@ -21,10 +24,14 @@ void Assist::gestureCheck() {
   if(!Optical.installed()) {
     return;
   }
-  const bool wrongColor = (m_Mirrored && averageColor <= 80) || (!m_Mirrored && (averageColor > 100));
-  std::cout<<averageDist * 100 <<", "<<averageColor<<", "<<(wrongColor?"sorting":"pass")<<std::endl;
-  if (wrongColor && colorSort >= 0) {
+  const bool wrongColor = (m_Mirrored && minColor <= 1.1) || (!m_Mirrored && (averageColor > 1.7));
+  //std::cout<<colorSort<<std::endl;
+  if (newRing == 0 && wrongColor && colorSort >= 0) {
+    std::cout<<averageDist * 200 <<", "<<averageColor<<", sorting"<<std::endl;
     colorSort++;
+    minColor = 255;
+    maxColor = 0;
+    newRing = 1;
   }
 }
 
@@ -35,7 +42,7 @@ void Assist::scheduleCheck() {
   }
   if(colorSort == -2) {
     intakeStop();
-    colorSort = 0;
+    colorSort = -1 * (autonMode == 7); //note: colorsort is off
     return;
   }
 }
@@ -45,11 +52,12 @@ void Assist::Run() {
   RunArm();
 }
 
+int a = 0;
 void Assist::RunIntake() {
   // Intake control logic
-  const bool armLoad = fabs(armRotation()) > loadDeg - 20 && fabs(armRotation()) < loadDeg * 2;
+  const bool armLoad = fabs(armRotation()) > loadDeg - 15 && fabs(armRotation()) < loadDeg * 2;
   const int color = Optical.hue();
-  averageColor = averageColor * 0.85 + color * 0.15;
+  averageColor = averageColor * 0.9 + log10(fmax(1,color - 15)) * 0.1;
 
   if(!forw && !back) {
     counter = 12;
@@ -62,12 +70,28 @@ void Assist::RunIntake() {
   }*/
   
   const bool dist = Optical.isNearObject();
-  if(averageDist > 0.5 && averageDist * 0.9 + dist * 0.1 <= 0.5) {
-    scheduleCheck();
-    gestureCheck();
+
+  if(averageDist >= 0.3) {
+    if(newRing == -1) {
+      scheduleCheck();
+      newRing = 0;
+    } else if(newRing == 0) {
+      //std::cout<<maxColor<<" "<<minColor<<std::endl;
+      maxColor = fmax(maxColor,averageColor);
+      minColor = fmin(minColor,averageColor);
+      gestureCheck();
+    }
   }
 
-  //std::cout<<averageDist * 200 <<", "<<averageColor<<std::endl;
+  if(averageDist <= 0.1 && newRing > -1) {
+    if(newRing != 1) {
+      std::cout<<averageDist * 200 <<", "<<averageColor<<", pass"<<std::endl;
+    }
+    averageDist = 0;
+    newRing = -1;
+  }
+
+  //if(fmod(a,5)==0){std::cout<<dist * 200 <<", "<<color<<std::endl;}
 
   averageDist = averageDist * 0.9 + dist * 0.1;
 
@@ -115,6 +139,7 @@ void Assist::RunArm() {
   // Handle arm movement and positioning
   bool pressing = Controller1.ButtonY.pressing();
   double target = 440; //- pressing * 0;
+  //std::cout<<mode<<std::endl;
   if(abs(mode) == 1) {
     target = loadDeg;
   } else if(mode == 0) {
@@ -124,6 +149,7 @@ void Assist::RunArm() {
       Arm.stop();
       mode = 1;
       target = loadDeg;
+      armPID.start(loadDeg-pos);
     }
   } else if(mode == 3) {
     target = 650;
@@ -131,6 +157,7 @@ void Assist::RunArm() {
       Arm.stop();
       mode = 0;
       target = 0;
+      armPID.start(-pos-200);
     }
   } else if(mode >= 4) {
     target = mode;

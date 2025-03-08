@@ -12,17 +12,22 @@ class Assist {
   private:
   
   bool m_Mirrored;
+
   bool forw;
   bool back;
   double counter;
   int colorSort;
   bool stall;
+
   double averageColor;
   double averageDist;
+  int newRing;
+  double maxColor;
+  double minColor;
 
   BreakTimer armB = BreakTimer(17,0.02);
 
-  int mode;
+  double mode;
   int loadDeg;
   PID armPID;
 
@@ -107,13 +112,13 @@ class Assist {
   void toggleArm() {
     Arm.setMaxTorque(100000000000,vex::currentUnits::amp);
     if(mode == 0) {
-      armPID.start(loadDeg);
+      armPID.start(loadDeg-armRotation());
       mode = -1;
     } else if(Controller1.ButtonY.pressing() && mode == 2) {
-      armPID.start(0);
+      armPID.start(650-armRotation());
       mode = 3;
     } else {
-      armPID.start(-ArmRot.position(degrees));
+      armPID.start(-200-armRotation());
       intakeStop();
       mode = 0;
     }
@@ -122,16 +127,18 @@ class Assist {
   void scoreArm() {
     armPID.start(0);
     Arm.setMaxTorque(100000000000,vex::currentUnits::amp);
-    if(fabs(mode) == 1) {
+    if(fabs(mode) == 1 || mode == 129) {
       mode = 2;
+      armPID.start(440-armRotation());
       armB.reset();
     } else {
+      armPID.start(650-armRotation());
       mode = 3;
     }
   }
 
   void setArmMode(int m) {
-    armPID.start(0);
+    armPID.start(m-armRotation());
     mode = m;
   }
 };
