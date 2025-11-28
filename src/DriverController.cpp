@@ -189,7 +189,8 @@ void DriverController::Run(vex::competition Competition) {
       Controller1.Screen.print(theTracker.getHeading());
       std::cout<<""<<std::endl;
     }
-    std::cout<<theTracker.getX()<<", "<<theTracker.getY()<<", "<<theTracker.getHeading()<<"\n";
+    //std::cout<<theTracker.getX()<<", "<<theTracker.getY()<<", "<<theTracker.getHeading()<<"\n";
+    std::cout<<theTracker.getAxial() * oDegreesToInches<<", "<<theTracker.getHeading()<<", "<<Distance.objectDistance(inches)<<std::endl;
 
     i = (i+1)%100;
     vex::task::sleep(10);

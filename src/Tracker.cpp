@@ -89,8 +89,9 @@ void Tracker::ArcIntegral() {
 
 
   // Calculate heading info
-  double radians = (getRotation() + m_LastAngle) * PI / 360.0; // average heading
-  double deltaRadians = (getRotation() - m_LastAngle) * PI / 180.0;
+  double angle = getRotation();
+  double radians = (angle + m_LastAngle) * PI / 360.0; // average heading
+  double deltaRadians = (angle - m_LastAngle) * PI / 180.0;
 
   // Calculate local x and y coordinates
   double localX = 0;
@@ -112,7 +113,7 @@ void Tracker::ArcIntegral() {
 
   m_LastAxial = axial;
   m_LastLateral = lateral;
-  m_LastAngle = getRotation();
+  m_LastAngle = angle;
 }
 
 int Tracker::TrackingThread(void * pVoid) {
