@@ -13,7 +13,7 @@ motor LeftDriveMotorA = motor(PORT16, ratio6_1, true);
 motor LeftDriveMotorB = motor(PORT12, ratio6_1, true); //17
 motor LeftDriveMotorC = motor(PORT14, ratio6_1, false); //20
 motor RightDriveMotorA = motor(PORT2, ratio6_1, false);
-motor RightDriveMotorB = motor(PORT17, ratio6_1, false); //8
+motor RightDriveMotorB = motor(PORT5, ratio6_1, false); //8
 motor RightDriveMotorC = motor(PORT20, ratio6_1, true); //14
 
 motor_group LeftDrive = motor_group(LeftDriveMotorA, LeftDriveMotorB, LeftDriveMotorC);
@@ -29,7 +29,7 @@ rotSub ArmRot = rotSub(PORT1, false); // 16
 
 inertial Inertial = inertial(PORT6,turnType::left); //11
 optical Optical = optical(PORT13);
-distance Distance = distance(PORT9); //10
+distance Distance = distance(PORT17); //10
 rotSub Axial = rotSub(PORT10, true, 0, -2.5, true); //-0.25, -3.375 //9
 rotSub Axial2 = rotSub(PORT16, true, 1, 1, true);
 rotSub Lateral = rotSub(PORT19, true, -3.4375, 2, false); //0.75, -0.75
