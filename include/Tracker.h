@@ -74,14 +74,16 @@ class Tracker {
   double getAxial() {
     double sum = m_Axial.getPosition() + m_Axial2.getPosition();
     double count = m_Axial.installed() + m_Axial2.installed();
+    double conversion = oDegreesToInches;
     if(count == 0) {
+      conversion = degreesToInches;
       return (m_LeftDrive.position(vex::rotationUnits::deg) + m_RightDrive.position(vex::rotationUnits::deg)) / 2.0;
     }
-    return sum / count;
+    return sum / count * conversion;
   }
 
   double getLateral() {
-    return m_Lateral.getPosition();
+    return m_Lateral.getPosition() * oDegreesToInches;
   }
 };
 

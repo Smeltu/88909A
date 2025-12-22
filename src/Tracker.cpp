@@ -32,9 +32,9 @@ void Tracker::set(double setX, double setY, double setA) {
   setRotation = m_SetRotation;
   
   m_LastAngle = getRotation();
-  double temp = getAxial();
-  m_Axial.setPosition(temp, degrees);
-  m_Axial2.setPosition(temp, degrees);
+  m_LastAxial = 0;
+  m_Axial.setPosition(0, degrees);
+  m_Axial2.setPosition(0, degrees);
 
   m_X = setX;
   m_Y = setY;
@@ -84,8 +84,8 @@ void Tracker::ArcIntegral() {
 
   //std::cout<<axial<<" "<<lateral<<" "<<getRotation()<<std::endl;
 
-  double deltaAxial = (axial - m_LastAxial) * ((Axial.installed() || Axial2.installed()) ? oDegreesToInches : degreesToInches);
-  double deltaLateral = (lateral - m_LastLateral) * oDegreesToInches;
+  double deltaAxial = axial - m_LastAxial;
+  double deltaLateral = lateral - m_LastLateral;
 
 
   // Calculate heading info

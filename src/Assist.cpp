@@ -27,7 +27,7 @@ void Assist::gestureCheck() {
   const bool wrongColor = (m_Mirrored && minColor <= 1.1) || (!m_Mirrored && (averageColor > 1.7));
   //std::cout<<colorSort<<std::endl;
   if (newRing == 0 && wrongColor && colorSort >= 0) {
-    std::cout<<averageDist * 200 <<", "<<averageColor<<", sorting"<<std::endl;
+    //std::cout<<averageDist * 200 <<", "<<averageColor<<", sorting"<<std::endl;
     colorSort++;
     minColor = 255;
     maxColor = 0;
@@ -85,7 +85,7 @@ void Assist::RunIntake() {
 
   if(averageDist <= 0.1 && newRing > -1) {
     if(newRing != 1) {
-      std::cout<<averageDist * 200 <<", "<<averageColor<<", pass"<<std::endl;
+      //std::cout<<averageDist * 200 <<", "<<averageColor<<", pass"<<std::endl;
     }
     averageDist = 0;
     newRing = -1;

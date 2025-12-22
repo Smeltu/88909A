@@ -4,12 +4,15 @@
 #include "DriverController.h"
 #include "Tracker.h"
 #include "RobotController.h"
+#include "MCL.h"
 
 using namespace vex;
 
 extern Tracker theTracker;
 extern RobotController Auton;
 extern Assist Assistant;
+
+extern MCL theMCL;
 
 //for output
 int i=0;
@@ -138,8 +141,8 @@ void DriverController::Run(vex::competition Competition) {
   Controller1.ButtonL2.pressed(wallstakeMacro);
 
   theTracker.Start();
-  Auton.Init(0,0,90);
-  //Assistant.setArmMode(0);
+  Auton.Init(24,24,90);
+  theMCL.Start(); //takes pos from tracker
 
   Doinker.set(false);
 
@@ -167,8 +170,7 @@ void DriverController::Run(vex::competition Competition) {
   }*/
   while (true) {
     RunDriveTrain();
-    RunHook();
-    if(i==90) {
+    /*if(i==90) {
       Brain.Screen.clearLine();
     }
     if(i==0) {
@@ -187,11 +189,16 @@ void DriverController::Run(vex::competition Competition) {
       Controller1.Screen.print(theTracker.getY());
       Controller1.Screen.print(", ");
       Controller1.Screen.print(theTracker.getHeading());
-      std::cout<<""<<std::endl;
-    }
+    }*/
     //std::cout<<theTracker.getX()<<", "<<theTracker.getY()<<", "<<theTracker.getHeading()<<"\n";
-    std::cout<<theTracker.getAxial() * oDegreesToInches<<", "<<theTracker.getHeading()<<", "<<Distance.objectDistance(inches)<<std::endl;
-
+    if(i%50==0) {
+      std::cout<<theTracker.getX()<<", "<<theTracker.getY()<<", "<<theMCL.getX(true)<<", "<<theMCL.getY(true)<<std::endl;
+      std::cout<<theTracker.getAxial()<<" "<<Distance.objectDistance(inches)<<std::endl;
+      
+    }
+    if(i%2==0) {
+      //std::cout<<Brain.Timer.time(msec)<<", "<<theTracker.getAxial()<<", "<<theTracker.getHeading()<<", "<<Distance.objectDistance(inches)<<std::endl;
+    }
     i = (i+1)%100;
     vex::task::sleep(10);
   }

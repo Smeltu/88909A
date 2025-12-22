@@ -17,6 +17,7 @@
 #include "RobotController.h"
 #include "constants.h"
 #include "Image.h"
+#include "MCL.h"
 
 using namespace vex;
 
@@ -39,6 +40,10 @@ DriverController dc;
 vex::competition Competition;
 Assist Assistant(abs(autonMode-5) <= 1);
 Tracker theTracker(LeftDrive, RightDrive, Inertial, Axial, Axial2, Lateral, Assistant.isMirrored());
+
+Sensor distSensor(1.9, -5.7, 270); // dx and dy assuming robot is at 0 deg (aka +dx is front of robot)
+MCL theMCL(theTracker, 500, distSensor);
+
 RobotController Auton(LeftDrive, RightDrive, theTracker);
 
 //autonomous
