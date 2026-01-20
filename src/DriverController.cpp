@@ -17,11 +17,8 @@ extern MCL theMCL;
 //for output
 int i=0;
 
-
-//hook
-bool triggered = false;
-int c = -1;
-BreakTimer clampTime(0.5,0.05);
+//for macro
+bool isMacroOn = false;
 
 //callbacks
 
@@ -33,27 +30,80 @@ void intakeBackward() {
   Assistant.intakeRev();
 }
 
-void toggleProp() {
-  Prop.set(!Prop.value());
+void toggleLoader() {
+  Loader.set(!Loader.value());
 }
 
-void toggleHook() {
-  if(!triggered) {
-    Hook.set(!Hook.value());
-    if(Hook.value()) {
-      Assistant.intakeStop();
-      Assistant.intakeRev();
-      c = 30;
-    }
+void wingOn() {
+  Wing.set(true);
+}
+
+void wingOff() {
+  if(isMacroOn) {
+    return;
   }
-  triggered = false;
+  Wing.set(false);
 }
 
-void runEndgame() {
-  Endgame.set(!Endgame.value());
+void trapdoor() {
+  Assistant.trapdoorScore();
 }
 
-void toggleColorSort() {
+void trapdoorMid() {
+  Assistant.trapdoorMidScore();
+}
+
+bool isBPressed() {
+  return Controller1.ButtonB.pressing();
+}
+
+int t = 0; // set to time * 10 in ms
+bool timeLimit() {
+  t--;
+  return t == -1;
+}
+
+bool cancelMacroOrTimeLimit() {
+  return isBPressed() || timeLimit();
+}
+
+bool breakFuncAndTimedLoader() {
+  if(t == 45) {
+    Loader.set(true);
+  }
+  return cancelMacroOrTimeLimit();
+}
+
+void forceTimeBreak() {
+  t = 0;
+}
+
+void wingAndForceBreak() {
+  forceTimeBreak();
+  Wing.set(false);
+}
+
+bool earlyRotateBreak() {
+  return (theTracker.getHeading() < 90);
+}
+
+void macro() {
+  isMacroOn = true;
+
+  double heading = theTracker.getHeading();
+  t = 75;
+  Auton.DriveStraight(8,heading,50,30,true,cancelMacroOrTimeLimit,forceTimeBreak,5.5);
+  t = 75;
+  Auton.DriveStraight(-5,heading+50,40,30,true,cancelMacroOrTimeLimit,forceTimeBreak,1.5);
+  t = 75;
+  Auton.DriveStraight(-30,heading-40,50,30,true,cancelMacroOrTimeLimit,wingAndForceBreak,3);
+  t = 30;
+  Auton.DriveStraight(-30,heading-5,60,30,true,cancelMacroOrTimeLimit,forceTimeBreak,4);
+
+  isMacroOn = false;
+}
+
+/*void toggleColorSort() {
   Assistant.toggleSort();
 }
 
@@ -64,63 +114,7 @@ void toggleStallCode() {
 void toggleColorSortAndStallCode() {
   toggleColorSort();
   toggleStallCode();
-}
-
-void armToggle() {
-  Assistant.toggleArm();
-}
-
-void armScore() {
-  Assistant.scoreArm();
-}
-
-void toggleDoinker() {
-  if(Doinker.value()) {
-    DoinkerClaw.set(false);
-  }
-  Doinker.set(!Doinker.value());
-}
-
-void toggleDoinkerClaw() {
-  DoinkerClaw.set(!DoinkerClaw.value());
-}
-
-int x = 0;
-bool antiStall() {
-  x++;
-  return x > 100;
-}
-
-void wallstakeMacro() {
-  /*if(autonMode != 7) {
-    return;
-  }*/
-  Assistant.setArmMode(129);
-  Assistant.intakeStop();
-  Assistant.intakeFwd();
-  Assistant.scheduleIntakeStop();
-}
-
-void moveForward() {
-  if(autonMode == 7) {
-    Auton.DriveStraight(1);
-    Assistant.intakeStop();
-    wait(15,msec);
-    Assistant.intakeFwd();
-  }
-}
-
-bool hookChecking() {
-  return Hook.value();
-}
-
-void hookOn() {
-  Hook.set(true);
-}
-
-bool quickBreak() {
-  return theTracker.getY() > 14.5;
-}
+}*/
 
 DriverController::DriverController() {}
 
@@ -129,47 +123,41 @@ void DriverController::Run(vex::competition Competition) {
 
   Controller1.ButtonR1.pressed(intakeForward);
   Controller1.ButtonR2.pressed(intakeBackward);
-  Controller1.ButtonL1.released(toggleHook);
-  //Controller1.ButtonL2.pressed(toggleProp);
-  //Controller1.ButtonUp.pressed(runEndgame);
-  Controller1.ButtonDown.pressed(toggleColorSortAndStallCode);
-  Controller1.ButtonY.pressed(armScore);
-  Controller1.ButtonB.pressed(armToggle);
-  Controller1.ButtonRight.pressed(toggleDoinker);
-  //Controller1.ButtonL2.pressed(toggleDoinkerClaw);
-  Controller1.ButtonUp.pressed(moveForward);
-  Controller1.ButtonL2.pressed(wallstakeMacro);
+  Controller1.ButtonL1.pressed(wingOff);
+  Controller1.ButtonL1.released(wingOn);
+  Controller1.ButtonL2.pressed(toggleLoader);
+  //Controller1.ButtonDown.pressed(toggleColorSortAndStallCode);
+  Controller1.ButtonY.pressed(trapdoor);
+  Controller1.ButtonRight.pressed(trapdoorMid); // consider adding autoreset
+  Controller1.ButtonDown.pressed(macro); // ButtonB is cancel
 
   theTracker.Start();
-  Auton.Init(24,24,90);
-  theMCL.Start(); //takes pos from tracker
+  Auton.Init(64,15.375,180); // used to be 90
+  theMCL.Start(); //takes pos from tracker. CURRENTLY NOT USED BY AUTO
 
-  Doinker.set(false);
+  Wing.set(true);
 
   if(autonMode == 7) {
     while(Inertial.isCalibrating()) {
       wait(50,msec);
     }
-    Auton.Init(72,9.75,90);
     Assistant.intakeFwd();
-    Assistant.toggleSort();
-    Auton.DriveStraight(1);
-    Auton.DriveStraight(9,90,100,100,true,quickBreak);
-    Auton.DriveArc(85,21,false);
-    Auton.DriveStraight(-5,361,100,15,true,hookChecking,hookOn,3);
-    Auton.Output(100,-100);
-    while(theTracker.getHeading()>155) {
-      wait(10,msec);
-    }
-    Auton.Output(100,60);
-    wait(10,msec);
+    t = 120; // 125, 60
+    Auton.DriveStraight(50,180,62,62,true,breakFuncAndTimedLoader);
+    wait(200,msec);
+    Loader.set(false);
+    wait(200,msec);
+    Auton.RotateTo(75,earlyRotateBreak);
+    /*Auton.DriveStraight(3,180);
+    Auton.RotateTo(90);
+    //Loader.set(true);
+    Auton.StopMotors();*/
+    // skills start macro
   }
-
-  /*if(autonMode == 1 || autonMode == 2 || autonMode == 4 || autonMode == 5) {
-    Arm.setPosition(fmax(Arm.position(degrees),0),degrees);
-  }*/
-  while (true) {
-    RunDriveTrain();
+  while(true) {
+    if(!isMacroOn) {
+      RunDriveTrain();
+    }
     /*if(i==90) {
       Brain.Screen.clearLine();
     }
@@ -193,14 +181,14 @@ void DriverController::Run(vex::competition Competition) {
     //std::cout<<theTracker.getX()<<", "<<theTracker.getY()<<", "<<theTracker.getHeading()<<"\n";
     if(i%50==0) {
       std::cout<<theTracker.getX()<<", "<<theTracker.getY()<<", "<<theMCL.getX(true)<<", "<<theMCL.getY(true)<<std::endl;
-      std::cout<<theTracker.getAxial()<<" "<<Distance.objectDistance(inches)<<std::endl;
-      
+      //std::cout<<theTracker.getAxial()<<" "<<Distance.objectDistance(inches)<<std::endl; 
     }
     if(i%2==0) {
+      //std::cout<<IntakeA.velocity(vex::percentUnits::pct)<<std::endl;
       //std::cout<<Brain.Timer.time(msec)<<", "<<theTracker.getAxial()<<", "<<theTracker.getHeading()<<", "<<Distance.objectDistance(inches)<<std::endl;
     }
     i = (i+1)%100;
-    vex::task::sleep(10);
+    vex::task::sleep(10); 
   }
 }
 
@@ -218,22 +206,5 @@ void DriverController::RunDriveTrain() {
   } else {
     RightDrive.spin(vex::forward, 3 * (forward - turn) / 25.0, vex::voltageUnits::volt);
     LeftDrive.spin(vex::forward, 3 * (forward + turn) / 25.0, vex::voltageUnits::volt);
-  }
-}
-
-void DriverController::RunHook() {
-  if(c>=0) {
-    c--;
-    if(c==0) {
-      Assistant.intakeStop();
-    }
-  }
-
-  /*double dist = Distance.objectDistance(vex::distanceUnits::mm);
-  if(dist > 65 && dist < 75 && !Hook.value() && Controller1.ButtonL1.pressing()) {*/
-  if(clampTime.update(1 - (HookLimit.pressing() && Controller1.ButtonL1.pressing()), 0.005)) {
-    clampTime.reset();
-    toggleHook();
-    triggered = true;
   }
 }

@@ -21,8 +21,8 @@
 
 using namespace vex;
 
-const int ofs = 1; //goal side
-const int def = 2; //ring side
+const int ofs = 1; //upper midgoal side
+const int def = 2; //lower midgoal side
 const int solo = 3;//solo
 const int ofs2 = 4; //1-3 are red, 4-6 are blue
 const int def2 = 5;
@@ -30,7 +30,7 @@ const int solo2 = 6;
 const int ski = 7;
 const int tests = 8;
 
-int autonMode = ofs; // change this for different autons
+int autonMode = ski; // change this for different autons
 
 double setRotation = 0;
 
@@ -41,7 +41,7 @@ vex::competition Competition;
 Assist Assistant(abs(autonMode-5) <= 1);
 Tracker theTracker(LeftDrive, RightDrive, Inertial, Axial, Axial2, Lateral, Assistant.isMirrored());
 
-Sensor distSensor(1.9, -5.7, 270); // dx and dy assuming robot is at 0 deg (aka +dx is front of robot)
+Sensor distSensor(2, 6.75, 90); // dx and dy assuming robot is at 0 deg (aka +dx is front of robot)
 MCL theMCL(theTracker, 500, distSensor);
 
 RobotController Auton(LeftDrive, RightDrive, theTracker);
@@ -86,25 +86,22 @@ void preAutonomous(void) {
   Axial.setdatarate(10);
   Lateral.setdatarate(10);
   Axial2.setdatarate(10);
-  ArmRot.setdatarate(10);
   
   LeftDrive.resetPosition();
   RightDrive.resetPosition();
   IntakeA.resetPosition();
   IntakeB.resetPosition();
-  IntakeRot.resetPosition();
   Axial.resetPosition();
   Lateral.resetPosition();
-  Arm.resetPosition();
-  ArmRot.resetPosition();
   Optical.gestureDisable();//Optical.gestureEnable();
   Optical.setLightPower(50);
 
-  Prop.set(true);
-  Hook.set(false);
-  Endgame.set(false);
-  Doinker.set(false);
-  DoinkerClaw.set(false);
+  if(!Axial.installed()) { std::cout<<"Warning: Axial sensor not installed"<<std::endl; }
+
+  Wing.set(false);
+  Loader.set(false);
+  TrapdoorA.set(true);
+  TrapdoorB.set(false);
 
   Inertial.calibrate();
   while(Inertial.isCalibrating()) {

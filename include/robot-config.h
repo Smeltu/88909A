@@ -18,10 +18,6 @@ extern motor_group RightDrive;
 extern motor IntakeA;
 extern motor IntakeB;
 extern motor_group Intake;
-extern rotSub IntakeRot;
-
-extern motor Arm;
-extern rotSub ArmRot;
 
 extern inertial Inertial;
 extern rotSub Axial;
@@ -31,13 +27,10 @@ extern controller Controller1;
 extern optical Optical;
 extern distance Distance;
 
-extern digital_out Hook;
-extern digital_out Prop;
-extern digital_out Doinker;
-extern digital_out Endgame;
-extern digital_out DoinkerClaw;
-
-extern limit HookLimit;
+extern digital_out Loader;
+extern digital_out Wing;
+extern digital_out TrapdoorA;
+extern digital_out TrapdoorB;
 
 
 /**

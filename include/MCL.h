@@ -158,6 +158,14 @@ public:
         return adjustedDeadReckoning.y;
     }
 
+    void setOdomX(double x) {
+        adjustedDeadReckoning.x = x;
+    }
+
+    void setOdomY(double y) {
+        adjustedDeadReckoning.y = y;
+    }
+
     const std::vector<Pose> &getParticles() const { return particles; }
 };
 
