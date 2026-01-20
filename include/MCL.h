@@ -2,6 +2,7 @@
 #define __MCL__
 
 #include "Tracker.h"
+#include <iostream>
 #include <vector>
 #include <cmath>
 #include <random>
@@ -160,10 +161,29 @@ public:
 
     void setOdomX(double x) {
         adjustedDeadReckoning.x = x;
+        for (auto &p : particles) p.x = x;
     }
 
     void setOdomY(double y) {
         adjustedDeadReckoning.y = y;
+        for (auto &p : particles) p.y = y;
+    }
+
+    void setTrackerToMCL() {                                                                                                             
+        Pose est = estimatePose();                                                                                                                                                                                                       
+        double varX = 0.0, varY = 0.0;                                                                                                   
+        for (auto &p : particles) {                                                                                                      
+            double dx = p.x - est.x;                                                                                                     
+            double dy = p.y - est.y;                                                                                                     
+            varX += p.weight * dx * dx;                                                                                                  
+            varY += p.weight * dy * dy;                                                                                                  
+        }                                                                                                                                
+                                                                                                                                         
+        const double threshold = 50.0; //arbitrary                                                              
+        if (varX <= threshold && varY <= threshold) {  
+            std::cout << "passed MCL confidence threshold" << std::endl;                                                                                  
+            tracker.set(adjustedDeadReckoning.x, adjustedDeadReckoning.y, tracker.getHeading());                                         
+        }                                                                                                                                
     }
 
     const std::vector<Pose> &getParticles() const { return particles; }

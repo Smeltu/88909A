@@ -91,6 +91,11 @@ void reverseIntake() {
   Assistant.intakeRev();
 }
 
+void catchBall() {
+  Loader.set(!Loader.value());
+  Assistant.intakeStop();
+}
+
 void offensive() {
   Auton.Init(59,24.5,90);
   Wing.set(true);
@@ -190,21 +195,82 @@ void skills() {
   x = 120;
   Auton.DriveStraight(50,180,62,62,true,timeLim);
   wait(400,msec);
+  runLoader();//added
   x = 50;
-  Auton.DriveStraight(-5,180,20,20,true,timeLim);;
+  Auton.DriveStraight(-5,180,20,20,true,timeLim);
   Auton.Output(-15,-15);
   wait(800,msec);
+  runLoader();//added
   Assistant.intakeStop();
   wait(400,msec);
   theTracker.set(55.5,theTracker.getY());
   theMCL.setOdomX(55.5);
-  theMCL.setOdomY(theTracker.getY());
+  theMCL.setOdomY(theTracker.getY()); //TODO: set using distance sensor
   Loader.set(false);
-  Auton.DriveStraight(8,140,100,15,true);
-  Auton.RotateTo(60);
-  Auton.DriveStraight(24,60,100,15,true);
+  Auton.DriveStraight(17,120,100,15,true); //8, 140
+  Auton.RotateTo(83); //60
+  Auton.DriveStraight(20,83,100,15,true);
+  Assistant.intakeFwd();
+  Auton.DriveStraight(-5, 83, 30, 20, true,__null,catchBall,4);//runLoader
+  Auton.DriveStraight(16,83,100,15,true);//,__null,stopIntake,5); //7.5, , , , true, ,stopIntake
+  Auton.DriveStraight(-8.5,83,100,15,true);
+  //Loader.set(true);
+  //Auton.DriveStraight(6,83,70,15,true,__null,stopIntake,3);
+  Auton.RotateTo(225);
+  x = 100;
+  Auton.DriveStraight(-22.5,225,100,15,true,timeLim,forceBreak,21.5);
+  scoreMid();
+  wait(1800,msec);
+  Loader.set(false);
+  Assistant.trapdoorScore();
+  wait(70,msec);
+  Auton.DriveStraight(22,225,100,15,true);
+  Auton.RotateTo(90);
+  theMCL.Start();
+  //std::cout << "mcl running: " << theMCL.Running() << std::endl;
+  wait(200,msec); //longer?
   std::cout<<theTracker.getX()<<", "<<theTracker.getY()<<", "<<theMCL.getX()<<", "<<theMCL.getY()<<std::endl;
+  theMCL.setTrackerToMCL();
+  theMCL.Stop();
+  Auton.RotateTo(228);
+  runLoader();
+  Auton.DriveStraight(35,228,100,15,true,__null,runIntake,5);
+  Auton.RotateTo(270); //Auton.DriveStraight(8,270,70,15,true);
   
+  //inconsistent from here
+  Auton.Output(100,100);
+  wait(300,msec);
+  Auton.Output(50,50);
+  wait(1500,msec);
+  Auton.DriveStraight(-8,270,100,15,true);
+  Auton.DriveStraight(-8,135,100,15,true,__null,runLoader,3);
+  theMCL.Start(); //Auton.DriveStraight(24,90,100,15,true);
+  std::cout<<theTracker.getX()<<", "<<theTracker.getY()<<", "<<theMCL.getX()<<", "<<theMCL.getY()<<std::endl;
+  theMCL.setTrackerToMCL();
+  theMCL.Stop();
+
+  //basically untested 
+  /*Auton.DriveStraight(78,90,100,15,true);
+  Auton.DriveStraight(12,45,100,15,true);
+  Auton.Output(100,100);
+  wait(300,msec);
+  Auton.Output(50,50);
+  wait(1500,msec);
+  Auton.DriveStraight(-8,90,100,15,true);
+  Auton.RotateTo(0);
+  Assistant.intakeRev;
+  x = 120;
+  Auton.DriveStraight(50,180,62,62,true,timeLim);
+  wait(400,msec);
+  x = 50;
+  Auton.DriveStraight(-5,180,20,20,true,timeLim);
+  Auton.Output(-15,-15);
+  wait(800,msec);
+  Assistant.intakeStop();
+  */
+  
+  std::cout<<theTracker.getX()<<", "<<theTracker.getY()<<", "<<theMCL.getX()<<", "<<theMCL.getY()<<std::endl;
+
   while(true) {
     wait(1000,msec);
   }
