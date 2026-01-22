@@ -190,43 +190,53 @@ void soloAWP2() {
 }
 
 void skills() {
-  Auton.Init(64,15.375,180);
+  Auton.Init(64,7,180); //15.375,180);
+  runLoader();
+  Wing.set(true);
   Assistant.intakeFwd();
-  x = 120;
-  Auton.DriveStraight(50,180,62,62,true,timeLim);
-  wait(400,msec);
-  runLoader();//added
+  Auton.DriveStraight(-4.5,180,70,15,true);
+  x = 180;//150;//120;
+  Auton.DriveStraight(50,180,42,42,true,timeLim,runLoader,3);
   x = 50;
-  Auton.DriveStraight(-5,180,20,20,true,timeLim);
-  Auton.Output(-15,-15);
+  runLoader();
+  Auton.DriveStraight(-3.5,180,60,15,true,timeLim);
+  x = 100;
+  Auton.DriveStraight(50,180,40,40,true,timeLim,runLoader,3);
+  Auton.Output(40,40);
+  wait(400,msec);
+  Auton.Output(30,30);
   wait(800,msec);
-  runLoader();//added
+  
+  x = 50;
+  Auton.DriveStraight(-10,180,70,20,true,timeLim);
+  Auton.Output(-20,-20);
+  wait(400,msec);
   Assistant.intakeStop();
   wait(400,msec);
-  theTracker.set(55.5,theTracker.getY());
-  theMCL.setOdomX(55.5);
-  theMCL.setOdomY(theTracker.getY()); //TODO: set using distance sensor
+  theTracker.set(55.5,Distance.objectDistance(inches) + 5.9);
+  theMCL.Start();
   Loader.set(false);
-  Auton.DriveStraight(17,120,100,15,true); //8, 140
+  Auton.DriveStraight(18,120,100,15,true); //8, 140
   Auton.RotateTo(83); //60
   Auton.DriveStraight(20,83,100,15,true);
   Assistant.intakeFwd();
   Auton.DriveStraight(-5, 83, 30, 20, true,__null,catchBall,4);//runLoader
-  Auton.DriveStraight(16,83,100,15,true);//,__null,stopIntake,5); //7.5, , , , true, ,stopIntake
+  Auton.DriveStraight(14,83,100,15,true);//,__null,stopIntake,5); //7.5, , , , true, ,stopIntake
   Auton.DriveStraight(-8.5,83,100,15,true);
-  //Loader.set(true);
-  //Auton.DriveStraight(6,83,70,15,true,__null,stopIntake,3);
   Auton.RotateTo(225);
-  x = 100;
-  Auton.DriveStraight(-22.5,225,100,15,true,timeLim,forceBreak,21.5);
+  x = 200;
+  Auton.DriveStraight(-20,225,100,15,true,timeLim,forceBreak,21.5);
+  Auton.Output(-25,-25);
+  wait(500,msec);
   scoreMid();
   wait(1800,msec);
   Loader.set(false);
+  Assistant.resetTrapdoor();
   Assistant.trapdoorScore();
   wait(70,msec);
   Auton.DriveStraight(22,225,100,15,true);
   Auton.RotateTo(90);
-  theMCL.Start();
+  Assistant.resetTrapdoor();
   //std::cout << "mcl running: " << theMCL.Running() << std::endl;
   wait(200,msec); //longer?
   std::cout<<theTracker.getX()<<", "<<theTracker.getY()<<", "<<theMCL.getX()<<", "<<theMCL.getY()<<std::endl;
@@ -234,16 +244,44 @@ void skills() {
   theMCL.Stop();
   Auton.RotateTo(228);
   runLoader();
-  Auton.DriveStraight(35,228,100,15,true,__null,runIntake,5);
+  Assistant.intakeStop();
+  Auton.DriveStraight(34.5,228,100,15,true,__null,runIntake,5);
   Auton.RotateTo(270); //Auton.DriveStraight(8,270,70,15,true);
+  Auton.Output(30,30);
+  wait(2600,msec);
+  Auton.DriveStraight(-6,270,100,15,true,__null,runLoader,3);
+  Assistant.intakeStop();
+  Auton.RotateTo(300);
+  Auton.DriveStraight(-19,320,100,15,true);
+  Auton.RotateTo(270);
+  Auton.DriveStraight(-80,270,100,15,true);
+
+  theMCL.setTrackerToMCL();
+  Auton.Goto(24,theMCL.getY());
+  Auton.RotateTo(90);
+  x = 100;
+  Auton.DriveStraight(-12,90,70,15,true,timeLim);
+  Auton.Output(-10,-10);
+  Assistant.trapdoorScore();
+  wait(2000,msec);
+  Assistant.resetTrapdoor();
+  Loader.set(true);
+  Auton.DriveStraight(16,90,100,15,true);
+  Auton.Output(30,30);
+  wait(2600,msec);
+  Auton.DriveStraight(-6,90,100,15,true,__null,runLoader,3);
+  Assistant.intakeStop();
+  Auton.RotateTo(30);
+  Auton.DriveStraight(15,30);
+  x = 300;
+  Auton.DriveStraight(20,0,45,45,false,timeLim,runLoader,10);
   
-  //inconsistent from here
-  Auton.Output(100,100);
-  wait(300,msec);
-  Auton.Output(50,50);
-  wait(1500,msec);
-  Auton.DriveStraight(-8,270,100,15,true);
-  Auton.DriveStraight(-8,135,100,15,true,__null,runLoader,3);
+
+  theMCL.setTrackerToMCL();
+
+
+  
+  /*//inconsistent from here
   theMCL.Start(); //Auton.DriveStraight(24,90,100,15,true);
   std::cout<<theTracker.getX()<<", "<<theTracker.getY()<<", "<<theMCL.getX()<<", "<<theMCL.getY()<<std::endl;
   theMCL.setTrackerToMCL();

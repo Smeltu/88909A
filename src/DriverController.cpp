@@ -132,7 +132,7 @@ void DriverController::Run(vex::competition Competition) {
   Controller1.ButtonDown.pressed(macro); // ButtonB is cancel
 
   theTracker.Start();
-  Auton.Init(64,15.375,180); // used to be 90
+  Auton.Init(64,7,180); // used to be 90
   theMCL.Start(); //takes pos from tracker. CURRENTLY NOT USED BY AUTO
 
   Wing.set(true);
@@ -141,13 +141,20 @@ void DriverController::Run(vex::competition Competition) {
     while(Inertial.isCalibrating()) {
       wait(50,msec);
     }
+    toggleLoader();
     Assistant.intakeFwd();
-    t = 120; // 125, 60
-    Auton.DriveStraight(50,180,62,62,true,breakFuncAndTimedLoader);
-    wait(200,msec);
-    Loader.set(false);
-    wait(200,msec);
+    Auton.DriveStraight(-4.5,180,70,15,true);
+    t = 180;//150;//120;
+    Auton.DriveStraight(50,180,42,42,true,timeLimit,toggleLoader,3);
+    t = 50;
+    toggleLoader();
+    Auton.DriveStraight(-3.5,180,60,15,true,timeLimit);
+    t = 100;
+    Auton.DriveStraight(50,180,40,40,true,timeLimit,toggleLoader,3);
+    Auton.Output(67,67);
+    wait(500,msec);
     Auton.RotateTo(75,earlyRotateBreak);
+
     /*Auton.DriveStraight(3,180);
     Auton.RotateTo(90);
     //Loader.set(true);

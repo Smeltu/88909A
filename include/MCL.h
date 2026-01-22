@@ -180,9 +180,20 @@ public:
         }                                                                                                                                
                                                                                                                                          
         const double threshold = 50.0; //arbitrary                                                              
-        if (varX <= threshold && varY <= threshold) {  
-            std::cout << "passed MCL confidence threshold" << std::endl;                                                                                  
-            tracker.set(adjustedDeadReckoning.x, adjustedDeadReckoning.y, tracker.getHeading());                                         
+        if (varX <= threshold || varY <= threshold) {  
+            std::cout << "passed MCL confidence threshold" << std::endl;   
+            double tempX = adjustedDeadReckoning.x;
+            double tempY = adjustedDeadReckoning.y;
+            if(varX > threshold) {
+                tempX = tracker.getX();
+                std::cout << "skip X" << std::endl;
+            }
+            if(varY > threshold) {
+                tempY = tracker.getY();
+                std::cout << "skip Y" << std::endl;
+            }                                                                             
+            tracker.set(tempX, tempY, tracker.getHeading());    
+            std::cout << "new coords: " << tempX << ", " << tempY << std::endl;                                     
         }                                                                                                                                
     }
 

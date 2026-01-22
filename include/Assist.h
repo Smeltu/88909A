@@ -83,18 +83,24 @@ class Assist {
   }
 
   void trapdoorMidScore() {
-  if(TrapdoorA.value() && !TrapdoorB.value()) {
-    TrapdoorA.set(true);
-    TrapdoorB.set(true);
-    intakeStop();
-    intakeFwd();
-    setCounter(45);
-  } else {
+    if(TrapdoorA.value() && !TrapdoorB.value()) {
+      TrapdoorA.set(true);
+      TrapdoorB.set(true);
+      intakeStop();
+      intakeFwd();
+      setCounter(45);
+    } else {
+      TrapdoorA.set(true);
+      TrapdoorB.set(false);
+      setCounter(20);
+    }
+  }
+ 
+  void resetTrapdoor() {
     TrapdoorA.set(true);
     TrapdoorB.set(false);
     setCounter(20);
   }
-}
 
   void toggleSort() {
     if(colorSort == -1) {

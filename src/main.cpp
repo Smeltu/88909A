@@ -41,7 +41,7 @@ vex::competition Competition;
 Assist Assistant(abs(autonMode-5) <= 1);
 Tracker theTracker(LeftDrive, RightDrive, Inertial, Axial, Axial2, Lateral, Assistant.isMirrored());
 
-Sensor distSensor(2, 6.75, 90); // dx and dy assuming robot is at 0 deg (aka +dx is front of robot)
+Sensor distSensor(2, 5.9, 90); // dx and dy assuming robot is at 0 deg (aka +dx is front of robot)
 MCL theMCL(theTracker, 500, distSensor);
 
 RobotController Auton(LeftDrive, RightDrive, theTracker);
