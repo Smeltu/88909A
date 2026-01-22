@@ -92,10 +92,10 @@ public:
     }
 
     void initMap() {
-        segments.emplace_back(0,0,144,0);
-        segments.emplace_back(144,0,144,144);
-        segments.emplace_back(144,144,0,144);
-        segments.emplace_back(0,144,0,0);
+        segments.emplace_back(0.5,0.5,143.5,0.5);
+        segments.emplace_back(143.5,0.5,143.5,143.5);
+        segments.emplace_back(143.5,143.5,0.5,143.5);
+        segments.emplace_back(0.5,143.5,0.5,0.5);
 
         circles.emplace_back(24,2.5,2.5);
         segments.emplace_back(26.828,48,24,50.828);
@@ -135,18 +135,36 @@ public:
     bool Running() const { return running; }
 
     Pose estimatePose() const {
-        double sumX=0, sumY=0, sumW=0, sumSin, sumCos;
+        double sumX=0, sumY=0, sumW=0;
         for (auto &p : particles) {
             sumW += p.weight;
             sumX += p.x * p.weight;
             sumY += p.y * p.weight;
-            sumSin += sin(deg2rad(p.headingDeg)) * p.weight;
-            sumCos += cos(deg2rad(p.headingDeg)) * p.weight;
         }
 
-        if(sumW <= 0 || particles.size() == 0) return Pose();
+        if(sumW <= 0 || particles.size() == 0) return adjustedDeadReckoning;
 
-        return Pose(sumX/sumW, sumY/sumW, rad2deg(atan2(sumSin/sumW, sumCos/sumW)));
+        return Pose(sumX/sumW, sumY/sumW, particles.front().headingDeg);
+    }
+
+    double getVarX() {
+        double varX = 0.0;
+        Pose est = estimatePose();
+        for (auto &p : particles) {
+            double dx = p.x - est.x;
+            varX += p.weight * dx * dx;
+        }
+        return varX;
+    }
+
+    double getVarY() {
+        double varY = 0.0;
+        Pose est = estimatePose();
+        for (auto &p : particles) {
+            double dy = p.y - est.y;
+            varY += p.weight * dy * dy;
+        }
+        return varY;
     }
 
     double getX(bool weightedAverage = false) {
@@ -179,7 +197,8 @@ public:
             varY += p.weight * dy * dy;                                                                                                  
         }                                                                                                                                
                                                                                                                                          
-        const double threshold = 50.0; //arbitrary                                                              
+        const double threshold = 150.0; //arbitrary               
+        std::cout << "variances: " << varX << ", " << varY << std::endl;                                               
         if (varX <= threshold || varY <= threshold) {  
             std::cout << "passed MCL confidence threshold" << std::endl;   
             double tempX = adjustedDeadReckoning.x;
@@ -192,8 +211,10 @@ public:
                 tempY = tracker.getY();
                 std::cout << "skip Y" << std::endl;
             }                                                                             
-            tracker.set(tempX, tempY, tracker.getHeading());    
-            std::cout << "new coords: " << tempX << ", " << tempY << std::endl;                                     
+            tracker.set(tempX, tempY, 361);    
+            std::cout << "new coords: " << tempX << ", " << tempY << std::endl;       
+            /*lastAxial = 0;
+            lastLateral = 0;*/ // changed tracker instead                           
         }                                                                                                                                
     }
 

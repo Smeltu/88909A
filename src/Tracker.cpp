@@ -26,15 +26,16 @@ m_LastAngle(0) {}
 
 void Tracker::set(double setX, double setY, double setA) {
   SingleLock sl(m_Mutex);
-  double ang = ((setA == 361) ? getRotation() : setA);
-  m_Inertial.setRotation(ang, degrees);
-  m_SetRotation = ang;
-  setRotation = m_SetRotation;
-  
-  m_LastAngle = getRotation();
-  m_LastAxial = 0;
+  if(setA != 361) {
+    m_Inertial.setRotation(setA, degrees);
+    m_SetRotation = setA;
+    setRotation = m_SetRotation;
+    
+    m_LastAngle = getRotation();
+  }
+  /* m_LastAxial = 0;
   m_Axial.setPosition(0, degrees);
-  m_Axial2.setPosition(0, degrees);
+  m_Axial2.setPosition(0, degrees);*/
 
   m_X = setX;
   m_Y = setY;

@@ -155,11 +155,6 @@ void DriverController::Run(vex::competition Competition) {
     wait(500,msec);
     Auton.RotateTo(75,earlyRotateBreak);
 
-    /*Auton.DriveStraight(3,180);
-    Auton.RotateTo(90);
-    //Loader.set(true);
-    Auton.StopMotors();*/
-    // skills start macro
   }
   while(true) {
     if(!isMacroOn) {
@@ -187,8 +182,9 @@ void DriverController::Run(vex::competition Competition) {
     }*/
     //std::cout<<theTracker.getX()<<", "<<theTracker.getY()<<", "<<theTracker.getHeading()<<"\n";
     if(i%50==0) {
-      std::cout<<theTracker.getX()<<", "<<theTracker.getY()<<", "<<theMCL.getX(true)<<", "<<theMCL.getY(true)<<std::endl;
+      //std::cout<<theTracker.getX()<<", "<<theTracker.getY()<<", "<<theMCL.getX(true)<<", "<<theMCL.getY(true)<<std::endl;
       //std::cout<<theTracker.getAxial()<<" "<<Distance.objectDistance(inches)<<std::endl; 
+      std::cout<<theTracker.getRotation() - setRotation <<", "<<Axial.getPosition()<<", "<<Axial.position(degrees)<<std::endl;
     }
     if(i%2==0) {
       //std::cout<<IntakeA.velocity(vex::percentUnits::pct)<<std::endl;

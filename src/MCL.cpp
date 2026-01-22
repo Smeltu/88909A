@@ -9,14 +9,8 @@ void MCL::adjustDeadReckoning() {
 
     Pose est = estimatePose();
 
-    // weighted variance
-    double varX = 0.0, varY = 0.0;
-    for (auto &p : particles) {
-        double dx = p.x - est.x;
-        double dy = p.y - est.y;
-        varX += p.weight * dx * dx;
-        varY += p.weight * dy * dy;
-    }
+    double varX = getVarX();
+    double varY = getVarY();
 
     const double good = 50.0;
     const double bad  = 150.0;
@@ -102,6 +96,7 @@ void MCL::StepMCL() {
     }
 
     resampleParticles();
+    adjustDeadReckoning();
 }
 
 double MCL::expectedMeasurement(const Pose &p) const {
@@ -191,7 +186,6 @@ void MCL::resampleParticles() {
 }
 
 
-// likely add something to set tracker to MCL prediction when the calculated raydist is close to measured + low uncertainty
 int MCL::MCLThread(void *pVoid) {
     MCL *pThis = (MCL*) pVoid;
 
@@ -200,8 +194,8 @@ int MCL::MCLThread(void *pVoid) {
             pThis->UpdateParticles();
             task::sleep(10);
         }
+        std::cout<<Brain.Timer.time(msec)<<", "<<pThis->tracker.getAxial()<<", "<<pThis->tracker.getHeading()<<", "<<Distance.objectDistance(inches) << std::endl;/*", "<<pThis->tracker.getX()<<", "<<pThis->tracker.getY()<<", "<<pThis->getX()<<", "<<pThis->getY()<<std::endl;*/
         pThis->StepMCL();
-        vex::task::sleep(10);
     } while (pThis->Running());
 
     return 0;

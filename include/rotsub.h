@@ -13,12 +13,14 @@ class rotSub : public vex::rotation {
         double xOffset;
         double yOffset; 
         bool axial;
+        bool adjust;
     public:
-        rotSub(int32_t index, bool reverse = false, double xOff = 0, double yOff = 0, bool axi = true):
+        rotSub(int32_t index, bool reverse = false, double xOff = 0, double yOff = 0, bool axi = true, bool adj = false):
             rotation(index, reverse),
-            xOffset(xOff),
+            xOffset(xOff), // +dx towards front of bot, +dy towards left of bot
             yOffset(yOff),
-            axial(axi) {}
+            axial(axi),
+            adjust(adj) {}
 
         void setdatarate( uint32_t rate) {
             datarate(rate);
@@ -30,18 +32,16 @@ class rotSub : public vex::rotation {
 
         double getPosition() {
             double pos = position(vex::rotationUnits::deg);
-            if(xOffset == 0 && yOffset == 0) {
+            if(!adjust) {
                 return pos;
             }
-            double radius = ((getRotation() - setRotation) / 360.0) * (sqrt(xOffset*xOffset + yOffset*yOffset) * 2 * PI) / oDegreesToInches;
-            
-            if(axial) {
-                radius *= cos(atan(fabs(yOffset/xOffset))) * -1 * ((xOffset >= 0) * 2 - 1);
-            } else {
-                radius *= sin(atan(fabs(yOffset/xOffset))) * ((yOffset >= 0) * 2 - 1);
-            }
 
-            return (pos - radius);
+            double rotationOffset = (getRotation() - setRotation) * PI / 180.0;
+            if(axial) {
+                return (pos - rotationOffset * yOffset / oDegreesToInches);
+            } else {
+                return (pos - rotationOffset * xOffset / oDegreesToInches);
+            }
         }
 };
 

@@ -60,7 +60,7 @@ int RobotController::EventHandlingRoutine(void * pVoid) {
 
 void RobotController::Goto(double X, double Y, double AngleCalibrate, bool Forward, Trigger StopTrigger, Event positionEvent, double EventAngle, Event StraightMovingEvent, double EventDistance) {
   
-  std::cout << "Starting GoTo; Target: " << X << ", " << Y << std::endl;
+  //std::cout << "Starting GoTo; Target: " << X << ", " << Y << std::endl;
   
   // first step : rotate
   double x = m_Tracker.getX();
@@ -91,11 +91,11 @@ void RobotController::Goto(double X, double Y, double AngleCalibrate, bool Forwa
 void RobotController::RotateTo(double TargetAngle, Trigger StopTrigger, Event positionEvent /*=NULL*/ , double EventAngle /*= 0*/ ) {
   double angle = m_Tracker.getHeading();
   if (fabs(TargetAngle - angle) < 0.3) { // Don't rotate if less than 0.3 degree
-    std::cout << "RotateTo Skipped (Low Error)" << std::endl;
+    //std::cout << "RotateTo Skipped (Low Error)" << std::endl;
     return;
   }
   
-  std::cout << "Starting RotateTo; TargetAngle: " << TargetAngle << ", Current Angle: " << angle << std::endl;
+  //std::cout << "Starting RotateTo; TargetAngle: " << TargetAngle << ", Current Angle: " << angle << std::endl;
   
   double error = m_Tracker.angleError(TargetAngle);
   double lastError = error;
@@ -112,7 +112,7 @@ void RobotController::RotateTo(double TargetAngle, Trigger StopTrigger, Event po
     if(fabs(m_Tracker.getHeading() - EventAngle) < 10 && !eventHasTriggered && positionEvent != NULL) {
       positionEvent();
       eventHasTriggered = true;
-      std::cout<<"RotatingEvent"<<std::endl;
+      //std::cout<<"RotatingEvent"<<std::endl;
     }
 
     error = m_Tracker.angleError(TargetAngle);
@@ -122,7 +122,7 @@ void RobotController::RotateTo(double TargetAngle, Trigger StopTrigger, Event po
 
     if(StopTrigger != NULL) {
       if(StopTrigger()) {
-        std::cout<<"Stop Trigger; ";
+        //std::cout<<"Stop Trigger; ";
         break;
       }
     }
@@ -133,7 +133,7 @@ void RobotController::RotateTo(double TargetAngle, Trigger StopTrigger, Event po
     vex::task::sleep(10);
   }
 
-  std::cout << "RotateTo done; x: " << m_Tracker.getX() << " y: " << m_Tracker.getY() << " Error: " << m_Tracker.angleError(TargetAngle) << std::endl;
+  //std::cout << "RotateTo done; x: " << m_Tracker.getX() << " y: " << m_Tracker.getY() << " Error: " << m_Tracker.angleError(TargetAngle) << std::endl;
   StopMotors();
 }
 
@@ -145,7 +145,7 @@ void RobotController::DriveStraight(double inches, double targetHeading, double 
     targetHeading = m_Tracker.getHeading();
   }
 
-  std::cout << "Starting DriveStraight; Dist: " << inches << ", Heading: " << targetHeading << std::endl;
+  //std::cout << "Starting DriveStraight; Dist: " << inches << ", Heading: " << targetHeading << std::endl;
 
   //errors
   double headingError = m_Tracker.angleError(targetHeading);
@@ -184,17 +184,16 @@ void RobotController::DriveStraight(double inches, double targetHeading, double 
     //call StopTrigger
     if(StopTrigger != NULL) {
       if(StopTrigger()) {
-        std::cout<<"Stop Trigger; ";
+        //std::cout<<"Stop Trigger; ";
         break;
       }
     }
 
     //call StraightMovingEvent
     if(fabs(error) < eventDistanceToTarget && !eventHasTriggered) {
-      std::cout<<error<<std::endl;
       StraightMovingEvent();
       eventHasTriggered = true;
-      std::cout<<"StraightMovingEvent"<<std::endl;
+      //std::cout<<error<<", StraightMovingEvent"<<std::endl;
     }
 
     out = range(out, minSpeed, maxSpeed);
@@ -209,13 +208,13 @@ void RobotController::DriveStraight(double inches, double targetHeading, double 
     vex::task::sleep(10);
   }
 
-  std::cout <<"driveStraight done; x: " << m_Tracker.getX() << " y: " << m_Tracker.getY() << std::endl;
+  //std::cout <<"driveStraight done; x: " << m_Tracker.getX() << " y: " << m_Tracker.getY() << std::endl;
   if(minSpeed == maxSpeed) {Output(minSpeed,minSpeed);return;}
   StopMotors();
 }
 
 void RobotController::DriveArc(double X, double Y, bool Forward, double maxSpeed, double minSpeed, Trigger StopTrigger, Event positionEvent, double EventAngle, Event StraightMovingEvent, double EventDistance) {
-  std::cout << "Starting DriveArc; Target: " << X << ", " << Y << std::endl;
+  //std::cout << "Starting DriveArc; Target: " << X << ", " << Y << std::endl;
   double dx = X - m_Tracker.getX();
   double dy = Y - m_Tracker.getY();
   if(dx == 0 && dy == 0) {return;}
@@ -267,9 +266,8 @@ void RobotController::DriveArc(double X, double Y, bool Forward, double maxSpeed
 
     //wait
     vex::task::sleep(10);
-    //std::cout<<error<<" "<<out<<" "<<targetHeading<<std::endl;
   }
-  std::cout << "driveArc done; x: " << m_Tracker.getX() << " y: " << m_Tracker.getY() << std::endl;
+  // std::cout << "driveArc done; x: " << m_Tracker.getX() << " y: " << m_Tracker.getY() << std::endl;
   StopMotors();
 }
 
