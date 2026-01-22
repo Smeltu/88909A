@@ -177,12 +177,20 @@ public:
         return adjustedDeadReckoning.y;
     }
 
-    void setOdomX(double x) {
+    double getSensorX() {
+        return sensor.dx;
+    }
+
+    double getSensorY() {
+        return sensor.dy;
+    }
+
+    void setX(double x) {
         adjustedDeadReckoning.x = x;
         for (auto &p : particles) p.x = x;
     }
 
-    void setOdomY(double y) {
+    void setY(double y) {
         adjustedDeadReckoning.y = y;
         for (auto &p : particles) p.y = y;
     }

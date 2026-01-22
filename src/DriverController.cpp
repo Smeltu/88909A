@@ -183,8 +183,8 @@ void DriverController::Run(vex::competition Competition) {
     //std::cout<<theTracker.getX()<<", "<<theTracker.getY()<<", "<<theTracker.getHeading()<<"\n";
     if(i%50==0) {
       //std::cout<<theTracker.getX()<<", "<<theTracker.getY()<<", "<<theMCL.getX(true)<<", "<<theMCL.getY(true)<<std::endl;
-      //std::cout<<theTracker.getAxial()<<" "<<Distance.objectDistance(inches)<<std::endl; 
-      std::cout<<theTracker.getRotation() - setRotation <<", "<<Axial.getPosition()<<", "<<Axial.position(degrees)<<std::endl;
+      std::cout<<theTracker.getAxial()<<" "<<Distance.objectDistance(inches)<<std::endl; 
+      // std::cout<<theTracker.getRotation() - setRotation <<", "<<Axial.getPosition()<<", "<<Axial.position(degrees)<<std::endl;
     }
     if(i%2==0) {
       //std::cout<<IntakeA.velocity(vex::percentUnits::pct)<<std::endl;

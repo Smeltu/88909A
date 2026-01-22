@@ -96,6 +96,16 @@ void catchBall() {
   Assistant.intakeStop();
 }
 
+void matchLoadMacro() {
+  Loader.set(true);
+  Auton.Output(45,45);
+  wait(500,msec);
+  Auton.Output(-10,-10);
+  wait(100,msec);
+  Auton.Output(10,10);
+  wait(2000,msec);
+}
+
 void offensive() {
   Auton.Init(59,24.5,90);
   Wing.set(true);
@@ -212,18 +222,19 @@ void skills() {
   Auton.Output(-20,-20);
   wait(400,msec);
   Assistant.intakeStop();
-  wait(400,msec);
-  theTracker.set(55.5,Distance.objectDistance(inches) + 6.375);
+  wait(450,msec);
+  theTracker.set(55.5,Distance.objectDistance(inches) + theMCL.getSensorY() + 0.5);
   theMCL.Start();
 
+  // can maybe skip the forwards and backwards sequence
   Loader.set(false);
-  Auton.DriveStraight(18,120,100,15,true); //8, 140
+  Auton.DriveStraight(18.3,120,100,15,true); //8, 140
   Auton.RotateTo(83); //60
   Auton.DriveStraight(20,83,100,15,true);
   Assistant.intakeFwd();
   Auton.DriveStraight(-5, 83, 30, 20, true,__null,catchBall,4);//runLoader
   Auton.DriveStraight(14,83,100,15,true);
-  Auton.DriveStraight(-8.3,83,100,15,true); // 8.5
+  Auton.DriveStraight(-7.6,83,100,15,true); // 8.5
   Auton.RotateTo(225);
   x = 200;
   Auton.DriveStraight(-22,225,100,15,true,timeLim,forceBreak,21.5);
@@ -238,27 +249,19 @@ void skills() {
   Auton.DriveStraight(17,225,100,15,true);
   Assistant.resetTrapdoor();
 
-  /*Auton.RotateTo(90);
-  //std::cout << "mcl running: " << theMCL.Running() << std::endl;
-  wait(400,msec); //longer?
-  std::cout<<"Values: " << theTracker.getX()<<", "<<theTracker.getY()<<", "<<theMCL.getX()<<", "<<theMCL.getY()<<std::endl;
-  theMCL.setTrackerToMCL();
-  Auton.RotateTo(228);*/
-
+  // how to avoid balls making this get stuck?
   runLoader();
   Assistant.intakeStop();
-  Auton.DriveStraight(39.7,228,100,15,true,__null,runIntake,5); // 39.5
+  Auton.DriveStraight(39.8,227,100,15,true,__null,runIntake,5); // 39.5
 
-  Auton.RotateTo(270); //Auton.DriveStraight(8,270,70,15,true); // TODO: MAKE THIS A FUNC
-  Auton.Output(30,30);
-  wait(500,msec);
-  Auton.Output(20,20);
-  wait(2000,msec);
+  Auton.RotateTo(270);
+  matchLoadMacro();
   Auton.DriveStraight(-6,270,100,15,true,__null,runLoader,3);
 
+  // sequence can be sped up significantly
   Assistant.intakeStop();
   Auton.RotateTo(140);
-  Auton.DriveStraight(18,140,100,15,true);
+  Auton.DriveStraight(19,140,100,15,true);
   Auton.RotateTo(90);
   Auton.DriveStraight(65,90,100,15,true);
   Auton.DriveStraight(15,65,100,15,true);
@@ -267,28 +270,30 @@ void skills() {
   theMCL.setTrackerToMCL();
   wait(200,msec);
   std::cout<<"Final coords: " << theTracker.getX()<<", "<<theTracker.getY()<<", "<<theMCL.getX()<<", "<<theMCL.getY()<<std::endl;
-  
   Auton.Goto(24,theTracker.getY());
   Auton.RotateTo(90);
+
+  wait(100,msec); //stabilize
+  theMCL.setX(Distance.objectDistance(inches) + theMCL.getSensorY() + 0.5);
+  wait(200,msec);
   x = 100;
-  Auton.DriveStraight(-12,90,70,15,true,timeLim);
+  Auton.DriveStraight(-13,90-(theMCL.getX(true)-24)*5,50,15,true,timeLim); // correction since the two turns before this seem to offset us; i.e. if x > 24, aim <90 so that driving backwards puts you closer to 24
   Auton.Output(-10,-10);
   Assistant.trapdoorScore();
-  wait(2000,msec);
+  wait(8500,msec);
   Assistant.resetTrapdoor();
-  Loader.set(true);
+
   Auton.DriveStraight(16,90,100,15,true);
-  Auton.Output(25,25);
-  wait(500,msec);
-  Auton.Output(15,15);
-  wait(2000,msec);
+  matchLoadMacro();
   Auton.DriveStraight(-24,90,100,15,true,__null,runLoader,3);
+
   Assistant.intakeStop();
   Auton.Output(-15,-15);
   wait(300,msec);
   Assistant.trapdoorScore();
-
-
+  wait(1800,msec);
+  theMCL.setTrackerToMCL();
+  wait(100,msec);
 
    
   while(true) {

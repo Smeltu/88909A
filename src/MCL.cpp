@@ -194,7 +194,8 @@ int MCL::MCLThread(void *pVoid) {
             pThis->UpdateParticles();
             task::sleep(10);
         }
-        std::cout<<Brain.Timer.time(msec)<<", "<<pThis->tracker.getAxial()<<", "<<pThis->tracker.getHeading()<<", "<<Distance.objectDistance(inches) << std::endl;/*", "<<pThis->tracker.getX()<<", "<<pThis->tracker.getY()<<", "<<pThis->getX()<<", "<<pThis->getY()<<std::endl;*/
+        // std::cout<<Brain.Timer.time(msec)<<", "<<pThis->tracker.getAxial()<<", "<<pThis->tracker.getHeading()<<", "<<Distance.objectDistance(inches) << std::endl;
+        std::cout<<pThis->tracker.getX()<<", "<<pThis->tracker.getY()<<", "<<pThis->getX()<<", "<<pThis->getY()<<std::endl;
         pThis->StepMCL();
     } while (pThis->Running());
 
