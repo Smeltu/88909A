@@ -97,19 +97,19 @@ public:
         segments.emplace_back(143.5,143.5,0.5,143.5);
         segments.emplace_back(0.5,143.5,0.5,0.5);
 
-        circles.emplace_back(24,2.5,2.5);
+        circles.emplace_back(24,3,2.5);
         segments.emplace_back(26.828,48,24,50.828);
         segments.emplace_back(24,50.828,21.172,48);
 
-        circles.emplace_back(24,141.5,2.5);
+        circles.emplace_back(24,141,2.5);
         segments.emplace_back(26.828,96,24,93.172);
         segments.emplace_back(24,93.172,21.172,96);
 
-        circles.emplace_back(120,2.5,2.5);
+        circles.emplace_back(120,3,2.5);
         segments.emplace_back(117.172,48,120,50.828);
         segments.emplace_back(120,50.828,122.828,48);
 
-        circles.emplace_back(120,141.5,2.5);
+        circles.emplace_back(120,141,2.5);
         segments.emplace_back(117.172,96,120,93.172);
         segments.emplace_back(120,93.172,122.828,96);
 

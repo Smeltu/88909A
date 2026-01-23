@@ -102,7 +102,7 @@ void matchLoadMacro() {
   wait(500,msec);
   Auton.Output(-10,-10);
   wait(100,msec);
-  Auton.Output(10,10);
+  Auton.Output(21,21); //10,10
   wait(2000,msec);
 }
 
@@ -234,7 +234,7 @@ void skills() {
   Assistant.intakeFwd();
   Auton.DriveStraight(-5, 83, 30, 20, true,__null,catchBall,4);//runLoader
   Auton.DriveStraight(14,83,100,15,true);
-  Auton.DriveStraight(-7.6,83,100,15,true); // 8.5
+  Auton.DriveStraight(-7.6,83,100,15,true);
   Auton.RotateTo(225);
   x = 200;
   Auton.DriveStraight(-22,225,100,15,true,timeLim,forceBreak,21.5);
@@ -263,7 +263,9 @@ void skills() {
   Auton.RotateTo(140);
   Auton.DriveStraight(19,140,100,15,true);
   Auton.RotateTo(90);
+  std::cout<<theTracker.getRotation()<<std::endl;
   Auton.DriveStraight(65,90,100,15,true);
+  std::cout<<theTracker.getRotation()<<std::endl;
   Auton.DriveStraight(15,65,100,15,true);
   wait(100,msec);
   std::cout<<"Pre-MCL set values: " << theTracker.getX()<<", "<<theTracker.getY()<<", "<<theMCL.getX()<<", "<<theMCL.getY()<<std::endl;
@@ -280,7 +282,7 @@ void skills() {
   Auton.DriveStraight(-13,90-(theMCL.getX(true)-24)*5,50,15,true,timeLim); // correction since the two turns before this seem to offset us; i.e. if x > 24, aim <90 so that driving backwards puts you closer to 24
   Auton.Output(-10,-10);
   Assistant.trapdoorScore();
-  wait(8500,msec);
+  wait(2100,msec); //1800
   Assistant.resetTrapdoor();
 
   Auton.DriveStraight(16,90,100,15,true);
@@ -291,11 +293,78 @@ void skills() {
   Auton.Output(-15,-15);
   wait(300,msec);
   Assistant.trapdoorScore();
-  wait(1800,msec);
+  wait(2100,msec);
   theMCL.setTrackerToMCL();
   wait(100,msec);
 
-   
+  Auton.DriveStraight(14,90,80,15,true);
+  Auton.RotateTo(180);
+  wait(100,msec);
+  std::cout<<theTracker.getRotation()<<std::endl;
+  Auton.DriveStraight(-94,180,100,15,true);
+  std::cout<<theTracker.getRotation()<<std::endl;
+  wait(100,msec);
+  std::cout<<"Pre-MCL set values: " << theTracker.getX()<<", "<<theTracker.getY()<<", "<<theMCL.getX()<<", "<<theMCL.getY()<<std::endl;
+  theMCL.setTrackerToMCL();
+  wait(200,msec);
+
+  Auton.RotateTo(90);
+  runLoader();
+  Assistant.resetTrapdoor();
+  x = 100;
+  Auton.DriveStraight(16,90+(theMCL.getX(true)-120)*6,100,15,true,timeLim,forceBreak);
+  matchLoadMacro();
+  Auton.DriveStraight(-15,90,80,15,true);
+  
+  Assistant.intakeStop();
+  Loader.set(false);
+  Auton.RotateTo(300);
+  Auton.DriveStraight(20,300,100,15,true);
+  Auton.RotateTo(270);
+  std::cout<<theTracker.getRotation()<<std::endl;
+  Auton.DriveStraight(60,270,100,15,true);
+  std::cout<<theTracker.getRotation()<<std::endl;
+  Auton.DriveStraight(15,245,100,15,true);
+  wait(100,msec);
+  std::cout<<"Pre-MCL set values: " << theTracker.getX()<<", "<<theTracker.getY()<<", "<<theMCL.getX()<<", "<<theMCL.getY()<<std::endl;
+  theMCL.setTrackerToMCL();
+  wait(200,msec);
+  std::cout<<"Final coords: " << theTracker.getX()<<", "<<theTracker.getY()<<", "<<theMCL.getX()<<", "<<theMCL.getY()<<std::endl;
+  Auton.Goto(119.5,theTracker.getY());
+  Auton.RotateTo(270);
+
+  wait(100,msec); //stabilize
+  theMCL.setX(Distance.objectDistance(inches) + theMCL.getSensorY() + 0.5);
+  wait(200,msec);
+  x = 100;
+  Auton.DriveStraight(-13,270+(theMCL.getX(true)-120)*5,50,15,true,timeLim); // -13,90-(theMCL.getX(true)-24)*5,50,15,true,timeLim
+  wait(2100,msec); //1800
+  Assistant.resetTrapdoor();
+  
+  Auton.DriveStraight(16,90,100,15,true);
+  matchLoadMacro();
+  Auton.DriveStraight(-24,90,100,15,true,__null,runLoader,3);
+  
+  Assistant.intakeStop();
+  Auton.Output(-15,-15);
+  wait(300,msec);
+  Assistant.trapdoorScore();
+  wait(2100,msec);
+  theMCL.setTrackerToMCL();
+  wait(100,msec);
+
+  Assistant.intakeStop();
+  /*Auton.DriveStraight(14,100,80,15,true);
+  Auton.RotateTo(200);
+  Auton.DriveStraight(10,200,100,15,true);
+  Auton.RotateTo(180);
+  Auton.DriveStraight(24,180,90,15,true);
+  Auton.DriveStraight(-4.5,180,70,15,true);
+  x = 180;//150;//120;
+  Auton.DriveStraight(50,180,42,42,true,timeLim,runLoader,3);
+  */
+
+  std::cout<<"Final coords: " << theTracker.getX()<<", "<<theTracker.getY()<<", "<<theMCL.getX()<<", "<<theMCL.getY()<<std::endl;
   while(true) {
     wait(1000,msec);
   }
